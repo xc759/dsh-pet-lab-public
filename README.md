@@ -85,9 +85,17 @@ assets/characters/<角色名>/
 
 ## 体积与打包
 
-- 源码仓约 25 MB，`git clone` 后即可运行
-- 绿色包（PyInstaller onedir）约 60–90 MB，取决于是否包含 OCR 模型
-- 打包脚本与参数见 [docs/ONEDIR_PACKAGING.md](docs/ONEDIR_PACKAGING.md)
+实测数字（本仓库首版，Python 3.12 + PyInstaller onedir）：
+
+| 形态 | 体积 | 说明 |
+| --- | --- | --- |
+| 源码仓（`git clone` 后） | 约 17 MB / 802 文件 | 装完依赖即可 `python -m pet` |
+| 绿色包解压后 | 约 280 MB | PySide6 约 115 MB + 随包 ffmpeg 约 84 MB |
+| 分发压缩包（zip / deflate 最大压缩） | 约 119 MB | 系统自带解压即可 |
+| 分发压缩包（7z / LZMA2） | 约 78 MB | **推荐**，体积最小 |
+
+包体不含 OCR 模型（约 32 MB）与 PresentMon 二进制，缺失时对应功能自动降级。
+打包脚本与参数见 [docs/ONEDIR_PACKAGING.md](docs/ONEDIR_PACKAGING.md)。
 
 ---
 
