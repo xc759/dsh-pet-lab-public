@@ -1,13 +1,13 @@
-大肥鱼桌宠 · 绿色包（解压即用）
+微光桌宠 · 绿色包（解压即用）
 ================================
 
 一、怎么启动
 ------------
-双击 dsh-pet-standalone-webm-chat.exe 即可。不需要安装、不需要管理员权限、不写注册表。
-整个 dsh-pet-standalone-webm-chat 文件夹就是程序本体，可以放在任意位置（U 盘也行，
+双击 petwisp-webm-chat.exe 即可。不需要安装、不需要管理员权限、不写注册表。
+整个 petwisp-webm-chat 文件夹就是程序本体，可以放在任意位置（U 盘也行，
 但桌宠会读写用户数据，建议放本地磁盘）。
 
-首次启动会弹出「大肥鱼 · 首次设置」向导，三步都可跳过：
+首次启动会弹出「微光 · 首次设置」向导，三步都可跳过：
   1) 选角色（内置 demo，另会列出你自己放进数据目录的角色）
   2) 填考试日（用于成长档案里的倒计时，可留空）
   3) 配模型 Key（仅当本包带 AI 聊天时出现；填完即可对话，也可稍后在设置里填）
@@ -16,21 +16,21 @@
 
 二、你的数据在哪
 ----------------
-%APPDATA%\dsh-pet-standalone-webm-chat\
+%APPDATA%\petwisp-webm-chat\
   config.json          所有设置
   config-slot-N.json   多开（第二只及以后）的设置
   characters\          自己加的角色
   growth\              成长档案
   pet-*.log            每次启动的运行日志（排查问题时看这个）
 
-换机/重装：把整个 %APPDATA%\dsh-pet-standalone-webm-chat 目录拷到新机器同一位置，
+换机/重装：把整个 %APPDATA%\petwisp-webm-chat 目录拷到新机器同一位置，
 启动即是原来的样子（形象/考试日/模型 Key/成长档案都在）。不想拷就走首次设置向导重配。
 
 三、怎么卸载
 ------------
 1) 退出桌宠（托盘图标右键 → 退出）
-2) 删除 dsh-pet-standalone-webm-chat 文件夹
-3) 删除 %APPDATA%\dsh-pet-standalone-webm-chat
+2) 删除 petwisp-webm-chat 文件夹
+3) 删除 %APPDATA%\petwisp-webm-chat
 没有残留服务、没有计划任务、没有注册表项。
 
 

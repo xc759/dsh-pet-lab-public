@@ -19,7 +19,7 @@ pytest.importorskip("PySide6")
 import shiboken6  # noqa: E402
 from PySide6.QtWidgets import QApplication, QWidget  # noqa: E402
 
-from pet.screen_capture.host import WindowHider, visible_top_level_windows  # noqa: E402
+from petwisp.screen_capture.host import WindowHider, visible_top_level_windows  # noqa: E402
 
 
 @pytest.fixture

@@ -8,7 +8,7 @@
    重解（改前预热起播每圈多解一帧：~1.2ms + 一次线程往返）；
 3. 每新帧 sprite 恰好重建一次（渲染仍按新帧产出非空 pixmap）。
 
-计数探针绑在 ``pet.frameseq_clip`` 自己的 ``QPixmap`` / ``QImage`` 名字上
+计数探针绑在 ``petwisp.frameseq_clip`` 自己的 ``QPixmap`` / ``QImage`` 名字上
 （真实模块 seam），产品对象一律是真的。纪律同 tests/test_frameseq_clip.py：
 同步直调 ``_advance`` + 事件泵，不赌固定 sleep。
 
@@ -34,7 +34,7 @@ from PySide6.QtCore import QPointF, Qt
 from PySide6.QtGui import QImage, QPainter, QPixmap
 from PySide6.QtWidgets import QApplication
 
-from pet.pet_sprite import PetSprite
+from petwisp.pet_sprite import PetSprite
 
 app = QApplication.instance() or QApplication([])
 
@@ -70,7 +70,7 @@ class _Probe:
     """按模块绑定的帧路径探针：记录 fromImage 与"解一帧"。
 
     解码计数只认 ``root``（本用例 tmp_path）下的帧文件：探针绑的是
-    ``pet.frameseq_clip`` 的模块级 ``QImage`` 名字，而全量套件里别的用例
+    ``petwisp.frameseq_clip`` 的模块级 ``QImage`` 名字，而全量套件里别的用例
     泄漏的 clip 仍在自己的目录里解码，走的正是同一个名字——不设范围就会把
     外来的后台解码算进本用例的「每帧恰一次」。收窄的只有计数**范围**：
     本目录的帧仍必须逐帧恰好计一次（断言强度不变）。
@@ -103,7 +103,7 @@ class _Probe:
 
 @pytest.fixture
 def probe(monkeypatch, tmp_path):
-    from pet import frameseq_clip
+    from petwisp import frameseq_clip
     p = _Probe(frameseq_clip, tmp_path)
     p.install()
     return p
@@ -164,7 +164,7 @@ def _settle(clip):
 
 
 def _sprite_for(clip):
-    from pet import frameseq_clip
+    from petwisp import frameseq_clip
     assert isinstance(clip, frameseq_clip.FrameSeqClip)
     return PetSprite(_Library(clip), pos=QPointF(0, 0), scale=0.5)
 
@@ -174,7 +174,7 @@ def test_playback_decodes_each_frame_once_and_builds_no_pixmap(tmp_path, probe):
     """每帧恰解码一次 + 上屏零 QPixmap（预热起播：帧 0 不重复解码）。"""
     d = tmp_path / "clip"
     _make_frames(d)
-    from pet.frameseq_clip import FrameSeqClip
+    from petwisp.frameseq_clip import FrameSeqClip
     clip = FrameSeqClip(d)
     sprite = _sprite_for(clip)
     try:
@@ -201,7 +201,7 @@ def test_cold_bind_clip_decodes_frame_zero_once(tmp_path, probe):
     """冷起播（bind_clip 的 jumpToFrame(0) 同步首帧）：帧 0 也不重复解码。"""
     d = tmp_path / "clip"
     _make_frames(d)
-    from pet.frameseq_clip import FrameSeqClip
+    from petwisp.frameseq_clip import FrameSeqClip
     clip = FrameSeqClip(d)
     sprite = _sprite_for(clip)
     try:
@@ -218,7 +218,7 @@ def test_sprite_rebuilds_once_per_frame_from_current_image(tmp_path, probe):
     """每新帧 sprite 恰重建一次，且重建后命中图与帧缓冲不别名。"""
     d = tmp_path / "clip"
     _make_frames(d)
-    from pet.frameseq_clip import FrameSeqClip
+    from petwisp.frameseq_clip import FrameSeqClip
 
     class _CountingSprite(PetSprite):
         def __init__(self, *a, **kw):
@@ -248,7 +248,7 @@ def test_icon_consumer_builds_lazily_but_still_gets_same_frame(tmp_path, probe):
     """托盘/灵动岛消费者语义不变：按需构建、同帧缓存、换帧失效。"""
     d = tmp_path / "clip"
     _make_frames(d)
-    from pet.frameseq_clip import FrameSeqClip
+    from petwisp.frameseq_clip import FrameSeqClip
     clip = FrameSeqClip(d)
     try:
         clip.start()
@@ -283,7 +283,7 @@ def test_foreign_clip_decode_outside_tmp_path_is_not_counted(tmp_path, probe):
     """
     d = tmp_path / "clip"
     _make_frames(d)
-    from pet.frameseq_clip import FrameSeqClip
+    from petwisp.frameseq_clip import FrameSeqClip
 
     with tempfile.TemporaryDirectory(prefix="frame_probe_foreign_") as foreign_dir:
         foreign = Path(foreign_dir)

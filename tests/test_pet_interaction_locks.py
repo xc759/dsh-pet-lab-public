@@ -10,9 +10,9 @@ from PySide6.QtCore import QEvent, QObject, QPoint, QPointF, QRect, Qt, Signal
 from PySide6.QtGui import QFocusEvent, QKeyEvent, QMouseEvent, QPixmap
 from PySide6.QtWidgets import QApplication, QWidget
 
-from pet import catalog
-from pet.config import Config
-from pet.window import PetWindow
+from petwisp import catalog
+from petwisp.config import Config
+from petwisp.window import PetWindow
 
 NAMES = [
     catalog.IDLE,
@@ -222,7 +222,7 @@ def _single_screen_desktop(monkeypatch):
     绕过假屏、把窗口钳到真实桌面，导致「按住 SHIFT 应可拖动」这类断言在带缩放/
     多显示器桌面上必红。
     """
-    from pet import window_placement
+    from petwisp import window_placement
 
     monkeypatch.setattr(window_placement, "desktop_area", lambda: None)
 
@@ -382,8 +382,8 @@ def test_tray_menu_syncs_mouse_through_from_config(tmp_path):
     from PySide6.QtGui import QPixmap
     from PySide6.QtWidgets import QApplication, QWidget
 
-    from pet.app import AppShell
-    from pet.config import Config
+    from petwisp.app import AppShell
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     config = Config(tmp_path)
@@ -439,9 +439,9 @@ def test_drag_does_not_play_click_sound_but_click_does(app, tmp_path, monkeypatc
     win = _make_win(app, tmp_path)
     press_calls = []
     release_calls = []
-    monkeypatch.setattr("pet.window.resolve_click_sound_pair", lambda pack, data_dir=None: (Path("press.wav"), Path("release.wav")))
-    monkeypatch.setattr("pet.window.play_press_sound", lambda pair, volume: press_calls.append((pair, volume)))
-    monkeypatch.setattr("pet.window.play_release_sound", lambda pair, volume: release_calls.append((pair, volume)))
+    monkeypatch.setattr("petwisp.window.resolve_click_sound_pair", lambda pack, data_dir=None: (Path("press.wav"), Path("release.wav")))
+    monkeypatch.setattr("petwisp.window.play_press_sound", lambda pair, volume: press_calls.append((pair, volume)))
+    monkeypatch.setattr("petwisp.window.play_release_sound", lambda pair, volume: release_calls.append((pair, volume)))
 
     # 拖动：按下 -> 超过阈值移动 -> 松手，不应触发任何点击音效
     start = win.pos()
@@ -468,9 +468,9 @@ def test_click_sound_pair_is_cleared_when_resolution_fails(app, tmp_path, monkey
     release_calls = []
     pair_a = (Path("press-a.wav"), Path("release-a.wav"))
     current_pair = [pair_a]
-    monkeypatch.setattr("pet.window.resolve_click_sound_pair", lambda pack, data_dir=None: current_pair[0])
-    monkeypatch.setattr("pet.window.play_press_sound", lambda pair, volume: press_calls.append(pair))
-    monkeypatch.setattr("pet.window.play_release_sound", lambda pair, volume: release_calls.append(pair))
+    monkeypatch.setattr("petwisp.window.resolve_click_sound_pair", lambda pack, data_dir=None: current_pair[0])
+    monkeypatch.setattr("petwisp.window.play_press_sound", lambda pair, volume: press_calls.append(pair))
+    monkeypatch.setattr("petwisp.window.play_release_sound", lambda pair, volume: release_calls.append(pair))
 
     # 第一次点击：解析成功，播放 pair_a
     win.mousePressEvent(_press(QPointF(10, 10), QPointF(200, 200)))
@@ -517,11 +517,11 @@ def test_edge_probe_click_does_not_play_click_sound(app, tmp_path, monkeypatch):
     press_calls = []
     release_calls = []
     pair = (Path("press.wav"), Path("release.wav"))
-    monkeypatch.setattr("pet.window.resolve_click_sound_pair",
+    monkeypatch.setattr("petwisp.window.resolve_click_sound_pair",
                         lambda pack, data_dir=None: pair)
-    monkeypatch.setattr("pet.window.play_press_sound",
+    monkeypatch.setattr("petwisp.window.play_press_sound",
                         lambda sound_pair, volume: press_calls.append(sound_pair))
-    monkeypatch.setattr("pet.window.play_release_sound",
+    monkeypatch.setattr("petwisp.window.play_release_sound",
                         lambda sound_pair, volume: release_calls.append(sound_pair))
 
     probe = _ProbeForSoundTest(active=True)

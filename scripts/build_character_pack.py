@@ -44,10 +44,10 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from pet import catalog  # noqa: E402
-from pet import character_pack as cp  # noqa: E402
-from pet import frameseq_provision as fp  # noqa: E402
-from pet import pack_download as pd  # noqa: E402
+from petwisp import catalog  # noqa: E402
+from petwisp import character_pack as cp  # noqa: E402
+from petwisp import frameseq_provision as fp  # noqa: E402
+from petwisp import pack_download as pd  # noqa: E402
 
 #: core = 离线必须完整可用的交互闭包，**与激活闸门同一常量**
 #: （``character_pack.CORE_REQUIRED_CATEGORIES``）——两边不许各写一份，

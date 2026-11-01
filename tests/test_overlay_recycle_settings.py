@@ -23,8 +23,8 @@ from PySide6.QtWidgets import QApplication
 import tests.test_frameseq_clip as fsc
 import tests.test_overlay_sprite_settings as oss
 import tests.test_sprite_menu_facade as fac
-from pet.frameseq_clip import FrameSeqClip
-from pet.pet_sprite import PetSprite
+from petwisp.frameseq_clip import FrameSeqClip
+from petwisp.pet_sprite import PetSprite
 
 app = QApplication.instance() or QApplication([])
 
@@ -113,7 +113,7 @@ def test_refresh_updates_every_sprite_library(tmp_path):
     ``config-slot-N.json``：子宠不再跟随主配置（那是"全局混每宠"的旧契约）。
     这里手工加进 overlay 的 sprite 按 slot 1 登记身份，逐只取自己的值。
     """
-    from pet import overlay_spawn_state as ovs
+    from petwisp import overlay_spawn_state as ovs
 
     shell, config, lib_main = _make_shell(tmp_path, {"ffmpeg_recycle_minutes": 10})
     lib_sub = RecordingLibrary()

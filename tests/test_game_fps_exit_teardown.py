@@ -24,9 +24,9 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 import pytest
 from PySide6.QtWidgets import QApplication
 
-from pet.island import game_fps as gf
-from pet.island import fps as island_fps
-from pet.config import Config
+from petwisp.island import game_fps as gf
+from petwisp.island import fps as island_fps
+from petwisp.config import Config
 
 
 @pytest.fixture(autouse=True)
@@ -56,7 +56,7 @@ def teardown_calls(monkeypatch):
 
 def _shell(app, tmp_path):
     """轻量 AppShell（与 session-end 收口套件同款：enable_chat=False，不建 UI）。"""
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     return AppShell(app, Config(tmp_path), enable_chat=False)
 
@@ -64,7 +64,7 @@ def _shell(app, tmp_path):
 def test_about_to_quit_closes_the_fps_capture_with_the_official_terminate(
         app, tmp_path, teardown_calls):
     """正常退出：必须有界收口，且走官方终止命令（唯一能保证释放 ETW 会话的方式）。"""
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     shell = _shell(app, tmp_path)
     try:
@@ -77,7 +77,7 @@ def test_about_to_quit_closes_the_fps_capture_with_the_official_terminate(
 def test_session_end_closes_the_capture_without_spawning_any_process(
         app, tmp_path, teardown_calls):
     """会话结束：同样收口，但**不派生进程**（issue #111 的关机纪律）。"""
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     shell = _shell(app, tmp_path)
     try:
@@ -90,7 +90,7 @@ def test_session_end_closes_the_capture_without_spawning_any_process(
 def test_every_exit_path_is_idempotent_and_never_raises(
         app, tmp_path, teardown_calls, monkeypatch):
     """两个退出信号可能都到、可能重复：幂等且不抛；收口本身失败也不阻断退出。"""
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     shell = _shell(app, tmp_path)
     try:
@@ -114,7 +114,7 @@ def test_every_exit_path_is_idempotent_and_never_raises(
 def test_the_real_teardown_stops_the_shared_hub_and_refuses_to_resurrect(
         app, tmp_path, monkeypatch):
     """真收口（不替换函数）：停共享宿主，且收口后**不再**接受任何登记。"""
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     built: list[object] = []
 

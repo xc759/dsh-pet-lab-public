@@ -27,10 +27,10 @@ from PySide6.QtCore import QPoint
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtWidgets import QApplication
 
-from pet import platform_win
-from pet import overlay_peripherals
-from pet.overlay_peripherals import FullscreenCursorWatcher
-from pet.overlay_window import OverlayWindow
+from petwisp import platform_win
+from petwisp import overlay_peripherals
+from petwisp.overlay_peripherals import FullscreenCursorWatcher
+from petwisp.overlay_window import OverlayWindow
 from tests.test_overlay_window_capabilities import _make_shell
 
 app = QApplication.instance() or QApplication([])
@@ -229,10 +229,10 @@ def test_tray_hide_and_screen_migration_stay_paired(tmp_path):
         # 平台判据用 ``sys.platform``——与产品分派（overlay_window.showEvent 的
         # win32 门）同一个键，避免测试用了另一个键而给出错误期望。
         if sys.platform == "win32":
-            from pet.platform_win import WindowsPerPixelInputController
+            from petwisp.platform_win import WindowsPerPixelInputController
             assert isinstance(ctl, WindowsPerPixelInputController)
         else:
-            from pet.platform_passthrough import QtPerPixelInputController
+            from petwisp.platform_passthrough import QtPerPixelInputController
             assert isinstance(ctl, QtPerPixelInputController), (
                 "posix 由 Qt 控制器接管穿透（此前 posix 无任何穿透落点）")
     finally:

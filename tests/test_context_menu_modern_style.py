@@ -16,7 +16,7 @@ def test_modern_menu_has_frameless_hint_on_windows():
     """Windows 下 modern 菜单必须带 FramelessWindowHint——否则 QPA 不挂
     WS_EX_LAYERED，圆角外的透明像素被当成不透明黑（四角黑边，PR #341 根因）。
     非 Windows 不置位（各平台原生弹窗行为不动）。"""
-    from pet.context_menus.menu_styles.modern import apply_modern_menu_style
+    from petwisp.context_menus.menu_styles.modern import apply_modern_menu_style
 
     menu = QMenu()
     apply_modern_menu_style(menu)

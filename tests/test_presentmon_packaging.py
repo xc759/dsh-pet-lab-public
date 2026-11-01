@@ -49,7 +49,7 @@ SHELL_SCRIPTS = {
 #: 的 ``size`` 字段）。它不是从 ``pet/island/game_fps.py`` 抄来的第二份真值。
 RELEASE_ASSET_SIZE = 980320
 
-from pet.island import game_fps  # noqa: E402  —— 期望值只有一份，直接问产品
+from petwisp.island import game_fps  # noqa: E402  —— 期望值只有一份，直接问产品
 
 BACKEND = RESOURCE_DIR / game_fps.BACKEND_EXE_NAME
 BACKEND_MISSING_REASON = (
@@ -201,7 +201,7 @@ class TestGateGuardsAgainstSecondTruth:
         所以断言的是**它 import 了产品模块**，不是它写了什么字面量。
         """
         text = SCRIPT.read_text(encoding="utf-8")
-        assert "from pet.island import game_fps" in text
+        assert "from petwisp.island import game_fps" in text
         assert "game_fps.BACKEND_EXE_NAME" in text
         assert "game_fps.REQUIRED_SHA256" in text
         # 反向断言：门里不许再有这两个常量的**定义**（副本真值）

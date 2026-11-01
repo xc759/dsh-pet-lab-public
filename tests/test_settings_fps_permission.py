@@ -11,10 +11,10 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 import pytest
 from PySide6.QtWidgets import QApplication
 
-import pet.modern_settings_dialog as settings_mod
-from pet import fps_permission, settings_network
-from pet.config import Config
-from pet.modern_settings_dialog import SettingRow
+import petwisp.modern_settings_dialog as settings_mod
+from petwisp import fps_permission, settings_network
+from petwisp.config import Config
+from petwisp.modern_settings_dialog import SettingRow
 
 app = QApplication.instance() or QApplication([])
 

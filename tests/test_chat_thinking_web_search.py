@@ -12,8 +12,8 @@ import time
 
 import pytest
 
-from pet.chat.models import ChatSettings, ProviderConfig, WebSearchSettings
-from pet.chat.providers import (
+from petwisp.chat.models import ChatSettings, ProviderConfig, WebSearchSettings
+from petwisp.chat.providers import (
     OpenAICompatibleProvider,
     ProviderError,
     SSEParser,
@@ -88,7 +88,7 @@ def test_settings_from_dict_sanitizes_unknown_values():
 
 
 def test_config_never_writes_web_search_key_to_disk(tmp_path):
-    from pet.config import Config
+    from petwisp.config import Config
 
     cfg = Config(tmp_path)
     settings = cfg.chat_settings()
@@ -185,7 +185,7 @@ def _web_cfg(url, **kw):
 
 
 def test_web_search_runs_tool_then_injects_results_into_answer(monkeypatch):
-    from pet.chat import web_search as ws
+    from petwisp.chat import web_search as ws
 
     seen = []
 
@@ -227,7 +227,7 @@ def test_web_search_runs_tool_then_injects_results_into_answer(monkeypatch):
 
 
 def test_web_search_skipped_when_model_says_no(monkeypatch):
-    from pet.chat import web_search as ws
+    from petwisp.chat import web_search as ws
 
     monkeypatch.setattr(ws, "search", lambda *a, **k: pytest.fail("不应搜索"))
     with _FakeEndpoint([
@@ -251,7 +251,7 @@ def test_web_search_degrades_gracefully_when_tools_unsupported():
 
 
 def test_search_failure_is_reported_to_model_not_fatal(monkeypatch):
-    from pet.chat import web_search as ws
+    from petwisp.chat import web_search as ws
 
     def boom(*a, **k):
         raise ws.WebSearchError("网络连接失败：timed out")
@@ -279,7 +279,7 @@ def test_inject_search_context_without_system_message():
 # ---------------------------------------------------------------- 搜索结果解析
 
 def test_parse_duckduckgo_html_skips_ads_and_decodes_links():
-    from pet.chat.web_search import parse_duckduckgo_html
+    from petwisp.chat.web_search import parse_duckduckgo_html
 
     page = (
         '<div class="result results_links result--ad "><a class="result__a" href="//duckduckgo.com/l/?uddg=https%3A%2F%2Fad.example">Ad</a></div>'
@@ -295,7 +295,7 @@ def test_parse_duckduckgo_html_skips_ads_and_decodes_links():
 
 
 def test_parse_baidu_html_uses_real_url_and_skips_internal_cards():
-    from pet.chat.web_search import parse_baidu_html
+    from petwisp.chat.web_search import parse_baidu_html
 
     page = (
         '<div class="result-op c-container" mu="http://nourl.ubs.baidu.com/279"><h3>AI 卡片</h3></div>'
@@ -309,7 +309,7 @@ def test_parse_baidu_html_uses_real_url_and_skips_internal_cards():
 
 
 def test_html_to_text_drops_scripts_and_keeps_title():
-    from pet.chat.web_search import html_to_text
+    from petwisp.chat.web_search import html_to_text
 
     text = html_to_text("<html><head><title>标题</title><script>var x=1</script></head><body><p>第一段</p><nav>菜单</nav><div>第二段</div></body></html>")
     assert text.startswith("标题：标题")
@@ -318,7 +318,7 @@ def test_html_to_text_drops_scripts_and_keeps_title():
 
 
 def test_free_engine_captcha_is_reported_and_falls_back(monkeypatch):
-    from pet.chat import web_search as ws
+    from petwisp.chat import web_search as ws
 
     ddg_ok = (
         '<div class="result results_links results_links_deep web-result ">'
@@ -349,7 +349,7 @@ def test_free_engine_captcha_is_reported_and_falls_back(monkeypatch):
 
 
 def test_keyed_engine_without_key_raises_clear_error():
-    from pet.chat import web_search as ws
+    from petwisp.chat import web_search as ws
 
     settings = WebSearchSettings(enabled=True, engine="tavily", api_key_ref="")
     with pytest.raises(ws.WebSearchError) as excinfo:
@@ -366,7 +366,7 @@ def _qapp():
 
 
 def test_chat_service_routes_activity_separately_from_content():
-    from pet.chat.service import ChatService
+    from petwisp.chat.service import ChatService
 
     class Provider:
         def stream(self, messages, config, cancel):
@@ -392,7 +392,7 @@ def test_chat_service_routes_activity_separately_from_content():
 
 
 def test_message_bubble_thinking_panel_collapses_when_answer_starts():
-    from pet.chat.widgets import MessageBubble
+    from petwisp.chat.widgets import MessageBubble
 
     app = _qapp()
     bubble = MessageBubble("assistant", "")
@@ -420,9 +420,9 @@ def test_message_bubble_thinking_panel_collapses_when_answer_starts():
 
 
 def test_ai_settings_page_persists_thinking_and_web_search(tmp_path, monkeypatch):
-    from pet.chat import models
-    from pet.chat.ai_settings_page import _AiSettingsPage
-    from pet.config import Config
+    from petwisp.chat import models
+    from petwisp.chat.ai_settings_page import _AiSettingsPage
+    from petwisp.config import Config
 
     stored = {}
     monkeypatch.setattr(models.SecretStore, "set", lambda self, ref, value: stored.__setitem__(ref, value) or True)
@@ -457,7 +457,7 @@ def test_ai_settings_page_persists_thinking_and_web_search(tmp_path, monkeypatch
 # ---------------------------------------------------------------- 思考过程随会话落盘
 
 def test_chat_message_persists_reasoning_and_stays_compatible():
-    from pet.chat.models import ChatMessage
+    from petwisp.chat.models import ChatMessage
 
     msg = ChatMessage("assistant", "答", reasoning="想了想", activity=["🔍 正在搜索：x"])
     raw = msg.to_dict()
@@ -472,9 +472,9 @@ def test_chat_message_persists_reasoning_and_stays_compatible():
 
 
 def test_thinking_panel_survives_reopening_the_conversation(tmp_path):
-    from pet.chat.prompt import PromptBuilder
-    from pet.chat.widgets import ChatWindow, MessageBubble
-    from pet.config import Config
+    from petwisp.chat.prompt import PromptBuilder
+    from petwisp.chat.widgets import ChatWindow, MessageBubble
+    from petwisp.config import Config
 
     class Provider:
         def stream(self, messages, config, cancel):

@@ -13,8 +13,8 @@ from PySide6.QtWidgets import QApplication
 
 import tests.test_overlay_window_capabilities as cap
 import tests.test_sprite_menu_facade as fac
-from pet.overlay_shell import OverlayShell
-from pet.pet_sprite import PetSprite
+from petwisp.overlay_shell import OverlayShell
+from petwisp.pet_sprite import PetSprite
 
 app = QApplication.instance() or QApplication([])
 
@@ -97,7 +97,7 @@ def test_tray_icon_fallback_is_pet_pawprint(tmp_path):
     """
     from PySide6.QtWidgets import QWidget
 
-    from pet.context_menus.icons import vector_menu_icon
+    from petwisp.context_menus.icons import vector_menu_icon
 
     shell = _make_shell(tmp_path)
     try:

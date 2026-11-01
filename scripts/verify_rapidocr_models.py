@@ -31,13 +31,13 @@
 
 **`--app-dir` 为什么必须存在（2026-10-13 交叉审查 B1）**：模型齐全不等于冻结包能用。
 截图动作的引擎走的是**动态 seam**（``pet/screen_capture/actions.py`` 用 importlib 按
-字符串 ``"ocr"`` 解析 ``pet.screen_capture.ocr``），PyInstaller 的静态分析从入口出发
-摸不到这个模块——只有构建脚本里那条 ``--hidden-import pet.screen_capture.ocr`` 能让它
+字符串 ``"ocr"`` 解析 ``petwisp.screen_capture.ocr``），PyInstaller 的静态分析从入口出发
+摸不到这个模块——只有构建脚本里那条 ``--hidden-import petwisp.screen_capture.ocr`` 能让它
 进包。少了那条参数，模型、rapidocr 配置全都随包，冻结包里却解析不出引擎，产品不崩、
 只是右键「截图 → 提取文字」永远置灰。
 
-切片 5 之后要判的模块变成**两个**：宿主侧的 ``pet.screen_capture.ocr``，以及识别
-子进程的 ``pet.screen_capture.ocr_worker``（冻结包里是 ``<exe> --ocr-worker``，模块
+切片 5 之后要判的模块变成**两个**：宿主侧的 ``petwisp.screen_capture.ocr``，以及识别
+子进程的 ``petwisp.screen_capture.ocr_worker``（冻结包里是 ``<exe> --ocr-worker``，模块
 名只以字符串出现在命令行里）。缺后者不会崩——每次点击报一句"起不了工作进程"，同样
 是"包看着完整、功能是死的"。判据见 :func:`required_bundle_modules`。
 
@@ -81,15 +81,15 @@ def required_bundle_modules() -> tuple[str, ...]:
 
     判据同样来自单一真相源：``pet/screen_capture/ocr.py`` 的 :data:`BUNDLE_MODULES`
     ——宿主侧那一条是模块名（``actions`` 的 importlib seam 拼出来的
-    ``pet.screen_capture.ocr``），子进程那一条也是模块名（``ocr_worker.py`` 只以
-    ``<python> -m pet.screen_capture.ocr_worker`` 的形式出现在命令行字符串里）。
+    ``petwisp.screen_capture.ocr``），子进程那一条也是模块名（``ocr_worker.py`` 只以
+    ``<python> -m petwisp.screen_capture.ocr_worker`` 的形式出现在命令行字符串里）。
     两者都**没有**静态 import 指向，PyInstaller 从入口出发摸不到；只有构建脚本的
     ``--hidden-import`` 能把它们拉进包。本脚本不抄第二份字面量——抄一份的下场是
     "改了产品没改门"。代价是这里会连带 import 整条截图动作栈（实测 +0.04 s：
     QtGui 已为 ocr.py 加载过），构建机上无感。
     """
     _repo_on_path()
-    from pet.screen_capture import ocr  # noqa: PLC0415 —— 路径先就位才能 import
+    from petwisp.screen_capture import ocr  # noqa: PLC0415 —— 路径先就位才能 import
 
     return tuple(ocr.BUNDLE_MODULES)
 
@@ -97,7 +97,7 @@ def required_bundle_modules() -> tuple[str, ...]:
 def load_expectations():
     """从 ``pet/screen_capture/ocr.py`` 取期望值：``(目录, {段名: 文件名}, {段名: sha256})``。"""
     _repo_on_path()
-    from pet.screen_capture import ocr  # noqa: PLC0415 —— 路径先就位才能 import
+    from petwisp.screen_capture import ocr  # noqa: PLC0415 —— 路径先就位才能 import
 
     return (repo_root().joinpath(*ocr.MODEL_RELATIVE_DIR), dict(ocr.MODEL_FILES),
             dict(ocr.MODEL_SHA256))
@@ -330,7 +330,7 @@ def main(argv: list[str] | None = None) -> int:
                 "FAIL: 这个产物无法跑「截图提取文字」——构建中止。缺模型/配置只是让识别"
                 "静默变差；缺引擎模块则产品不崩、菜单永远置灰（那正是动态 seam 的坑）。\n"
                 f"期望的引擎模块：{', '.join(required)}\n"
-                "（构建脚本里必须有 --hidden-import pet.screen_capture.ocr）\n"
+                "（构建脚本里必须有 --hidden-import petwisp.screen_capture.ocr）\n"
                 + FETCH_HINT + "\n")
         return 0 if ok else 1
 

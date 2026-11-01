@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """``scripts/cleanup_mei_cache.py`` 的 CLI 契约：帮助写清归属门禁，行为按归属删除。
 
-脚本是 ``pet.runtime_cleanup`` 的命令行门面：删除前提是**本产品自己的归属标记**，
+脚本是 ``petwisp.runtime_cleanup`` 的命令行门面：删除前提是**本产品自己的归属标记**，
 没有标记的 ``_MEI*`` 目录一律保留。这里在 CLI 这一层锁住同一份语义——帮助文本
 必须写明，删除行为必须照做。所有目录都建在 pytest 的 tmp 里。
 """
@@ -13,7 +13,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from pet.runtime_cleanup import OWNER_MARKER_NAME, mark_owned_runtime_dir
+from petwisp.runtime_cleanup import OWNER_MARKER_NAME, mark_owned_runtime_dir
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "cleanup_mei_cache.py"

@@ -28,7 +28,7 @@ app = QApplication.instance() or QApplication([])
 
 def test_result_panel_text_view_copies_with_ctrl_c():
     """结果面板的只读文本视图：选中后 Ctrl+C 必须真的进剪贴板。"""
-    from pet.screen_capture.result_panel import ScreenResultPanel
+    from petwisp.screen_capture.result_panel import ScreenResultPanel
 
     panel = ScreenResultPanel()
     try:
@@ -46,7 +46,7 @@ def test_result_panel_text_view_copies_with_ctrl_c():
 
 def test_result_panel_text_view_is_click_focusable():
     """视图要能因点击获得焦点，否则 Ctrl+C 没有落点（不等于"打开就抢焦点"）。"""
-    from pet.screen_capture.result_panel import ScreenResultPanel
+    from petwisp.screen_capture.result_panel import ScreenResultPanel
 
     panel = ScreenResultPanel()
     try:
@@ -63,7 +63,7 @@ def test_result_panel_text_view_is_click_focusable():
 
 def test_ask_dialog_bubble_is_keyboard_selectable():
     """截图问答气泡：除了鼠标选中，还要能用键盘选中并复制。"""
-    from pet.screen_capture.ask_dialog import _Bubble
+    from petwisp.screen_capture.ask_dialog import _Bubble
 
     colors = {"button": "#1677e8", "text": "#111111"}
     bubble = _Bubble("包\n尚未发布任何包", "assistant", colors)

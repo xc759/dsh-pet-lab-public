@@ -34,7 +34,7 @@ import time
 
 import pytest
 
-from pet.music import players as music_players, settings as settings_music
+from petwisp.music import players as music_players, settings as settings_music
 
 pytest.importorskip("PySide6")
 
@@ -225,8 +225,8 @@ def test_explicit_detect_rescans_a_stale_negative_cache(tmp_path, monkeypatch):
     ``warm_cache_async`` 见 ``_cache["kugou"] is None`` 直接幂等返回，用户看到
     「未找到」，唯一的出路是重启。
     """
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = _qapp()
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)

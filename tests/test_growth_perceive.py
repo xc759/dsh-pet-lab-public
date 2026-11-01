@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""对话感知（``pet.growth.perceive`` + ``GrowthService.note_user_text``）。
+"""对话感知（``petwisp.growth.perceive`` + ``GrowthService.note_user_text``）。
 
 两条红线在这里落成断言：
 1. **不存原句**：写完档案，文件里不允许出现用户那句话；
@@ -15,10 +15,10 @@ import pytest
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
-from pet.chat.models import ChatSettings
-from pet.chat.prompt import PromptBuilder, set_growth_text_observer, set_growth_text_provider
-from pet.growth import perceive
-from pet.growth.service import GrowthService
+from petwisp.chat.models import ChatSettings
+from petwisp.chat.prompt import PromptBuilder, set_growth_text_observer, set_growth_text_provider
+from petwisp.growth import perceive
+from petwisp.growth.service import GrowthService
 
 
 class _Cfg:

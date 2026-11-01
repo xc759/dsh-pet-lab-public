@@ -33,8 +33,8 @@ from pathlib import Path
 
 import pytest
 
-from pet import gpu_monitor as gm
-from pet.island import segments as isl
+from petwisp import gpu_monitor as gm
+from petwisp.island import segments as isl
 
 #: 本机探针实测过的三块适配器（名字来自 DXGI）+ 一块只有 PDH 认识的适配器。
 LUID_AMD = "0x00000000_0x00017F06"
@@ -725,7 +725,7 @@ def test_cross_thread_use_is_refused_without_touching_pdh():
 def test_module_has_no_third_party_dependency():
     """零新依赖：只许标准库 + 项目内模块（``pet.*``）。"""
     allowed = {"__future__", "ctypes", "dataclasses", "logging", "math", "re",
-               "sys", "threading", "time", "typing", "pet"}
+               "sys", "threading", "time", "typing", "petwisp"}
     for line in Path(gm.__file__).read_text(encoding="utf-8").splitlines():
         if not line.startswith(("import ", "from ")):
             continue

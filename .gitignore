@@ -117,6 +117,8 @@ assets/characters/*/frameseq/
 !/assets/characters/README.md
 !/assets/characters/placeholder/
 !/assets/characters/placeholder/**
+# 占位形象只发源素材；运行时解码出的帧序列缓存与转换锁不入库
+/assets/characters/placeholder/frameseq/
 
 # 发行包压缩产物（发布到 Release 后即可删，绝不入库）
 *.7z

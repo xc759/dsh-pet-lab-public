@@ -12,7 +12,7 @@ from __future__ import annotations
 import pytest
 from PySide6.QtWidgets import QApplication
 
-from pet.chat.widgets import (
+from petwisp.chat.widgets import (
     MAX_ATTACHMENTS,
     MAX_IMAGE_BYTES,
     MAX_IMAGE_TOTAL_BYTES,
@@ -176,7 +176,7 @@ class TestAttachmentFilter:
             return [], ""
 
         monkeypatch.setattr(
-            "pet.chat.widgets.QFileDialog.getOpenFileNames",
+            "petwisp.chat.widgets.QFileDialog.getOpenFileNames",
             fake_get_open_file_names,
         )
         composer = ChatComposer()

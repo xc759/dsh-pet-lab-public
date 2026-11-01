@@ -23,11 +23,11 @@ from PySide6.QtCore import QObject, Signal
 from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QApplication
 
-import pet.library as library_mod
-from pet import catalog
-from pet.config import Config
-from pet.predictive_prewarm import PredictivePrewarm, roll_next
-from pet.window import PetWindow
+import petwisp.library as library_mod
+from petwisp import catalog
+from petwisp.config import Config
+from petwisp.predictive_prewarm import PredictivePrewarm, roll_next
+from petwisp.window import PetWindow
 
 
 @pytest.fixture

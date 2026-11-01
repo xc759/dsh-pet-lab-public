@@ -8,7 +8,7 @@ from PySide6.QtCore import QEvent
 from PySide6.QtGui import QTextDocument
 from PySide6.QtWidgets import QApplication
 
-from pet.config import Config
+from petwisp.config import Config
 
 
 def _config(tmp_path: Path) -> Config:
@@ -17,7 +17,7 @@ def _config(tmp_path: Path) -> Config:
 
 def test_quick_chat_bubble_instantiates(tmp_path: Path):
     app = QApplication.instance() or QApplication([])
-    from pet.quick_chat import QuickChatBubble
+    from petwisp.quick_chat import QuickChatBubble
 
     cfg = _config(tmp_path)
     bubble = QuickChatBubble(cfg)
@@ -32,7 +32,7 @@ def test_quick_chat_bubble_instantiates(tmp_path: Path):
 
 def test_quick_chat_long_reply_uses_pagination(tmp_path: Path):
     app = QApplication.instance() or QApplication([])
-    from pet.quick_chat import QuickChatBubble
+    from petwisp.quick_chat import QuickChatBubble
 
     cfg = _config(tmp_path)
     bubble = QuickChatBubble(cfg)
@@ -54,8 +54,8 @@ def test_quick_chat_bubble_truncates_long_ai_reply(tmp_path: Path):
     几百像素，长回答直接铺进去会撑成一堵墙。
     """
     app = QApplication.instance() or QApplication([])
-    import pet.quick_chat as quick_chat_mod
-    from pet.quick_chat import QuickChatBubble
+    import petwisp.quick_chat as quick_chat_mod
+    from petwisp.quick_chat import QuickChatBubble
 
     bubble = QuickChatBubble(_config(tmp_path))
     try:
@@ -104,10 +104,10 @@ def test_quick_chat_bubble_truncates_long_ai_reply(tmp_path: Path):
 
 
 def test_quick_chat_closes_when_the_window_loses_focus(tmp_path: Path, monkeypatch):
-    import pet.quick_chat as quick_chat_mod
+    import petwisp.quick_chat as quick_chat_mod
 
     app = QApplication.instance() or QApplication([])
-    from pet.quick_chat import QuickChatBubble
+    from petwisp.quick_chat import QuickChatBubble
 
     bubble = QuickChatBubble(_config(tmp_path))
     bubble.show()
@@ -132,8 +132,8 @@ def test_quick_chat_waits_for_popup_menu_to_close(tmp_path: Path, monkeypatch):
     """菜单收尾的失活事件不能把刚打开的快速对话立即关掉。"""
     import time
 
-    import pet.app as app_mod
-    from pet.app import PetInstance
+    import petwisp.app as app_mod
+    from petwisp.app import PetInstance
 
     app = QApplication.instance() or QApplication([])
     state = {"popup": True}
@@ -169,7 +169,7 @@ def test_quick_chat_waits_for_popup_menu_to_close(tmp_path: Path, monkeypatch):
 
 def test_quick_chat_open_is_deferred_to_next_event_turn(tmp_path: Path):
     """Cocoa 原生菜单不可被 activePopupWidget 发现，打开动作仍须异步派发。"""
-    from pet.app import PetInstance
+    from petwisp.app import PetInstance
 
     app = QApplication.instance() or QApplication([])
     owner = PetInstance.__new__(PetInstance)
@@ -199,7 +199,7 @@ def test_quick_chat_survives_initial_cocoa_activation_handoff(tmp_path: Path):
     if app.platformName() != "cocoa":
         pytest.skip("requires the real Cocoa Qt platform plugin")
 
-    from pet.quick_chat import QuickChatBubble
+    from petwisp.quick_chat import QuickChatBubble
 
     settings = QDialog()
     bubble = QuickChatBubble(_config(tmp_path))

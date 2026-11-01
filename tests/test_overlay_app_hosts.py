@@ -26,17 +26,17 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 from PySide6.QtCore import QLockFile
 from PySide6.QtWidgets import QApplication
 
-import pet.app as app_mod
-import pet.window as window_mod
+import petwisp.app as app_mod
+import petwisp.window as window_mod
 import tests.test_overlay_window_capabilities as cap
 import tests.test_sprite_menu_facade as fac
-from pet.app import AppShell, PetInstance
-from pet.config import Config
-from pet.festival.service import FestivalReminderService
-from pet.overlay_shell import OverlayShell, _SettingsIdentity
-from pet.pet_sprite import PetSprite
-from pet.todo.reminder import TodoReminderService
-from pet.voice.chime_service import VoiceChimeService
+from petwisp.app import AppShell, PetInstance
+from petwisp.config import Config
+from petwisp.festival.service import FestivalReminderService
+from petwisp.overlay_shell import OverlayShell, _SettingsIdentity
+from petwisp.pet_sprite import PetSprite
+from petwisp.todo.reminder import TodoReminderService
+from petwisp.voice.chime_service import VoiceChimeService
 
 app = QApplication.instance() or QApplication([])
 
@@ -414,7 +414,7 @@ _LEAK_PROBE: dict = {}
 
 def _chime_quiet_listeners() -> list:
     """共享免打扰表里属于 ``VoiceChimeService`` 的模块回调（按身份认，不碰别人的订阅）。"""
-    from pet import quiet_mode
+    from petwisp import quiet_mode
 
     target = VoiceChimeService._on_quiet_state_changed
     return [callback for callback in list(quiet_mode.shared_quiet_state()._listeners)
@@ -607,14 +607,14 @@ def test_legacy_topology_hosts_unchanged(tmp_path):
 
 # ---------------------------------------------------------------- O5 指令通道归属
 def test_settings_command_belongs_to_overlay_host_not_app(tmp_path):
-    """overlay 拓扑下「退出子肥鱼」指令由壳独占消费，AppShell 不得抢先摘走。
+    """overlay 拓扑下「退出子宠」指令由壳独占消费，AppShell 不得抢先摘走。
 
     两条 watcher 盯同一个配置目录，都调 ``consume_command``（**消费即删**）。
     AppShell 侧的 ``clear_spawned_pets`` / slot 身份在 overlay 下都没有目标
     （子宠是 sprite，不在 ``_instances`` 里），谁先跑谁把指令摘走 → 设置页
-    「一键退出子肥鱼」静默失效。故 app 侧在 overlay 拓扑下必须让路。
+    「一键退出子宠」静默失效。故 app 侧在 overlay 拓扑下必须让路。
     """
-    from pet import overlay_settings_command as cmd
+    from petwisp import overlay_settings_command as cmd
 
     shell, inst, overlay = _make_overlay_app(tmp_path)
     try:
@@ -635,7 +635,7 @@ def test_settings_command_belongs_to_overlay_host_not_app(tmp_path):
             "AppShell 把指令摘走了：壳侧再也消费不到（overlay 下它没有目标可执行）"
         shell._poll_settings_process()          # 3s 轮询兜底同样不得摘走
         assert cmd.command_path(config_dir).exists(), "轮询兜底路径也摘走了指令"
-        # 壳侧照常消费并真的退出那只子肥鱼
+        # 壳侧照常消费并真的退出那只子宠
         overlay._on_settings_command_dir_changed(str(config_dir))
         assert overlay._spawned == []
     finally:

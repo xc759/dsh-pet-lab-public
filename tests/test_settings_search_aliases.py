@@ -30,10 +30,10 @@ from PySide6.QtCore import Qt
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication
 
-import pet.modern_settings_dialog as settings_mod
-from pet.config import Config
-from pet.modern_settings_dialog import SettingRow, SettingsSection
-from pet.settings_widgets import SettingsTabContainer
+import petwisp.modern_settings_dialog as settings_mod
+from petwisp.config import Config
+from petwisp.modern_settings_dialog import SettingRow, SettingsSection
+from petwisp.settings_widgets import SettingsTabContainer
 
 app = QApplication.instance() or QApplication([])
 
@@ -250,7 +250,7 @@ def test_old_title_information_slot_content_reaches_the_content_selector(tmp_pat
 
 def test_alias_reset_defaults_and_excluded_terms_are_documented(tmp_path, monkeypatch):
     """别名表里每条都能命中真实行；「重置」这类没有行落点的词不假装有命中。"""
-    from pet.settings_search import ROW_ALIASES
+    from petwisp.settings_search import ROW_ALIASES
 
     assert ROW_ALIASES, "别名表不能是空的"
     for token, targets in ROW_ALIASES.items():
@@ -363,7 +363,7 @@ def test_check_update_is_a_command_and_stays_out_of_the_index(tmp_path, monkeypa
     「恢复默认设置 / 保存并退出」同类——候选集只装 ``SettingRow``，命令给不出行
     落点。要让它可搜得先给按钮建落点模型，那是另一件事。
     """
-    from pet.settings_search import ROW_ALIASES
+    from petwisp.settings_search import ROW_ALIASES
 
     assert not any("检查更新" in token for token in ROW_ALIASES), (
         "别名表不该为命令类控件破例")
@@ -430,7 +430,7 @@ def test_collapsible_box_title_query_reaches_the_rows_inside_the_box(tmp_path, m
 
 def test_group_title_walk_is_memo_independent(tmp_path, monkeypatch):
     """带缓存与不带缓存算出的组标题逐行一致（缓存只加速、不改语义）。"""
-    from pet.settings_search import fold_group_titles
+    from petwisp.settings_search import fold_group_titles
 
     dialog = _dialog(tmp_path, monkeypatch)
     try:
@@ -447,7 +447,7 @@ def test_group_title_walk_is_memo_independent(tmp_path, monkeypatch):
 
 
 def test_no_chat_build_skips_aliases_whose_rows_are_absent(tmp_path, monkeypatch):
-    """打包变体（excludes=['pet.chat']）：别名目标行不存在时静默跳过，不报错。"""
+    """打包变体（excludes=['petwisp.chat']）：别名目标行不存在时静默跳过，不报错。"""
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
     dialog = settings_mod.ModernSettingsDialog(Config(tmp_path), include_ai=False)
     try:
@@ -598,8 +598,8 @@ def test_author_rows_are_searchable_and_jump_to_the_update_page(tmp_path, monkey
     它们不是 SettingRow（没有配置键），但按同形暴露 label/hint_label，所以同一套
     匹配函数就能覆盖——不必为"可搜"改掉那一块的排版。
     """
-    from pet import settings_search
-    from pet.settings_about import AuthorRow
+    from petwisp import settings_search
+    from petwisp.settings_about import AuthorRow
 
     dialog = _dialog(tmp_path, monkeypatch)
     try:

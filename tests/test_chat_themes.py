@@ -4,7 +4,7 @@
 import re
 from pathlib import Path
 
-from pet.chat.themes import (
+from petwisp.chat.themes import (
     ANCHOR_RATIO, THEMES, build_modern_custom_overlay_qss, build_overlay_qss,
     scale_background_pixmap, theme_names,
 )
@@ -65,9 +65,9 @@ def test_all_builtin_themes_resolve():
     import os
     os.environ.setdefault('QT_QPA_PLATFORM', 'offscreen')
     from PySide6.QtWidgets import QApplication
-    from pet.chat.legacy_widgets import ChatWindow
-    from pet.chat import session_store
-    from pet.config import Config
+    from petwisp.chat.legacy_widgets import ChatWindow
+    from petwisp.chat import session_store
+    from petwisp.config import Config
     import tempfile
 
     app = QApplication.instance() or QApplication([])
@@ -90,9 +90,9 @@ def test_classic_background_supports_builtin_theme_while_modern_background_is_in
     os.environ.setdefault('QT_QPA_PLATFORM', 'offscreen')
     from PySide6.QtGui import QColor, QPixmap
     from PySide6.QtWidgets import QApplication
-    from pet.chat.legacy_widgets import ChatWindow as LegacyChatWindow
-    from pet.chat.widgets import ChatWindow as ModernChatWindow
-    from pet.config import Config
+    from petwisp.chat.legacy_widgets import ChatWindow as LegacyChatWindow
+    from petwisp.chat.widgets import ChatWindow as ModernChatWindow
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     custom = tmp_path / 'modern.png'
@@ -122,7 +122,7 @@ def test_classic_background_supports_builtin_theme_while_modern_background_is_in
 
 
 def test_clamp_box_keeps_inside_and_aspect():
-    from pet.chat.crop_dialog import VIEW_ASPECT, clamp_box
+    from petwisp.chat.crop_dialog import VIEW_ASPECT, clamp_box
 
     # 越界夹回
     x, y, w, h = clamp_box(-0.5, -0.5, 0.5, 16 / 9)
@@ -138,7 +138,7 @@ def test_clamp_box_keeps_inside_and_aspect():
 
 
 def test_custom_crop_config_roundtrip(tmp_path):
-    from pet.config import Config
+    from petwisp.config import Config
 
     cfg = Config(tmp_path)
     cfg.set('chat_bg_crops', {'builtin:whale': [0.1, 0.2, 0.5, 0.8]})
@@ -149,7 +149,7 @@ def test_custom_crop_config_roundtrip(tmp_path):
 
 # ---------------------------------------------------------- 取景框（focus/自定义裁切）
 def test_focus_rect_custom_crop_wins_over_theme_focus():
-    from pet.chat.themes import background_focus_rect, get_theme
+    from petwisp.chat.themes import background_focus_rect, get_theme
 
     theme = get_theme('whale')
     crops = {'builtin:whale': [0.0, 0.0, 0.25, 1.0]}
@@ -157,7 +157,7 @@ def test_focus_rect_custom_crop_wins_over_theme_focus():
 
 
 def test_focus_rect_falls_back_to_theme_focus_without_crop():
-    from pet.chat.themes import background_focus_rect, get_theme
+    from petwisp.chat.themes import background_focus_rect, get_theme
 
     theme = get_theme('whale')
     assert background_focus_rect(theme, {}, 'builtin:whale') == tuple(theme['focus'])
@@ -167,7 +167,7 @@ def test_focus_rect_falls_back_to_theme_focus_without_crop():
 
 
 def test_focus_rect_malformed_crop_falls_back_to_theme_focus():
-    from pet.chat.themes import background_focus_rect, get_theme
+    from petwisp.chat.themes import background_focus_rect, get_theme
 
     theme = get_theme('whale')
     for bad in ([0.1, 0.2, 0.5], 'junk', [0.1, 'x', 0.5, 1.0], 42):
@@ -176,7 +176,7 @@ def test_focus_rect_malformed_crop_falls_back_to_theme_focus():
 
 
 def test_focus_rect_no_theme_uses_default():
-    from pet.chat.themes import DEFAULT_FOCUS, background_focus_rect
+    from petwisp.chat.themes import DEFAULT_FOCUS, background_focus_rect
 
     assert background_focus_rect(None, {}, '/tmp/custom.jpg') == DEFAULT_FOCUS
     crops = {'/tmp/custom.jpg': [0.1, 0.1, 0.5, 0.5]}
@@ -184,7 +184,7 @@ def test_focus_rect_no_theme_uses_default():
 
 
 def test_cover_draw_offset_keeps_focus_rect_fully_visible():
-    from pet.chat.themes import background_draw_offset
+    from petwisp.chat.themes import background_draw_offset
 
     # 200x100 源图 cover 进 100x100 窗口 → sw=200, sh=100；取景框 [0.25,0.75] 应完整可见
     x, y = background_draw_offset(0, 0, 100, 100, 200, 100, (0.25, 0.0, 0.5, 1.0), 'cover')
@@ -194,7 +194,7 @@ def test_cover_draw_offset_keeps_focus_rect_fully_visible():
 
 
 def test_cover_draw_offset_custom_crop_left_edge():
-    from pet.chat.themes import background_draw_offset
+    from petwisp.chat.themes import background_draw_offset
 
     # 自定义取景框贴左缘 [0,0.25]：应左对齐（x=0）而非居中
     x, y = background_draw_offset(0, 0, 100, 100, 200, 100, (0.0, 0.0, 0.25, 1.0), 'cover')
@@ -202,7 +202,7 @@ def test_cover_draw_offset_custom_crop_left_edge():
 
 
 def test_cover_draw_offset_clamped_to_cover_bounds():
-    from pet.chat.themes import background_draw_offset
+    from petwisp.chat.themes import background_draw_offset
 
     # 取景框比窗口还大（fw=1.0）：居中于主体，且不超出 cover 边界 [-100, 0]
     x, y = background_draw_offset(0, 0, 100, 100, 200, 100, (0.0, 0.0, 1.0, 1.0), 'cover')
@@ -210,7 +210,7 @@ def test_cover_draw_offset_clamped_to_cover_bounds():
 
 
 def test_non_cover_fill_modes_stay_centered():
-    from pet.chat.themes import background_draw_offset
+    from petwisp.chat.themes import background_draw_offset
 
     # contain：缩放图比窗口小，永远居中，focus 不参与
     assert background_draw_offset(0, 0, 100, 100, 100, 50, (0.0, 0.0, 0.25, 1.0), 'contain') == (0, 25)
@@ -230,8 +230,8 @@ def _check_paint_honors_custom_crop(window_cls, tmp_path, monkeypatch):
     from PySide6.QtGui import QColor, QPixmap
     from PySide6.QtWidgets import QApplication
 
-    from pet.chat import themes as chat_themes
-    from pet.config import Config
+    from petwisp.chat import themes as chat_themes
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     cfg = Config(tmp_path)
@@ -268,11 +268,11 @@ def _check_paint_honors_custom_crop(window_cls, tmp_path, monkeypatch):
 
 def test_paint_honors_custom_crop(tmp_path, monkeypatch):
     """modern 渲染路径：见 _check_paint_honors_custom_crop。"""
-    from pet.chat.widgets import ChatWindow
+    from petwisp.chat.widgets import ChatWindow
     _check_paint_honors_custom_crop(ChatWindow, tmp_path, monkeypatch)
 
 
 def test_legacy_paint_honors_custom_crop(tmp_path, monkeypatch):
     """legacy 渲染路径同样必须真读 chat_bg_crops（回归曾两路齐丢）。"""
-    from pet.chat.legacy_widgets import ChatWindow as LegacyChatWindow
+    from petwisp.chat.legacy_widgets import ChatWindow as LegacyChatWindow
     _check_paint_honors_custom_crop(LegacyChatWindow, tmp_path, monkeypatch)

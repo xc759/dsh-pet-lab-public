@@ -1,7 +1,7 @@
 # 主动识屏 + 多 Agent 联动 — 实施手册（Kimi K3 终审版）
 
 > 文档状态：**方案已确认，代码未动工**。待用户下“动手指令”后按本手册分阶段实施。
-> 适用范围：`D:\dsh-pet-pr`（dsh-pet-indesktop 独立桌宠，PySide6）。
+> 适用范围：`D:\petwisp-pr`（petwisp-indesktop 独立桌宠，PySide6）。
 > 复审对象：本手册的规格是否自洽、可实施、不违背“低功耗 + 多开 + 不影响使用”三条铁律。
 
 ---
@@ -16,7 +16,7 @@
   3. 多开 `--instance` 配置隔离 + 启动避让；
   4. WebM 元数据跨进程缓存、余额跨实例缓存、日志按 PID 隔离、vision/PIL 懒导入；
   5. 角色显示名、右键全屏自动隐藏开关、no_mirror 补充。
-- 本手册新增内容当前**一个文件都未创建**：`pet/proactive.py`、相关测试、配置字段均未写入。
+- 本手册新增内容当前**一个文件都未创建**：`petwisp/proactive.py`、相关测试、配置字段均未写入。
 
 ---
 
@@ -99,13 +99,13 @@ QTimer 8s（仅 enabled==True 且窗口可见时存在）
 | custom | 使用用户自填值 | 同左 | 同左 |
 
 实现要求：
-- 配置读取必须经 `pet/config.py` 的白名单机制登记，且与默认 dict 深合并（保留新增默认键）；
+- 配置读取必须经 `petwisp/config.py` 的白名单机制登记，且与默认 dict 深合并（保留新增默认键）；
 - 运行时使用 `effective_proactive_config(raw)` 得到最终值；所有数值 `clamp` 到合法范围；非法 preset 回退 `balanced`；
 - `require_idle=false` 时 effective 配置中 `min_idle_seconds` 视为 0（G4 直接通过），字段原值保留不动。
 
 ---
 
-## 4. Phase 1 规格：`pet/proactive.py` 纯函数（零 UI、零网络、零 Win32）
+## 4. Phase 1 规格：`petwisp/proactive.py` 纯函数（零 UI、零网络、零 Win32）
 
 复审重点：**所有函数必须无副作用、可注入时钟/随机源、100% 单测**。
 
@@ -169,7 +169,7 @@ effective_proactive_config(raw: dict) -> dict   # 默认+P预设+用户值，cla
 
 ## 5. Phase 2 规格：Win32 采集与 Watcher（先日志后实机）
 
-### 5.1 `pet/vision.py` 扩展（保持 PIL 懒导入现状）
+### 5.1 `petwisp/vision.py` 扩展（保持 PIL 懒导入现状）
 ```python
 foreground_window_info()  # 【新增函数】→ {hwnd, pid, process, title, rect(x,y,w,h)} | None
 get_foreground_window_rect() -> tuple[int,int,int,int] | None   # 可由上者派生
@@ -186,7 +186,7 @@ capture_window_rect(rect) -> PIL.Image | None   # 后台线程内调用
 - `capture_window_rect` 只在 worker 线程执行；主线程绝不允许出现 `ImageGrab`；
 - 目标窗口不可见/最小化/被 cloaked（`DWMWA_CLOAKED`）→ 返回 None，本轮静默跳过。
 
-### 5.2 `ProactiveScreenWatcher`（`pet/proactive.py` 内实现）
+### 5.2 `ProactiveScreenWatcher`（`petwisp/proactive.py` 内实现）
 - 单一 `QTimer`，间隔 8s，仅 `enabled==True` **且白名单非空**时 `start()`；
   `setEnabled(False)` 或白名单被清空即 `stop()`（与验收 #3「白名单为空 = 无定时器」对齐）；
 - 挂到 `PetWindow`，`_pause_activity()` 时停止、`_resume_activity()` 时按配置重启（与现有隐藏暂停一致）；
@@ -231,7 +231,7 @@ capture_window_rect(rect) -> PIL.Image | None   # 后台线程内调用
 
 ## 7. Phase 4 规格：设置 UI 与右键二级菜单
 
-### 7.1 设置页（`pet/settings_dialog.py` 新增分组「主动识屏」）
+### 7.1 设置页（`petwisp/settings_dialog.py` 新增分组「主动识屏」）
 - 总开关；
 - 预设下拉：安静 / 平衡 / 活跃 / 自定义；选自定义才展开三个频率参数；
 - 「仅当我闲置时触发」勾选 + 闲置秒数输入（勾选才启用输入；与右键二级菜单同一开关，双向同步）；
@@ -239,7 +239,7 @@ capture_window_rect(rect) -> PIL.Image | None   # 后台线程内调用
 - 每日上限、鼠标穿透允许、先兆提示、免费优先 复选框；
 - 保存即生效（复用现有 `settings_saved → refresh_pet_settings` 路径）。
 
-### 7.2 右键二级菜单（`pet/window.py contextMenuEvent`）
+### 7.2 右键二级菜单（`petwisp/window.py contextMenuEvent`）
 ```
 主动识屏 ▸  [x] 开启主动识屏
            [x] 鼠标穿透时仍允许主动识屏
@@ -264,7 +264,7 @@ capture_window_rect(rect) -> PIL.Image | None   # 后台线程内调用
 ### 8.2 各 Agent 事件源（已调研验证）
 | Agent | 事件源 | 实现 |
 |---|---|---|
-| DSH | **内置桥接插件**（`integrations/dsh-pet-bridge`）：订阅 `agent/created`、`agent/status`、`agent/request-error`、`cordis/request-run(-resolved)` 与 `session/event`（turn/tool/审批/问题/命令），按实例写入固定桥目录 `<数据基目录>/dsh-pet-bridge/dsh-{pid}.jsonl`（消费端 glob `dsh*.jsonl`，兼容旧版单文件 `dsh.jsonl`）；勾选时弹确认框一键安装（**node 直调 pnpm add + 自维护 profile 的 `dsh.profile.bundles` 层**——不走 `dsh plugin`，规避其在 Windows 上拆碎含空格路径的缺陷），关闭自动卸载（幂等）。已实测：插件需声明 `dsh.bundle` + `cordis.patch.yml` 才会成为 profile layer |
+| DSH | **内置桥接插件**（`integrations/petwisp-bridge`）：订阅 `agent/created`、`agent/status`、`agent/request-error`、`cordis/request-run(-resolved)` 与 `session/event`（turn/tool/审批/问题/命令），按实例写入固定桥目录 `<数据基目录>/petwisp-bridge/dsh-{pid}.jsonl`（消费端 glob `dsh*.jsonl`，兼容旧版单文件 `dsh.jsonl`）；勾选时弹确认框一键安装（**node 直调 pnpm add + 自维护 profile 的 `dsh.profile.bundles` 层**——不走 `dsh plugin`，规避其在 Windows 上拆碎含空格路径的缺陷），关闭自动卸载（幂等）。已实测：插件需声明 `dsh.bundle` + `cordis.patch.yml` 才会成为 profile layer |
 | Claude Code | 官方 hooks（PreToolUse/PostToolUse/PostToolUseFailure/Stop/SessionStart/UserPromptSubmit） | 勾选开启时弹确认框，经用户同意后把 hook 命令写入 `.claude/settings.json`，命令追加一行到事件文件 |
 | Cursor | `~/.cursor/projects/**/agent-transcripts/*.jsonl`（**真实格式**：`{role, message:{content:[...]}}`——user→thinking、assistant+tool_use→working、assistant 纯文本→idle） | byte-offset tail，1.5s，仅最近 1 天目录，文件数上限 50 |
 | OpenCode | **原生 SQLite 直读**（`~/.local/share/opencode/opencode.db` 的 event 表，rowid 偏移轮询，只读模式不阻塞写入）——**无需插件** | 1.5s 轮询，backfill 防护 |
@@ -319,7 +319,7 @@ capture_window_rect(rect) -> PIL.Image | None   # 后台线程内调用
 
 ## 12. 终审修订记录（2026-08-27，Kimi K3 对照实码复审）
 
-复审方式：逐条对照 `D:\dsh-pet-pr` 现有代码（vision.py / config.py / window.py / app.py），
+复审方式：逐条对照 `D:\petwisp-pr` 现有代码（vision.py / config.py / window.py / app.py），
 并重跑测试基线（130 passed / 4 skipped，与 §0 一致）。修订如下：
 
 1. **§2/§6 429 退避勘误**：原文「已有 429 重试（2/4/8s ×3）」与实码不符——

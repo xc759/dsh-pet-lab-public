@@ -19,8 +19,8 @@ from __future__ import annotations
 import math
 import pytest
 
-from pet import collision
-from pet import physics
+from petwisp import collision
+from petwisp import physics
 
 
 class TestCollisionEllipseDetection:

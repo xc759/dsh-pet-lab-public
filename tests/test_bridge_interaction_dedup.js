@@ -11,7 +11,7 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const sourcePath = path.resolve(here, "../integrations/dsh-pet-bridge/index.js");
+const sourcePath = path.resolve(here, "../integrations/petwisp-bridge/index.js");
 const source = fs.readFileSync(sourcePath, "utf8");
 
 function loadInteractionDedupKeys() {

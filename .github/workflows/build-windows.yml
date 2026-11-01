@@ -165,13 +165,13 @@ jobs:
       - name: Compile installers (Inno Setup)
         shell: pwsh
         run: |
-          $version = (Select-String -Path 'pet\__init__.py' -Pattern "__version__ = '([^']+)'").Matches[0].Groups[1].Value
+          $version = (Select-String -Path 'petwisp\__init__.py' -Pattern "__version__ = '([^']+)'").Matches[0].Groups[1].Value
           Write-Host "==> AppVersion from __version__: $version"
           # webm-chat 用 .iss 的默认 AppId / 显示名，但版本必须显式传：.iss 里
           # MyAppVersion 是硬编码默认值，不传就会与 pet/__init__.py 单一来源漂移。
           $chat = @(
             "/DMyAppVersion=$version",
-            'packaging\dsh-pet.iss'
+            'packaging\petwisp.iss'
           )
           & ISCC.exe @chat
           if ($LASTEXITCODE -ne 0) { throw "ISCC webm-chat failed" }
@@ -179,13 +179,13 @@ jobs:
           # {{ED2590E4-A968-4E8D-B7C4-75DFE012D0E9}}）：两个安装包共用 AppId 会
           # 互装覆盖对方的卸载登记。
           $webm = @(
-            '/DMyAppShortName=dsh-pet-standalone-webm',
-            '/DMyAppExeName=dsh-pet-standalone-webm.exe',
-            '/DMyAppDir=..\dist-onedir\dsh-pet-standalone-webm',
+            '/DMyAppShortName=petwisp-webm',
+            '/DMyAppExeName=petwisp-webm.exe',
+            '/DMyAppDir=..\dist-onedir\petwisp-webm',
             '/DMyAppId={{ED2590E4-A968-4E8D-B7C4-75DFE012D0E9}',
-            '/DMyAppDisplay=dsh-pet-standalone (WebM)',
+            '/DMyAppDisplay=petwisp (WebM)',
             "/DMyAppVersion=$version",
-            'packaging\dsh-pet.iss'
+            'packaging\petwisp.iss'
           )
           & ISCC.exe @webm
           if ($LASTEXITCODE -ne 0) { throw "ISCC webm failed" }
@@ -200,7 +200,7 @@ jobs:
         if: (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) || github.event.inputs.upload_artifacts == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: dsh-pet-standalone-windows-x86_64
+          name: petwisp-windows-x86_64
           path: |
             dist-onedir/*-portable.zip
             dist-onedir/*-setup.exe

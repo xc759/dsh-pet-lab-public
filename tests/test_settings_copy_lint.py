@@ -23,10 +23,10 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from PySide6.QtWidgets import QApplication
 
-import pet.modern_settings_dialog as settings_mod
-from pet.config import Config
-from pet.modern_settings_dialog import SettingRow, SettingsSection
-from pet.settings_widgets import CollapsibleGroup
+import petwisp.modern_settings_dialog as settings_mod
+from petwisp.config import Config
+from petwisp.modern_settings_dialog import SettingRow, SettingsSection
+from petwisp.settings_widgets import CollapsibleGroup
 
 app = QApplication.instance() or QApplication([])
 
@@ -206,7 +206,7 @@ GLOBAL_SCOPE_WORDS = ("所有桌宠", "全部桌宠", "所有宠物")
 
 def test_per_pet_rows_never_promise_a_global_scope(tmp_path, monkeypatch):
     """逐宠键的行文案不许说"所有桌宠"（范围真值 = ``PER_PET_KEYS``）。"""
-    from pet import pet_profiles
+    from petwisp import pet_profiles
 
     dialog = _dialog(tmp_path, monkeypatch)
     try:

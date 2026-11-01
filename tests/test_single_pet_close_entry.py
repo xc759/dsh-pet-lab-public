@@ -23,13 +23,13 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 from PySide6.QtCore import QPointF
 from PySide6.QtWidgets import QApplication
 
-from pet import pet_profiles as profiles
-from pet.config import APP_DIR_NAME
+from petwisp import pet_profiles as profiles
+from petwisp.config import APP_DIR_NAME
 from tests.test_overlay_spawn import _center_ratios, _make_persistent_shell
 
 app = QApplication.instance() or QApplication([])
 
-MAIN_LABEL = "主肥鱼 [slot-0]"
+MAIN_LABEL = "主桌宠 [slot-0]"
 
 
 def _tray_menu(shell):
@@ -166,17 +166,17 @@ def test_single_pet_close_then_restore_then_quit(tmp_path, monkeypatch):
 
 def test_single_pet_close_entry_tooltip_differs_from_child_copy(tmp_path):
     """逐只 tooltip 按"这只"的身份给恢复方式：slot0 走「生成 / 恢复 slot0」，
-    子宠走「生小肥鱼」（子宠是靠自己的槽档案回来的，不冒充 slot0 那条路）。"""
+    子宠走「生小宠」（子宠是靠自己的槽档案回来的，不冒充 slot0 那条路）。"""
     shell, _made = _make_persistent_shell(tmp_path)
     try:
         main_tip = _action(
             _submenus(_tray_menu(shell))[MAIN_LABEL], "退出这只").toolTip()
         shell.spawn_pet()
         child = shell._spawned[0]
-        sub = _submenus(_tray_menu(shell))[f"小肥鱼 [slot-{shell._spawned_slots[child]}]"]
+        sub = _submenus(_tray_menu(shell))[f"小宠 [slot-{shell._spawned_slots[child]}]"]
         child_tip = _action(sub, "退出这只").toolTip()
         assert main_tip and child_tip and main_tip != child_tip
         assert "生成 / 恢复 slot0" in main_tip
-        assert "生小肥鱼" in child_tip
+        assert "生小宠" in child_tip
     finally:
         _teardown(shell)

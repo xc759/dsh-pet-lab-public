@@ -17,7 +17,7 @@ PetWindow 的呈现面。
    ``isVisible()`` 反映 overlay 可见性（proactive G1 的输入）；
 6. 快速对话：气泡可点 → ``open_quick_chat`` 锚定被点 sprite，回车走既有
    ChatService 链路；
-7. 无聊天变体降级：``pet.quick_chat`` 导入失败 / ``enable_chat=False`` →
+7. 无聊天变体降级：``petwisp.quick_chat`` 导入失败 / ``enable_chat=False`` →
    静默 False、气泡保持全穿透；
 8. legacy 拓扑行为不变。
 
@@ -37,18 +37,18 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication
 
-import pet.vision as vision_mod
+import petwisp.vision as vision_mod
 import tests.test_overlay_window_capabilities as cap
 import tests.test_sprite_menu_facade as fac
-from pet.config import Config
-from pet.multi_window_shared import (
+from petwisp.config import Config
+from petwisp.multi_window_shared import (
     MultiWindowProxy,
     SharedProactiveWatcher,
     presentation_targets,
 )
-from pet.overlay_shell import OverlayShell
-from pet.sprite_behavior import STATE_ACTS
-from pet.sprite_bubble import sprite_anchor_rect_global
+from petwisp.overlay_shell import OverlayShell
+from petwisp.sprite_behavior import STATE_ACTS
+from petwisp.sprite_bubble import sprite_anchor_rect_global
 
 app = QApplication.instance() or QApplication([])
 
@@ -79,7 +79,7 @@ class _Host:
 
 
 class _NoChatInstance(cap.CapInstance):
-    """无聊天打包变体（pet.chat 被 excludes 排除）的实例面。"""
+    """无聊天打包变体（petwisp.chat 被 excludes 排除）的实例面。"""
 
     enable_chat = False
 
@@ -384,13 +384,13 @@ def test_alert_bubble_click_is_noop(tmp_path):
 
 # ---------------------------------------------------------------- 7. 无聊天变体降级
 def test_no_chat_module_degrades_quietly(tmp_path, monkeypatch):
-    """pet.chat 缺失（打包 excludes）→ ImportError 守卫静默降级为不可点。
+    """petwisp.chat 缺失（打包 excludes）→ ImportError 守卫静默降级为不可点。
 
-    复现真实变体：``pet.quick_chat`` 的模块级 ``from .chat.service import
-    ChatService`` 在无聊天打包里抛 ImportError（name = ``pet.chat.service``）。
+    复现真实变体：``petwisp.quick_chat`` 的模块级 ``from .chat.service import
+    ChatService`` 在无聊天打包里抛 ImportError（name = ``petwisp.chat.service``）。
     """
-    monkeypatch.setitem(sys.modules, "pet.chat.service", None)
-    monkeypatch.delitem(sys.modules, "pet.quick_chat", raising=False)
+    monkeypatch.setitem(sys.modules, "petwisp.chat.service", None)
+    monkeypatch.delitem(sys.modules, "petwisp.quick_chat", raising=False)
     shell, _ = _make_shell(tmp_path, real_config=True)
     try:
         shell.overlay.show()

@@ -8,9 +8,9 @@ from __future__ import annotations
 
 import pytest
 
-from pet import catalog
-from pet.app import AppShell
-from pet.config import Config
+from petwisp import catalog
+from petwisp.app import AppShell
+from petwisp.config import Config
 
 
 class _StubInstance:

@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from pet import character_packs_page as page
+from petwisp import character_packs_page as page
 
 
 def _write_pack(root: Path, cid: str, folder: str, *, clips=3, broken=False) -> Path:
@@ -94,8 +94,8 @@ def test_registry_fetch_is_size_capped(monkeypatch):
     """注册表拉取必须有体积上限（终审 B12：无上限 read 会被坏源拖死）。"""
     import io
 
-    from pet import character_packs_page as page
-    from pet import pack_download as pd
+    from petwisp import character_packs_page as page
+    from petwisp import pack_download as pd
 
     ok_url = "https://cdn.jsdelivr.net/gh/x/y@main/packs-index.json"
 
@@ -127,7 +127,7 @@ def test_registry_fetch_is_size_capped(monkeypatch):
 
 def test_registry_fetch_rejects_untrusted_url():
     """清单是整个信任链的根：非 https / 非白名单主机的地址不许 urlopen（终审）。"""
-    from pet import character_packs_page as page
+    from petwisp import character_packs_page as page
 
     for bad in ("https://example.invalid/reg.json", "http://cdn.jsdelivr.net/x"):
         try:
@@ -142,7 +142,7 @@ def test_build_content_never_blocks_gui_on_registry(monkeypatch):
     """构造设置页不许同步联网（终审 B12）：慢源只能影响"可下载"区块。"""
     import time
 
-    from pet import character_packs_page as page
+    from petwisp import character_packs_page as page
 
     monkeypatch.setenv(page.ENV_REGISTRY, "https://example.invalid/reg.json")
 
@@ -160,8 +160,8 @@ def test_build_content_never_blocks_gui_on_registry(monkeypatch):
 
 def test_use_pack_activates_restart_scoped(tmp_path, monkeypatch):
     """「使用这套」= 写 active.json（重启后生效，无跨进程通知）；core 不闭环的版本被拒。"""
-    from pet import character_pack as cp
-    from pet import character_packs_page as page
+    from petwisp import character_pack as cp
+    from petwisp import character_packs_page as page
 
     chars = tmp_path / "chars"
     good = chars / "demo" / "1.0.0-base-640x360"
@@ -174,7 +174,7 @@ def test_use_pack_activates_restart_scoped(tmp_path, monkeypatch):
         (d / "f_0001.webp").write_bytes(b"x")
         (d / "meta.json").write_text(
             __import__('json').dumps({'fps': 24.0, 'frames': 1, 'content_sha': 'a' * 64,
-                                      'encoder': __import__('pet.frameseq_provision', fromlist=['x']).ENCODER_DESC}),
+                                      'encoder': __import__('petwisp.frameseq_provision', fromlist=['x']).ENCODER_DESC}),
             encoding="utf-8")
         clips.append({"name": name, "category": cat, "dir": f"anim/{cat}/{name}",
                       "frames": 1, "key_every": 12, "part": "core",
@@ -206,8 +206,8 @@ def test_installed_packs_marks_active_one(tmp_path):
     """列表要能指出"当前使用"的那套——由 active.json 指针决定，不是版本号。"""
     import json as _json
 
-    from pet import character_pack as cp
-    from pet import character_packs_page as page
+    from petwisp import character_pack as cp
+    from petwisp import character_packs_page as page
 
     root = tmp_path / "characters"
     for ver, name in (("1.0.0-base-640x360", "旧"), ("2.0.0-base-640x360", "新")):
@@ -220,7 +220,7 @@ def test_installed_packs_marks_active_one(tmp_path):
             (d / "f_0001.webp").write_bytes(b"x")
             (d / "meta.json").write_text(_json.dumps(
                 {"fps": 24.0, "frames": 1, "content_sha": "a" * 64,
-                 "encoder": __import__('pet.frameseq_provision', fromlist=['x']).ENCODER_DESC}),
+                 "encoder": __import__('petwisp.frameseq_provision', fromlist=['x']).ENCODER_DESC}),
                 encoding="utf-8")
             clips.append({"name": cname, "category": cat, "dir": f"anim/{cat}/{cname}",
                           "frames": 1, "key_every": 12, "part": "core",
@@ -241,8 +241,8 @@ def test_installed_packs_marks_active_one(tmp_path):
 
 def test_download_section_loaded_builds_rows_without_crash(tmp_path, monkeypatch, qapp):
     """清单拉取成功后的回调必须真的铺出行（六轮抓到的 QObject→QWidget parent 崩溃）。"""
-    from pet import character_packs_page as page
-    from pet import pack_download as pd
+    from petwisp import character_packs_page as page
+    from petwisp import pack_download as pd
 
     monkeypatch.setenv("PET_PACK_DIR", str(tmp_path))
     pack = pd.Pack(id="demo", name="深深", variant="base", version="2.0.0",
@@ -261,7 +261,7 @@ def test_download_section_loaded_builds_rows_without_crash(tmp_path, monkeypatch
         texts = [lb.text() for lb in w.findChildren(QLabel)]
         # 一包一行：画质档名 + 折叠分件明细（用户拍板形态）
         assert any("标清角色包" in t for t in texts), texts[:8]
-        from pet.settings_widgets import CollapsibleGroup
+        from petwisp.settings_widgets import CollapsibleGroup
         groups = w.findChildren(CollapsibleGroup)
         assert any(g.toggle.text().startswith("分件明细") for g in groups), [
             g.toggle.text() for g in groups]
@@ -281,7 +281,7 @@ def test_installed_part_names_requires_clips_on_disk(tmp_path):
     """索引 parts 还在、素材目录被删 → 按未安装处理（重下入口不许被封死，六轮）。"""
     import json as _json
 
-    from pet import character_packs_page as page
+    from petwisp import character_packs_page as page
 
     target = tmp_path / "pack"
     d = target / "anim" / "idle" / "c"
@@ -300,7 +300,7 @@ def test_installed_part_names_requires_clips_on_disk(tmp_path):
 
 
 def test_parse_part_filename():
-    from pet.character_packs_page import _parse_part_filename
+    from petwisp.character_packs_page import _parse_part_filename
     from pathlib import Path as _P
 
     assert _parse_part_filename(_P("demo-2.0.0-base-640x360.extra3.zip")) == \
@@ -314,7 +314,7 @@ def test_parse_part_filename():
 
 def test_registry_falls_through_on_structurally_invalid_json(monkeypatch):
     """第一个源返回合法 JSON 但清单结构不合法 → 必须继续试下一个源（P2）。"""
-    from pet import character_packs_page as page
+    from petwisp import character_packs_page as page
 
     calls = []
 

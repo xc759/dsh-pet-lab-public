@@ -2,7 +2,7 @@ from collections import deque
 
 from PySide6.QtWidgets import QApplication
 
-from pet.window import PetWindow
+from petwisp.window import PetWindow
 
 
 def _app():

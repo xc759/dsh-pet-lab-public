@@ -12,9 +12,9 @@ from PySide6.QtCore import QObject, QRect, Signal
 from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QApplication
 
-from pet import catalog
-from pet.config import Config
-from pet.window import PetWindow
+from petwisp import catalog
+from petwisp.config import Config
+from petwisp.window import PetWindow
 
 NAMES = [
     catalog.IDLE,
@@ -281,7 +281,7 @@ def test_fullscreen_geometry_hit_requires_borderless(app, tmp_path):
 
 def _lyric_window(app, tmp_path, monkeypatch):
     """起一个真窗口并把歌词控制器按配置跑起来（timer 活跃）。"""
-    from pet.music import now_playing
+    from petwisp.music import now_playing
 
     # 操作系统边界：不真的去调 Windows SMTC（Linux/macOS 本就返回 None）。
     monkeypatch.setattr(now_playing, "get_now_playing", lambda: None)

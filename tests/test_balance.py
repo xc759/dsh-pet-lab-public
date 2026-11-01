@@ -8,8 +8,8 @@ from datetime import date, datetime, timedelta, timezone
 
 import pytest
 
-from pet.island import balance
-from pet.chat.models import ChatSession
+from petwisp.island import balance
+from petwisp.chat.models import ChatSession
 
 _BJ = timezone(timedelta(hours=8))
 
@@ -208,7 +208,7 @@ def test_friday_evening_next_peak_skips_weekend():
 
 def test_statutory_holiday_name_reports_free_days_only():
     """festival_calendar 的节假日边界：只认放假日，补班日与表外日期返回 None。"""
-    from pet.festival.calendar import statutory_holiday_name
+    from petwisp.festival.calendar import statutory_holiday_name
 
     assert statutory_holiday_name(date(2026, 10, 1)) == "国庆节"
     assert statutory_holiday_name(date(2026, 2, 16)) == "春节"
@@ -302,8 +302,8 @@ def test_chat_session_title_roundtrip():
 
 def test_balance_worker_start_failure_never_leaves_busy(monkeypatch, tmp_path):
     from PySide6.QtWidgets import QApplication
-    from pet.app import PetApp
-    from pet.config import Config
+    from petwisp.app import PetApp
+    from petwisp.config import Config
     app = QApplication.instance() or QApplication([])
     owner = PetApp(app, Config(base=tmp_path))
     owner.win = type("Win", (), {
@@ -322,7 +322,7 @@ def test_balance_worker_start_failure_never_leaves_busy(monkeypatch, tmp_path):
     class BrokenThread:
         def __init__(self, *a, **k): pass
         def start(self): raise RuntimeError("cannot start")
-    monkeypatch.setattr("pet.app.threading.Thread", BrokenThread)
+    monkeypatch.setattr("petwisp.app.threading.Thread", BrokenThread)
     owner.show_balance(owner.win)
     assert owner._balance_busy is False
     # 清空本测试排队的 singleShot(done.emit(...))，不泄漏给下一个测试
@@ -372,7 +372,7 @@ def test_format_balance_display_amounts_and_unmatched_text():
 
 def test_menu_balance_action_calls_bound_window_callback():
     from PySide6.QtWidgets import QApplication, QMenu
-    from pet.context_menus.shared import add_balance
+    from petwisp.context_menus.shared import add_balance
     app = QApplication.instance() or QApplication([])
     calls = []
     pet = type("Pet", (), {"on_show_balance": lambda self, parent=None: calls.append(parent)})()

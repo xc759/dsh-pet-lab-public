@@ -4,7 +4,7 @@
 覆盖两层：
 - ``pet/runtime_cleanup.py``：归属标记是删除前提，链接/junction/重解析点不跟随，
   删除前复核归属（TOCTOU），当前运行目录与在用目录受保护；
-- 冻结入口与安装器：``--uninstall-cleanup`` 必须在 import ``pet.app`` 之前分流，
+- 冻结入口与安装器：``--uninstall-cleanup`` 必须在 import ``petwisp.app`` 之前分流，
   不建 Qt、不跑正常 main；ISS 在删除 exe 前调用清理并留痕。
 
 所有目录都建在 pytest 的 tmp 里；不碰真实临时目录、用户配置、注册表，
@@ -23,9 +23,9 @@ from pathlib import Path
 
 import pytest
 
-from pet import runtime_cleanup
-from pet.config import Config
-from pet import uninstall_cleanup
+from petwisp import runtime_cleanup
+from petwisp.config import Config
+from petwisp import uninstall_cleanup
 
 ROOT = Path(__file__).resolve().parents[1]
 FROZEN_ENTRIES = ("packaging/pet_entry.py", "packaging/pet_entry_no_chat.py")
@@ -270,9 +270,9 @@ def test_frozen_entries_dispatch_uninstall_cleanup_before_importing_app() -> Non
     for name in FROZEN_ENTRIES:
         source = (ROOT / name).read_text(encoding="utf-8")
         dispatch_at = source.index('"--uninstall-cleanup" in sys.argv')
-        app_import_at = source.index("from pet.app import main")
-        assert dispatch_at < app_import_at, f"{name}: --uninstall-cleanup 必须在 import pet.app 之前分流"
-        assert "from pet.uninstall_cleanup import main as uninstall_cleanup_main" in source
+        app_import_at = source.index("from petwisp.app import main")
+        assert dispatch_at < app_import_at, f"{name}: --uninstall-cleanup 必须在 import petwisp.app 之前分流"
+        assert "from petwisp.uninstall_cleanup import main as uninstall_cleanup_main" in source
         assert "mark_frozen_runtime_dir()" in source
 
 
@@ -283,33 +283,33 @@ entry_path = sys.argv[1]
 sys.path.insert(0, sys.argv[2])  # 仓库根：入口要能 import pet（子进程 cwd 不进 sys.path）
 record = {"mark": None, "cleanup": None, "app_main": None, "py_modules": sorted(sys.modules)}
 
-runtime_cleanup = types.ModuleType("pet.runtime_cleanup")
+runtime_cleanup = types.ModuleType("petwisp.runtime_cleanup")
 def mark_frozen_runtime_dir():
     record["mark"] = "called"
     return None
 runtime_cleanup.mark_frozen_runtime_dir = mark_frozen_runtime_dir
 
-uninstall = types.ModuleType("pet.uninstall_cleanup")
+uninstall = types.ModuleType("petwisp.uninstall_cleanup")
 def main(argv=None):
     record["cleanup"] = list(sys.argv[1:])  # runpy 会把 argv[0] 换成入口路径
     return 7
 uninstall.main = main
 
-app = types.ModuleType("pet.app")
+app = types.ModuleType("petwisp.app")
 def app_main(*args, **kwargs):
     record["app_main"] = list(sys.argv)
     return 99
 app.main = app_main
 
-import pet
-pet.runtime_cleanup = runtime_cleanup
-pet.uninstall_cleanup = uninstall
-pet.app = app
-sys.modules["pet.runtime_cleanup"] = runtime_cleanup
-sys.modules["pet.uninstall_cleanup"] = uninstall
-sys.modules["pet.app"] = app
+import petwisp
+petwisp.runtime_cleanup = runtime_cleanup
+petwisp.uninstall_cleanup = uninstall
+petwisp.app = app
+sys.modules["petwisp.runtime_cleanup"] = runtime_cleanup
+sys.modules["petwisp.uninstall_cleanup"] = uninstall
+sys.modules["petwisp.app"] = app
 
-sys.argv = ["dsh-pet-standalone", "--uninstall-cleanup"]
+sys.argv = ["petwisp", "--uninstall-cleanup"]
 exit_code = 0
 try:
     runpy.run_path(entry_path, run_name="__main__")
@@ -331,7 +331,7 @@ print(json.dumps({
 def test_frozen_entry_uninstall_cleanup_runs_without_qt_or_normal_main(entry: str, tmp_path) -> None:
     """真实入口进程里跑 `--uninstall-cleanup`：走清理、不建 Qt、不跑正常 main。
 
-    spy 通过 sys.modules 注入（清理实现、pet.app、运行目录标记）：即使入口漏了
+    spy 通过 sys.modules 注入（清理实现、petwisp.app、运行目录标记）：即使入口漏了
     分流，也只会调到 spy，不会真的启动桌宠或碰真实自启/注册表。
     """
     runner = tmp_path / "_entry_runner.py"
@@ -402,7 +402,7 @@ def test_uninstall_cleanup_main_reports_crash_and_records_it(tmp_path, monkeypat
 
 def test_uninstall_cleanup_main_reports_unreadable_config(monkeypatch, capsys) -> None:
     """配置读不出来时也要有结果与非零退出码（卸载流程不该被 traceback 打断）。"""
-    import pet.config as config_mod
+    import petwisp.config as config_mod
 
     def boom(*args, **kwargs):
         raise RuntimeError("config dir unreadable")
@@ -414,7 +414,7 @@ def test_uninstall_cleanup_main_reports_unreadable_config(monkeypatch, capsys) -
 
 
 def test_iss_uninstall_runs_cleanup_before_removing_files() -> None:
-    iss = (ROOT / "packaging" / "dsh-pet.iss").read_text(encoding="utf-8")
+    iss = (ROOT / "packaging" / "petwisp.iss").read_text(encoding="utf-8")
     # 只看生效的指令：注释里会提到旧写法，不能拿来判定行为
     live = "\n".join(
         line for line in iss.splitlines() if line.strip() and not line.strip().startswith(";")
@@ -462,14 +462,14 @@ def _code_without_comments(text: str) -> str:
 
 def test_shared_bridge_protected_when_another_variant_uses_agent(tmp_path) -> None:
     """跨变体保护在 slot 档案结构下依然成立：别的变体在用就不许删共享桥接/hooks。"""
-    ours = tmp_path / "dsh-pet-standalone-webm-chat"
+    ours = tmp_path / "petwisp-webm-chat"
     ours.mkdir()
     (ours / "config.json").write_text(
         json.dumps({"agent_link": {"dsh": False, "claude": False}}), encoding="utf-8"
     )
     (ours / "config-slot-0.json").write_text(json.dumps({"character": "demo"}), encoding="utf-8")
     (ours / "config-slot-2.json").write_text(json.dumps({"scale": 0.8}), encoding="utf-8")
-    peer = tmp_path / "dsh-pet-standalone-webm"
+    peer = tmp_path / "petwisp-webm"
     peer.mkdir()
     (peer / "config.json").write_text(
         json.dumps({"agent_link": {"dsh": True, "claude": False}}), encoding="utf-8"

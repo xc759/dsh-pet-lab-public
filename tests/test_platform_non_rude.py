@@ -32,9 +32,9 @@ import pytest
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication
 
-import pet.overlay_window as overlay_window
-from pet.overlay_window import OverlayWindow
-from pet.platform_win import _set_windows_non_rude_hwnd
+import petwisp.overlay_window as overlay_window
+from petwisp.overlay_window import OverlayWindow
+from petwisp.platform_win import _set_windows_non_rude_hwnd
 
 needs_win32 = pytest.mark.skipif(
     sys.platform != "win32", reason="NonRudeHWND 是 Windows Shell 专属属性")

@@ -27,9 +27,9 @@ from types import SimpleNamespace
 
 import pytest
 
-from pet.chat.models import ProviderConfig  # noqa: E402
-from pet.screen_capture import translate as translate_mod  # noqa: E402
-from pet.screen_capture.translate import TranslateError, translate_text  # noqa: E402
+from petwisp.chat.models import ProviderConfig  # noqa: E402
+from petwisp.screen_capture import translate as translate_mod  # noqa: E402
+from petwisp.screen_capture.translate import TranslateError, translate_text  # noqa: E402
 
 
 class _FakeResponse:
@@ -108,7 +108,7 @@ def _cheap_ssl_context(monkeypatch):
     换成一个哨兵还顺手把"确实传给了 urlopen"变成可断言的
     （见 ``test_the_ssl_flag_and_the_context_reach_urlopen``）。
     """
-    from pet.chat import providers as providers_mod
+    from petwisp.chat import providers as providers_mod
 
     sentinel = object()
     monkeypatch.setattr(providers_mod, "_make_ssl_context", lambda _verify: sentinel)
@@ -255,7 +255,7 @@ def test_the_max_tokens_are_clamped_into_a_sane_window(monkeypatch):
 
 def test_the_ssl_flag_and_the_context_reach_urlopen(monkeypatch, _cheap_ssl_context):
     """``verify_ssl`` 必须真的传到 SSL 上下文构造上（自签名网关靠它跑通）。"""
-    from pet.chat import providers as providers_mod
+    from petwisp.chat import providers as providers_mod
 
     seen: list[bool] = []
     monkeypatch.setattr(providers_mod, "_make_ssl_context",

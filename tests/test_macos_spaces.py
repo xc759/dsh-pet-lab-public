@@ -12,15 +12,15 @@ from PySide6.QtCore import QCoreApplication, Qt
 from PySide6.QtGui import QGuiApplication, QShowEvent
 from PySide6.QtWidgets import QApplication
 
-from pet import platform_mac
-from pet.overlay_window import OverlayWindow
+from petwisp import platform_mac
+from petwisp.overlay_window import OverlayWindow
 
 app = QApplication.instance() or QApplication([])
 
 
 @pytest.mark.parametrize("initial, expected", [(258, 257), (9, 9), (0, 1)])
 def test_spaces_policy_preserves_other_native_behavior(monkeypatch, initial, expected):
-    from pet.platform_mac import _mac_set_window_all_spaces
+    from petwisp.platform_mac import _mac_set_window_all_spaces
 
     behavior = initial
 
@@ -49,7 +49,7 @@ def test_spaces_policy_preserves_other_native_behavior(monkeypatch, initial, exp
 
 @pytest.mark.parametrize("platform", ["darwin", "win32", "linux"])
 def test_spaces_policy_is_safe_off_cocoa(monkeypatch, platform):
-    from pet.platform_mac import _mac_set_window_all_spaces
+    from petwisp.platform_mac import _mac_set_window_all_spaces
 
     if QGuiApplication.platformName() == "cocoa":
         pytest.skip("requires a non-Cocoa platform")
@@ -58,7 +58,7 @@ def test_spaces_policy_is_safe_off_cocoa(monkeypatch, platform):
 
 
 def test_every_overlay_reapplies_spaces_policy_after_show(monkeypatch):
-    import pet.overlay_window as overlay_mod
+    import petwisp.overlay_window as overlay_mod
 
     seen = []
     monkeypatch.setattr(overlay_mod, "_mac_set_window_all_spaces", seen.append)

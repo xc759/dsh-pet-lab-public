@@ -10,7 +10,7 @@ import threading
 
 import pytest
 
-from pet import webm_clip
+from petwisp import webm_clip
 
 
 class _FakeImg:
@@ -183,7 +183,7 @@ def test_set_first_frame_budget_applies():
 
 
 def test_config_first_frame_budget_normalized(tmp_path):
-    from pet.config import Config
+    from petwisp.config import Config
 
     cfg = Config(tmp_path)
     assert cfg.get("first_frame_cache_max_mb") == 8  # 批10-A3：默认 32→8
@@ -198,7 +198,7 @@ def test_config_first_frame_budget_legacy_32_migrates_to_8(tmp_path):
     其它显式值（如 16/64）不被动。"""
     import json
 
-    from pet.config import Config
+    from petwisp.config import Config
 
     cfg = Config(tmp_path)
     cfg.save()  # 确保配置文件落盘（构造不一定立即写）

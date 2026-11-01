@@ -23,7 +23,7 @@ from pathlib import Path
 
 import pytest
 
-from pet import config_write_lock as cwl
+from petwisp import config_write_lock as cwl
 
 REPO = str(Path(__file__).resolve().parent.parent)
 WAIT = 60.0  # 子进程同步宽预算
@@ -37,7 +37,7 @@ WAIT = 60.0  # 子进程同步宽预算
 _CHILD = r"""
 import json, os, sys, time
 sys.path.insert(0, os.environ["CWL_REPO"])
-from pet import config_write_lock as cwl
+from petwisp import config_write_lock as cwl
 
 mode = os.environ["CWL_MODE"]
 lock_dir = os.environ["CWL_DIR"]

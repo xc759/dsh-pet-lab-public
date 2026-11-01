@@ -9,7 +9,7 @@ import sys
 
 from PySide6.QtCore import QPoint, QRect, Qt
 
-from pet.window import pick_context_menu_position
+from petwisp.window import pick_context_menu_position
 
 
 def _menu_size(width: int = 120, height: int = 220):
@@ -88,7 +88,7 @@ import time
 from PySide6.QtCore import QPoint
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication, QMenu
-from pet.window import animate_context_menu_to
+from petwisp.window import animate_context_menu_to
 
 app = QApplication([])
 menu = QMenu()

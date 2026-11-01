@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""知识提炼（``pet.growth.extract``）与 ``GrowthService.harvest_knowledge``。
+"""知识提炼（``petwisp.growth.extract``）与 ``GrowthService.harvest_knowledge``。
 
 红线优先：**档案里不能出现聊天原句**。所以这里断言的是"落盘内容只由关键词组成"，
 而不是"提炼得够不够多"。任何一条测试如果为了让用例通过而去读 ``text``，
@@ -11,9 +11,9 @@ import json
 
 import pytest
 
-from pet.growth import extract
-from pet.growth.schema import MAX_TOPICS
-from pet.growth.service import GrowthService
+from petwisp.growth import extract
+from petwisp.growth.schema import MAX_TOPICS
+from petwisp.growth.service import GrowthService
 
 
 class _Cfg:

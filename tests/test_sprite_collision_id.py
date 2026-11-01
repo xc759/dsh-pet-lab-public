@@ -27,8 +27,8 @@ from PySide6.QtCore import QObject, QPointF, Qt, Signal
 from PySide6.QtGui import QImage
 from PySide6.QtWidgets import QApplication
 
-from pet.pet_sprite import PetSprite
-from pet.sprite_collision import SpriteCollisionWorld
+from petwisp.pet_sprite import PetSprite
+from petwisp.sprite_collision import SpriteCollisionWorld
 
 app = QApplication.instance() or QApplication([])
 

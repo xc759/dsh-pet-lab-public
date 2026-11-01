@@ -31,7 +31,7 @@ def _anchor() -> QRect:
 
 # ------------------------------------------------------------ 纯函数
 def test_column_scales_linearly_and_default_is_unchanged():
-    from pet.speech_bubble_text import (
+    from petwisp.speech_bubble_text import (
         BUBBLE_TEXT_COLUMN,
         BUBBLE_TEXT_COLUMN_MAX,
         bubble_column_for_text,
@@ -53,7 +53,7 @@ def test_column_scales_linearly_and_default_is_unchanged():
 
 
 def test_scale_is_clamped_and_nan_falls_back_to_default():
-    from pet.speech_bubble_text import (
+    from petwisp.speech_bubble_text import (
         BUBBLE_TEXT_SCALE_MAX,
         BUBBLE_TEXT_SCALE_MIN,
         clamp_bubble_text_scale,
@@ -68,7 +68,7 @@ def test_scale_is_clamped_and_nan_falls_back_to_default():
 
 
 def test_font_px_scales_with_floor():
-    from pet.speech_bubble_text import (
+    from petwisp.speech_bubble_text import (
         BUBBLE_BODY_FONT_PX,
         scale_bubble_font_px,
     )
@@ -83,7 +83,7 @@ def test_font_px_scales_with_floor():
 
 
 def test_breath_bubble_reference_canvas_scales():
-    from pet.speech_bubble_text import (
+    from petwisp.speech_bubble_text import (
         breath_bubble_size_for_anchor,
         breath_bubble_size_for_scale,
     )
@@ -104,8 +104,8 @@ def test_breath_bubble_reference_canvas_scales():
 # ------------------------------------------------------------ 配置
 def test_config_clamps_bubble_text_scale(tmp_path: Path):
     """钳位仍由配置读端负责；真值在 slot0 档案（每宠键，规范 §五）。"""
-    from pet.config import Config
-    from pet.settings_slot_config import route_settings_config
+    from petwisp.config import Config
+    from petwisp.settings_slot_config import route_settings_config
 
     def slot0():
         return route_settings_config(Config(base=tmp_path, instance_id="slot-0"))
@@ -129,7 +129,7 @@ def test_config_clamps_bubble_text_scale(tmp_path: Path):
 
 # ------------------------------------------------------------ 气泡本体
 def _bubble(scale: float, text: str, **kwargs):
-    from pet.speech_bubble import PetSpeechBubble
+    from petwisp.speech_bubble import PetSpeechBubble
 
     bubble = PetSpeechBubble()
     try:
@@ -179,7 +179,7 @@ def test_scaled_label_never_narrower_than_the_widest_line():
     用的是 **show_text 自己排出来的 pages**，不是测试另排一次。
     """
     _qapp()
-    from pet.speech_bubble_text import bubble_max_lines, paginate_bubble_text
+    from petwisp.speech_bubble_text import bubble_max_lines, paginate_bubble_text
 
     text = "桌宠气泡文字放大以后，每一行的行尾都不能被气泡右边界切掉，这是硬约束。" * 2
     for scale in (1.0, 1.5, 2.0, 3.0):
@@ -226,7 +226,7 @@ def test_scaled_text_still_paginates():
 def test_scale_applies_to_breath_bubble_text_but_not_image():
     """呼吸气泡：文字吃 bubble_text_scale，配图仍只吃 image_scale。"""
     _qapp()
-    from pet.speech_bubble import PetSpeechBubble
+    from petwisp.speech_bubble import PetSpeechBubble
 
     normal = PetSpeechBubble(style_id="breath_bubble")
     big = PetSpeechBubble(style_id="breath_bubble")
@@ -252,8 +252,8 @@ def test_scaled_wrap_budget_matches_the_label_in_the_live_show_text_path(monkeyp
     旧实现下 column=744、label=714、气泡 770 直接越界。
     """
     _qapp()
-    from pet.speech_bubble import PetSpeechBubble
-    from pet.speech_bubble_text import bubble_max_lines, paginate_bubble_text
+    from petwisp.speech_bubble import PetSpeechBubble
+    from petwisp.speech_bubble_text import bubble_max_lines, paginate_bubble_text
 
     narrow = QRect(0, 0, 420, 700)
     monkeypatch.setattr(
@@ -315,7 +315,7 @@ def test_scale_clamped_on_bubble_and_stays_on_screen():
 def test_show_text_without_scale_keeps_legacy_hardcoded_font():
     """没有注入系数时（旧调用点）保持 13px 硬编码基线，行为零变化。"""
     _qapp()
-    from pet.speech_bubble import PetSpeechBubble
+    from petwisp.speech_bubble import PetSpeechBubble
 
     bubble = PetSpeechBubble()
     bubble.show_text("未注入系数。", _anchor(), 3000)

@@ -17,7 +17,7 @@ import time
 
 import pytest
 
-from pet.decode_fanout import (
+from petwisp.decode_fanout import (
     DecodeFanoutHub,
     FanoutFeed,
     _RingBuffer,

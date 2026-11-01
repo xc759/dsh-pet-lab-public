@@ -1,4 +1,4 @@
-"""Hermes-to-dsh-pet Agent Link bridge.
+"""Hermes-to-petwisp Agent Link bridge.
 
 Writes activity states and identity-only human-approval events to one JSONL
 file. Prompts, messages, tool arguments/results, paths, and credentials are not
@@ -26,13 +26,16 @@ _LAST_EMITTED: tuple[str, str] | None = None
 
 
 def _events_path() -> Path:
-    override = os.environ.get("DSH_PET_HERMES_EVENTS", "").strip()
+    override = os.environ.get("PETWISP_HERMES_EVENTS", "").strip()
+    if not override:
+        # 改名前的旧前缀：Hermes 侧的启动脚本/环境可能是老版本留下的，仍要认。
+        override = os.environ.get("DSH_PET_HERMES_EVENTS", "").strip()
     if override:
         return Path(override).expanduser()
     appdata = os.environ.get("APPDATA", "").strip()
     if appdata:
-        return Path(appdata) / "dsh-pet-standalone-webm-chat" / "agent-events" / "hermes.jsonl"
-    return Path.home() / ".config" / "dsh-pet-standalone-webm-chat" / "agent-events" / "hermes.jsonl"
+        return Path(appdata) / "petwisp-webm-chat" / "agent-events" / "hermes.jsonl"
+    return Path.home() / ".config" / "petwisp-webm-chat" / "agent-events" / "hermes.jsonl"
 
 
 def _aggregate_state() -> str:

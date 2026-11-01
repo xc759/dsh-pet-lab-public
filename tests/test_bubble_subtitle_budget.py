@@ -21,8 +21,8 @@ from PySide6.QtCore import QPointF, QRect
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtWidgets import QApplication
 
-from pet.island import balance as balance_mod
-from pet.speech_bubble import BUBBLE_TEXT_COLUMN, PetSpeechBubble
+from petwisp.island import balance as balance_mod
+from petwisp.speech_bubble import BUBBLE_TEXT_COLUMN, PetSpeechBubble
 
 BEIJING = ZoneInfo("Asia/Shanghai")
 # issue 截图里的余额正文形态：短正文（气泡内宽窄），峰谷副标题两行。

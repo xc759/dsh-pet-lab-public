@@ -15,8 +15,8 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 import pytest  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
-from pet import click_sound  # noqa: E402
-from pet.speech_bubble import PetSpeechBubble  # noqa: E402
+from petwisp import click_sound  # noqa: E402
+from petwisp.speech_bubble import PetSpeechBubble  # noqa: E402
 from tests.test_overlay_collision_toggle import _make_slot_shell  # noqa: E402
 
 app = QApplication.instance() or QApplication([])
@@ -248,8 +248,8 @@ def test_r7_same_text_without_id_not_deduped(tmp_path, probes):
 
 # ---------------------------------------------------------------- R7 agent_link
 def _make_link_mgr(tmp_path, agent_link_cfg=None):
-    from pet.agent_link import AgentLinkManager
-    from pet.config import Config
+    from petwisp.agent_link import AgentLinkManager
+    from petwisp.config import Config
 
     bubbles: list[str] = []
 
@@ -303,7 +303,7 @@ def test_r7_agent_link_identical_activity_after_cooldown_both_surface(tmp_path):
 
 
 def test_r7_agent_link_repeated_sound_after_cooldown_plays_again(tmp_path, monkeypatch):
-    from pet import agent_link
+    from petwisp import agent_link
 
     played: list[object] = []
     monkeypatch.setattr(agent_link, "play_sound",

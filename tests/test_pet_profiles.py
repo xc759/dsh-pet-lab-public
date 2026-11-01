@@ -25,10 +25,10 @@ from pathlib import Path
 
 import pytest
 
-from pet import catalog, config_write_lock as cwl, overlay_spawn_state as ovs
-from pet import pet_profiles as pp
-from pet import settings_slot_config as ssc
-from pet.config import Config
+from petwisp import catalog, config_write_lock as cwl, overlay_spawn_state as ovs
+from petwisp import pet_profiles as pp
+from petwisp import settings_slot_config as ssc
+from petwisp.config import Config
 
 REPO = str(Path(__file__).resolve().parent.parent)
 WAIT = 60.0
@@ -64,7 +64,7 @@ def _begin(config_dir: Path, slot: int) -> int:
 _CHILD = r"""
 import json, os, sys, time
 sys.path.insert(0, os.environ["PP_REPO"])
-from pet import pet_profiles as pp
+from petwisp import pet_profiles as pp
 
 mode = os.environ["PP_MODE"]
 config_dir = os.environ["PP_DIR"]
@@ -80,7 +80,7 @@ if mode == "add":
 elif mode == "migrate":
     print("STATUS %s" % pp.migrate_slot0_profile(config_dir).status, flush=True)
 elif mode == "hold":
-    from pet import config_write_lock as cwl
+    from petwisp import config_write_lock as cwl
     with cwl.config_write_lock(config_dir, timeout=10.0):
         print("LOCKED", flush=True)
         release = os.environ["PP_RELEASE"]
@@ -528,7 +528,7 @@ def test_slot0_migration_existing_profile_consistency_with_config_save(tmp_path)
     用户拿到的是一份写着"保留"却已经空掉的配置。这里连续走两步（先迁移、再真保存），
     断言源侧**始终**没有每宠键、目标档案**始终**逐字节不变。
     """
-    from pet.config import APP_DIR_NAME, Config
+    from petwisp.config import APP_DIR_NAME, Config
 
     cfg_dir = tmp_path / APP_DIR_NAME          # Config.dir = base / APP_DIR_NAME
     source = _global_with_per_pet(cfg_dir)

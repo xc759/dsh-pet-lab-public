@@ -26,8 +26,8 @@ from pathlib import Path
 
 import pytest
 
-from pet.island import extension_host as host
-from pet.island import segments as isl
+from petwisp.island import extension_host as host
+from petwisp.island import segments as isl
 
 READ_LOG = "read.log"
 IMPORT_FLAG = "imported.flag"

@@ -7,8 +7,8 @@
 """
 from __future__ import annotations
 
-from pet import window_alerts
-from pet.music import detect as music_detect
+from petwisp import window_alerts
+from petwisp.music import detect as music_detect
 
 
 class _FakeCfg:
@@ -47,7 +47,7 @@ def test_starts_singing_when_music_plays(monkeypatch):
     host = _FakeHost()
     window_alerts.check_music_sing(host)
 
-    from pet.window import SING_ANIM
+    from petwisp.window import SING_ANIM
 
     assert host._music_sing_active is True
     assert host.switches == [SING_ANIM]

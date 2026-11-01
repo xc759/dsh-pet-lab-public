@@ -6,10 +6,10 @@ from types import SimpleNamespace
 
 import pytest
 
-from pet import catalog, config as config_mod, pet_profiles as profiles
-from pet.config import Config
-from pet.overlay_shell import _SpriteConfig
-from pet.settings_slot_config import SlotRoutedConfig
+from petwisp import catalog, config as config_mod, pet_profiles as profiles
+from petwisp.config import Config
+from petwisp.overlay_shell import _SpriteConfig
+from petwisp.settings_slot_config import SlotRoutedConfig
 
 
 def _views(tmp_path, raw):
@@ -147,9 +147,9 @@ def test_pure_entry_imports_no_qt_or_keyring_in_fresh_process():
 
     code = '''
 import sys
-from pet.config import normalize_pet_profile_snapshot
+from petwisp.config import normalize_pet_profile_snapshot
 assert normalize_pet_profile_snapshot({"version": 1, "scale": 1.7})["scale"] == 0.72
-assert not any(name.startswith(("PySide6", "keyring", "pet.chat")) for name in sys.modules)
+assert not any(name.startswith(("PySide6", "keyring", "petwisp.chat")) for name in sys.modules)
 '''
     result = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, timeout=30)
     assert result.returncode == 0, result.stderr

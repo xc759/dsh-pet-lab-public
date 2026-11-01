@@ -39,7 +39,7 @@ def _wait_until(predicate, timeout: float = 3.0) -> bool:
 
 
 def _make_pet_sprite():
-    from pet.pet_sprite import PetSprite
+    from petwisp.pet_sprite import PetSprite
 
     lib = fac.RichLibrary()
     sprite = PetSprite(lib, pos=QPointF(50, 50), scale=0.5)
@@ -72,7 +72,7 @@ def test_pet_sprite_visible_defaults_true_and_toggle_reports_dirty():
 # ---------------------------------------------------------------- OverlayWindow 三处排除
 def test_hidden_sprite_excluded_from_hit_and_click_through():
     """命中与穿透判据：隐藏 sprite 不参与逐像素联合命中。"""
-    from pet.overlay_window import OverlayWindow
+    from petwisp.overlay_window import OverlayWindow
 
     overlay = OverlayWindow()
     sprite = FakeSprite((0, 0), (64, 64))
@@ -91,7 +91,7 @@ def test_hidden_sprite_excluded_from_hit_and_click_through():
 
 def test_hidden_sprite_excluded_from_position_fanout():
     """位置 fanout：隐藏 sprite 的 rect 变化不再触发跟随回调。"""
-    from pet.overlay_window import OverlayWindow
+    from petwisp.overlay_window import OverlayWindow
 
     overlay = OverlayWindow()
     sprite = FakeSprite((10, 10), (40, 40), movable=True)
@@ -112,7 +112,7 @@ def test_hidden_sprite_excluded_from_position_fanout():
 
 def test_hidden_sprite_excluded_from_paint():
     """绘制：隐藏 sprite 不画（脏区域照旧被擦除）。"""
-    from pet.overlay_window import OverlayWindow
+    from petwisp.overlay_window import OverlayWindow
 
     overlay = OverlayWindow()
     sprite = FakeSprite((0, 0), (64, 64))
@@ -167,7 +167,7 @@ def test_tray_menu_has_per_sprite_visibility_toggle(tmp_path):
         menu = shell._tray_menu
         assert menu is not None
         sub = next(a.menu() for a in menu.actions()
-                   if a.text().startswith("小肥鱼"))
+                   if a.text().startswith("小宠"))
         action = next(a for a in sub.actions() if a.text() == "显示这只")
         assert action.isCheckable() is True
         assert action.isChecked() is True
@@ -211,7 +211,7 @@ def test_click_route_ignores_hidden_sprite(tmp_path):
 
 def test_sprite_without_visible_field_treated_as_visible():
     """鸭式 sprite（无 visible 字段）沿用既有语义：恒可见（灰假件不被打红）。"""
-    from pet.overlay_window import OverlayWindow
+    from petwisp.overlay_window import OverlayWindow
 
     overlay = OverlayWindow()
     sprite = FakeSprite((0, 0), (64, 64))     # test_overlay_window.FakeSprite 无 visible
@@ -278,8 +278,8 @@ def _real_frameseq_sprite(tmp_path, name="idle1", count=12):
     """真 PetSprite + 真 FrameSeqClip（现场生成的 webp 帧素材）。"""
     from tests.test_frameseq_clip import _make_frames
 
-    from pet.frameseq_clip import FrameSeqClip
-    from pet.pet_sprite import PetSprite
+    from petwisp.frameseq_clip import FrameSeqClip
+    from petwisp.pet_sprite import PetSprite
 
     frames_dir = tmp_path / name
     _make_frames(frames_dir, count=count)
@@ -334,7 +334,7 @@ def test_pause_clip_stops_timer_and_resume_continues_without_rewind(tmp_path):
 
 def test_pause_clip_is_idempotent_and_noop_without_clip(tmp_path):
     """无 clip / 重复暂停：幂等 no-op（隐藏与恢复可能被重复触发）。"""
-    from pet.pet_sprite import PetSprite
+    from petwisp.pet_sprite import PetSprite
 
     bare = PetSprite(fac.RichLibrary(), pos=QPointF(0, 0), scale=0.5)
     bare.pause_clip()                          # 无 clip：不许抛
@@ -381,7 +381,7 @@ def test_unbind_while_paused_does_not_poison_clip_for_next_bind(tmp_path):
     """
     from tests.test_frameseq_clip import _make_frames
 
-    from pet.frameseq_clip import FrameSeqClip
+    from petwisp.frameseq_clip import FrameSeqClip
 
     sprite, clip_a = _real_frameseq_sprite(tmp_path, name="idle1")
     frames_b = tmp_path / "idle2"
@@ -617,7 +617,7 @@ def test_window_visibility_pairs_pause_and_resume_warm_for_all_libraries(tmp_pat
 
 def test_shell_set_sprite_visible_notifies_driver_tier(tmp_path):
     """逐只藏光：壳层必须通知驱动器（零可见 sprite → 目标 T3）。"""
-    from pet.tick_governor import TIER_OCCLUDED
+    from petwisp.tick_governor import TIER_OCCLUDED
 
     shell, _lib = _make_shell(tmp_path)
     try:
@@ -637,7 +637,7 @@ def test_shell_set_sprite_visible_notifies_driver_tier(tmp_path):
 
 def test_hiding_one_of_two_sprites_keeps_tier_running(tmp_path):
     """只剩一只可见时不许降档（零可见 sprite 才是 T3 的判据）。"""
-    from pet.tick_governor import TIER_OCCLUDED
+    from petwisp.tick_governor import TIER_OCCLUDED
 
     shell, _lib = _make_shell(tmp_path)
     try:

@@ -43,11 +43,11 @@ import time
 import pytest
 from PySide6.QtCore import QObject
 
-from pet import window_alerts
-from pet.music import detect as music_detect, now_playing
+from petwisp import window_alerts
+from petwisp.music import detect as music_detect, now_playing
 
 # import 期有平台分支，必须在下面 _win32 夹具改 sys.platform 之前完成导入。
-from pet.window import SING_ANIM
+from petwisp.window import SING_ANIM
 
 # Windows.Media.MediaPlaybackType
 UNKNOWN = 0
@@ -350,7 +350,7 @@ class _SongWindow(QObject):
 
 def _controller(monkeypatch):
     """真实控制器 + 被记录的取词线程入口（取词会联网，必须打桩）。"""
-    from pet.music.lyric_controller import MusicLyricController
+    from petwisp.music.lyric_controller import MusicLyricController
 
     win = _SongWindow()
     ctrl = MusicLyricController(win)
@@ -672,7 +672,7 @@ def test_sample_loop_passes_switch_from_config(monkeypatch):
     桩掉 now_playing.get_now_playing，只检查采样线程实际传了什么参数——这是
     "配置 → 采样"这段接线唯一会被漏掉的地方。
     """
-    from pet.music.lyric_controller import MusicLyricController
+    from petwisp.music.lyric_controller import MusicLyricController
 
     calls: list = []
 

@@ -32,8 +32,8 @@ from PySide6.QtWidgets import QApplication
 import tests.test_overlay_window_capabilities as cap
 import tests.test_sprite_menu_facade as fac
 import tests.test_overlay_hosts_multiscreen as hosts_mod
-from pet.overlay_shell import OverlayShell
-from pet.pet_sprite import PetSprite
+from petwisp.overlay_shell import OverlayShell
+from petwisp.pet_sprite import PetSprite
 from tests.test_overlay_hosts_multiscreen import (
     FakeScreen, _hittable, _move, _press, _release)
 

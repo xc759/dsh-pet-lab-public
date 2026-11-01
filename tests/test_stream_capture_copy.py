@@ -46,9 +46,9 @@ def _build_dialog(tmp_path, monkeypatch, *, topology: str | None = None,
     路径）；``capture`` 非 None 时先写进**主配置**。``instance_id`` 非空 = 子宠页
     （它自己的 config-slot-N.json 才是读写对象，拓扑门仍只认主配置）。
     """
-    import pet.modern_settings_dialog as settings_mod
-    from pet import overlay_settings_command as cmd_mod
-    from pet.config import APP_DIR_NAME, Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp import overlay_settings_command as cmd_mod
+    from petwisp.config import APP_DIR_NAME, Config
 
     monkeypatch.setattr(settings_mod.sys, "platform", "win32")
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -78,8 +78,8 @@ def _close(dialog):
 
 def _stream_capture_hint(tmp_path, monkeypatch, topology: str | None) -> str:
     """按拓扑构建设置页，取「直播捕获兼容」行的说明文本。"""
-    import pet.modern_settings_dialog as settings_mod
-    from pet import overlay_settings_command as cmd_mod
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp import overlay_settings_command as cmd_mod
 
     dialog = _build_dialog(tmp_path, monkeypatch, topology=topology)
     try:
@@ -94,8 +94,8 @@ def _stream_capture_hint(tmp_path, monkeypatch, topology: str | None) -> str:
 
 def test_stream_capture_copy_is_restart_level_under_overlay_topology(tmp_path, monkeypatch):
     """overlay（默认路径）：如实说明这是重启级切换（T4 口径），作用域在行内标注里。"""
-    import pet.modern_settings_dialog as settings_mod
-    from pet import overlay_settings_command as cmd_mod
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp import overlay_settings_command as cmd_mod
 
     dialog = _build_dialog(tmp_path, monkeypatch, topology="overlay")
     try:
@@ -117,8 +117,8 @@ def test_stream_capture_copy_is_restart_level_under_overlay_topology(tmp_path, m
 
 def test_stream_capture_copy_same_restart_copy_when_already_checked(tmp_path, monkeypatch):
     """已勾选（配置 true，尚未重启的那一进程）：不得退回"看起来已经生效"的旧文案。"""
-    import pet.modern_settings_dialog as settings_mod
-    from pet import overlay_settings_command as cmd_mod
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp import overlay_settings_command as cmd_mod
 
     dialog = _build_dialog(tmp_path, monkeypatch, capture=True)
     try:
@@ -137,7 +137,7 @@ def test_stream_capture_copy_same_restart_copy_when_already_checked(tmp_path, mo
 
 def test_stream_capture_check_is_never_greyed_out(tmp_path, monkeypatch):
     """T4 Phase A：**主宠页**两个拓扑下都可点（不再置灰）。"""
-    from pet import overlay_settings_command as cmd_mod
+    from petwisp import overlay_settings_command as cmd_mod
 
     for capture in (False, True):
         dialog = _build_dialog(tmp_path, monkeypatch, capture=capture)
@@ -162,8 +162,8 @@ def test_stream_capture_check_editable_on_child_page(tmp_path, monkeypatch):
     from PySide6.QtCore import Qt
     from PySide6.QtTest import QTest
 
-    from pet import overlay_settings_command as cmd_mod
-    from pet.config import APP_DIR_NAME
+    from petwisp import overlay_settings_command as cmd_mod
+    from petwisp.config import APP_DIR_NAME
 
     dialog = _build_dialog(tmp_path, monkeypatch, topology="overlay",
                            instance_id="slot-1", capture=False)
@@ -212,8 +212,8 @@ def test_stream_capture_copy_unchanged_under_explicit_legacy_env(tmp_path, monke
 
 def test_capture_config_flips_topology_verdict(tmp_path, monkeypatch):
     """配置文件就是拓扑输入：true → 非 overlay（legacy 单窗）。"""
-    from pet import overlay_settings_command as cmd_mod
-    from pet.config import Config
+    from petwisp import overlay_settings_command as cmd_mod
+    from petwisp.config import Config
 
     monkeypatch.delenv("PET_RENDER_TOPOLOGY", raising=False)
     config = Config(tmp_path)

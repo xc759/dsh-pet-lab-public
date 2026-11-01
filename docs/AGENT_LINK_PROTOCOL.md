@@ -20,7 +20,7 @@ Agent 侧（写方）                          桌宠侧（读方）
 
 DSH 通道只有**一个读方**：`DshMonitor`（一个 `DirGlobTailer` + 一个轮询线程）。
 每条桥接记录解析一次后分发给两个消费者：信号分派（气泡/动画/音效管线）与
-`pet/dsh_state.py` 的纯收敛器（8 态收敛 + 审批/问题锁存），DSH 端口探活
+`petwisp/dsh_state.py` 的纯收敛器（8 态收敛 + 审批/问题锁存），DSH 端口探活
 （offline 判定的唯一来源）也并入同一线程（3s 一节拍，候选端口 3080/38080/
 19387 与 `$DSH_PORT`）。
 ```
@@ -43,9 +43,9 @@ DSH 通道只有**一个读方**：`DshMonitor`（一个 `DirGlobTailer` + 一�
 
 | 平台 | 路径 |
 |---|---|
-| Windows | `%APPDATA%\dsh-pet-standalone[-变体]\agent-events\` |
-| macOS | `~/Library/Application Support/dsh-pet-standalone[-变体]/agent-events/` |
-| Linux | `~/.config/dsh-pet-standalone[-变体]/agent-events/` |
+| Windows | `%APPDATA%\petwisp[-变体]\agent-events\` |
+| macOS | `~/Library/Application Support/petwisp[-变体]/agent-events/` |
+| Linux | `~/.config/petwisp[-变体]/agent-events/` |
 
 ### 2.2 JSON 行格式
 
@@ -99,14 +99,14 @@ DSH 通道只有**一个读方**：`DshMonitor`（一个 `DirGlobTailer` + 一�
 1. **追加写**（append），UTF-8 编码；PowerShell 写入方建议 `-Encoding UTF8`（读方已兼容首行 BOM）。
 2. **去重**：连续相同状态不要重复落盘（状态切换瞬间可能抖出重复事件，重复行会占住桌宠端换帧节流位）。
 3. **轮转**：事件文件超过约 1MB 时轮转（如 `dsh-{pid}.jsonl` → `dsh-{pid}.jsonl.1`，只留一代）；读方通过文件身份识别自动适配，无需特殊处理。
-4. **绝不阻塞宿主**：写事件失败时静默放弃——联动是锦上添花，不能影响 Agent 本体（参考 `integrations/dsh-pet-bridge/index.js` 的做法）。
+4. **绝不阻塞宿主**：写事件失败时静默放弃——联动是锦上添花，不能影响 Agent 本体（参考 `integrations/petwisp-bridge/index.js` 的做法）。
 5. **隐私红线**：只写状态/事件元数据（状态、事件名、工具名），**不要**把代码内容、命令全文、文件内容、屏幕信息写进事件文件。
 
 ## 3. 内置四种接入模式（现状分析）
 
 | Agent | 模式 | 事件来源 | 是否写外部配置 |
 |---|---|---|---|
-| DSH | 插件订阅 | 内置桥接插件 `integrations/dsh-pet-bridge/` 订阅 agent 生命周期事件，按实例写桥目录 `<base>/dsh-pet-bridge/dsh-{pid}.jsonl`（消费端 glob `dsh*.jsonl`，兼容旧版单文件 `dsh.jsonl`） | 安装/卸载 dsh 插件（弹窗同意） |
+| DSH | 插件订阅 | 内置桥接插件 `integrations/petwisp-bridge/` 订阅 agent 生命周期事件，按实例写桥目录 `<base>/petwisp-bridge/dsh-{pid}.jsonl`（消费端 glob `dsh*.jsonl`，兼容旧版单文件 `dsh.jsonl`） | 安装/卸载 dsh 插件（弹窗同意） |
 | Claude Code | hooks 注入 | 向 `~/.claude/settings.json` 注入官方 hooks，落地脚本把事件写 `agent-events/claude.jsonl` | 注入/卸载 hooks（弹窗同意） |
 | Cursor | transcript 直读 | 直接 tail `~/.cursor/projects/**/agent-transcripts/*.jsonl`（官方转写文件，按 role/content 解析） | 否 |
 | OpenCode | 数据库直读 | 只读 `~/.local/share/opencode/opencode.db` 的 `event` 表（rowid 增量） | 否 |
@@ -158,11 +158,11 @@ printf '{"ts": %s, "state": "idle"}\n' "$(date +%s)" >> ~/.gemini/pet-events.jso
 
 | # | 位置 | 改什么 |
 |---|---|---|
-| 1 | `pet/config.py` `_default_agent_link_data()` | 新增默认开关键 |
-| 2 | `pet/config.py` `_clean_agent_link_data()` | 键列表加入新键 |
-| 3 | `pet/agent_link.py` `AgentLinkManager.__init__` | `monitors` 字典注册监视器实例 |
-| 4 | `pet/agent_link.py` `AgentLinkManager.AGENT_NAMES` | 显示名 |
-| 5 | `pet/context_menus/shared.py` `add_agent_link_menu()` | 菜单条目 |
+| 1 | `petwisp/config.py` `_default_agent_link_data()` | 新增默认开关键 |
+| 2 | `petwisp/config.py` `_clean_agent_link_data()` | 键列表加入新键 |
+| 3 | `petwisp/agent_link.py` `AgentLinkManager.__init__` | `monitors` 字典注册监视器实例 |
+| 4 | `petwisp/agent_link.py` `AgentLinkManager.AGENT_NAMES` | 显示名 |
+| 5 | `petwisp/context_menus/shared.py` `add_agent_link_menu()` | 菜单条目 |
 
 监视器实现上，走统一协议的只需继承 `BaseAgentMonitor`（参考 `CustomAgentMonitor`）；已有本地事件源的覆写 `_poll()`（参考 `CursorMonitor`/`OpenCodeMonitor`），把解析结果经 `state_changed`/`activity` 信号发出即可。
 

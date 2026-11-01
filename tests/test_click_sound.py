@@ -13,8 +13,8 @@ from types import SimpleNamespace
 import pytest
 from PySide6.QtCore import QTimer
 
-from pet import click_sound
-from pet import window as window_mod
+from petwisp import click_sound
+from petwisp import window as window_mod
 
 
 class FakeQtAudio:
@@ -533,9 +533,9 @@ def test_play_with_effect_returns_false_when_error_persists(tmp_path, monkeypatc
 
 def test_click_sound_immediate_toggle_in_dialog_affects_pet_window(tmp_path, monkeypatch):
     """回归测试：设置对话框中即时关闭点击音效，桌宠窗口点击立即不播放。"""
-    from pet.config import Config
-    from pet.window import PetWindow
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp.config import Config
+    from petwisp.window import PetWindow
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
     from PySide6.QtWidgets import QApplication
     from types import SimpleNamespace
 
@@ -544,7 +544,7 @@ def test_click_sound_immediate_toggle_in_dialog_affects_pet_window(tmp_path, mon
     # config-slot-0.json。运行期那份配置面因此也是路由视图（PetWindow 读的就是它），
     # 否则设置窗写档案、窗口读主配置，即时生效变成空话。初值同样要落盘再开窗：
     # 路由视图的读源只取盘。
-    from pet.settings_slot_config import route_settings_config
+    from petwisp.settings_slot_config import route_settings_config
 
     config = route_settings_config(Config(base=tmp_path, instance_id="slot-0"))
     config.set("click_sound_enabled", True)
@@ -557,13 +557,13 @@ def test_click_sound_immediate_toggle_in_dialog_affects_pet_window(tmp_path, mon
     assert win.click_sound_enabled is True
 
     # 模拟设置对话框即时关闭
-    monkeypatch.setattr("pet.modern_settings_dialog.autostart_mod.is_enabled", lambda: False)
+    monkeypatch.setattr("petwisp.modern_settings_dialog.autostart_mod.is_enabled", lambda: False)
     dialog = ModernSettingsDialog(config, include_ai=False)
     assert dialog.click_sound_check.isChecked() is True
 
     played = []
-    monkeypatch.setattr("pet.window.play_sound", lambda *a, **k: played.append(a))
-    monkeypatch.setattr("pet.window.play_press_sound", lambda *a, **k: played.append(a))
+    monkeypatch.setattr("petwisp.window.play_sound", lambda *a, **k: played.append(a))
+    monkeypatch.setattr("petwisp.window.play_press_sound", lambda *a, **k: played.append(a))
 
     # 关闭点击音效
     dialog.click_sound_check.setChecked(False)
@@ -588,7 +588,7 @@ def test_cache_path_stable_across_mtime_change(tmp_path):
     回归：键曾是 path:mtime:size——每次重新部署（文件复制刷新 mtime）后
     首次点击必重转码，并因此拉起 QtMultimedia ffmpeg 后端常驻 +40~74MB。
     """
-    from pet import click_sound
+    from petwisp import click_sound
 
     src = tmp_path / "ding.mp3"
     src.write_bytes(b"fake-mp3-content")
@@ -605,7 +605,7 @@ def test_cache_path_stable_across_mtime_change(tmp_path):
 
 def test_cache_path_memoizes_content_hash(tmp_path, monkeypatch):
     """内容哈希经 (path,mtime,size) memo 只算一次（点击热路径不反复整读）。"""
-    from pet import click_sound
+    from petwisp import click_sound
 
     src = tmp_path / "ding.mp3"
     src.write_bytes(b"fake-mp3-content")
@@ -625,7 +625,7 @@ def test_cache_path_memoizes_content_hash(tmp_path, monkeypatch):
 
 def test_cache_path_falls_back_to_stat_key_when_unreadable(tmp_path, monkeypatch):
     """内容读不到（ACL/独占）时退回 stat 键，绝不让缓存键计算炸掉播放。"""
-    from pet import click_sound
+    from petwisp import click_sound
 
     src = tmp_path / "locked.mp3"
     src.write_bytes(b"x")
@@ -653,7 +653,7 @@ def test_sound_cache_dir_resolved_once_per_process(monkeypatch):
     """缓存目录只向 QStandardPaths 解析一次；测试复位后可重新解析。"""
     from PySide6.QtCore import QStandardPaths
 
-    from pet import click_sound
+    from petwisp import click_sound
 
     click_sound._reset_caches_for_tests()
     calls = []
@@ -677,7 +677,7 @@ def test_cache_path_does_not_resolve_source_path(monkeypatch, tmp_path):
     """缓存键不得每次发声都做 resolve()（Windows 上每源两次 GetFinalPathName）。"""
     from pathlib import Path as _Path
 
-    from pet import click_sound
+    from petwisp import click_sound
 
     src = tmp_path / "ding.mp3"
     src.write_bytes(b"fake-mp3-content")
@@ -700,7 +700,7 @@ def test_sounds_root_resolved_once_per_meipass(monkeypatch):
     """音源根目录不得每次发声都重新 resolve（Windows 上是一次 GetFinalPathName）。"""
     from pathlib import Path as _Path
 
-    from pet import click_sound
+    from petwisp import click_sound
 
     click_sound._reset_caches_for_tests()
     counts = []

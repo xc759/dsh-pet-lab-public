@@ -7,8 +7,8 @@ from __future__ import annotations
 
 from PySide6.QtWidgets import QApplication
 
-from pet.config import Config
-from pet.window import PetWindow
+from petwisp.config import Config
+from petwisp.window import PetWindow
 
 
 def _qapp() -> QApplication:
@@ -29,7 +29,7 @@ def _disabled_config(tmp_path):
 
 
 def test_petapp_disabled_optional_services_not_constructed(tmp_path):
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     app = _qapp()
     cfg = _disabled_config(tmp_path)
@@ -42,7 +42,7 @@ def test_petapp_disabled_optional_services_not_constructed(tmp_path):
 
 def test_petapp_enabled_default_services_still_constructed(tmp_path):
     """默认配置（待办开）保持既有构造行为。"""
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     app = _qapp()
     shell = AppShell(app, Config(tmp_path), enable_chat=False)
@@ -54,8 +54,8 @@ def test_petapp_enabled_default_services_still_constructed(tmp_path):
 
 
 def test_petapp_start_disabled_services_stay_stopped(tmp_path, monkeypatch):
-    import pet.app as app_mod
-    from pet.app import AppShell
+    import petwisp.app as app_mod
+    from petwisp.app import AppShell
 
     app = _qapp()
     monkeypatch.setattr(app_mod.QTimer, "singleShot", lambda *a, **k: None)

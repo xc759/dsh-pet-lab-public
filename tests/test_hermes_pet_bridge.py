@@ -46,7 +46,7 @@ def test_registers_activity_and_human_input_observer_hooks():
 
 def test_writes_minimal_state_events_and_omits_prompt_and_tool_args(tmp_path, monkeypatch):
     path = tmp_path / "pet" / "events.jsonl"
-    monkeypatch.setenv("DSH_PET_HERMES_EVENTS", str(path))
+    monkeypatch.setenv("PETWISP_HERMES_EVENTS", str(path))
     _reset()
     ctx = HookRegistry()
     bridge.register(ctx)
@@ -68,7 +68,7 @@ def test_writes_minimal_state_events_and_omits_prompt_and_tool_args(tmp_path, mo
 
 def test_session_end_uses_documented_completion_fields(tmp_path, monkeypatch):
     path = tmp_path / "events.jsonl"
-    monkeypatch.setenv("DSH_PET_HERMES_EVENTS", str(path))
+    monkeypatch.setenv("PETWISP_HERMES_EVENTS", str(path))
     _reset()
     bridge._on_session_end(session_id="one", completed=False, interrupted=True)
     assert _read(path)[-1]["state"] == "attention"
@@ -78,7 +78,7 @@ def test_session_end_uses_documented_completion_fields(tmp_path, monkeypatch):
 
 def test_failed_session_emits_error_state(tmp_path, monkeypatch):
     path = tmp_path / "events.jsonl"
-    monkeypatch.setenv("DSH_PET_HERMES_EVENTS", str(path))
+    monkeypatch.setenv("PETWISP_HERMES_EVENTS", str(path))
     _reset()
     bridge._on_pre_llm_call(session_id="failed-session", platform="cli")
     bridge._on_session_end(
@@ -90,7 +90,7 @@ def test_failed_session_emits_error_state(tmp_path, monkeypatch):
 
 def test_api_server_chat_activity_is_suppressed(tmp_path, monkeypatch):
     path = tmp_path / "events.jsonl"
-    monkeypatch.setenv("DSH_PET_HERMES_EVENTS", str(path))
+    monkeypatch.setenv("PETWISP_HERMES_EVENTS", str(path))
     _reset()
     ctx = HookRegistry()
     bridge.register(ctx)
@@ -111,7 +111,7 @@ def test_api_server_chat_activity_is_suppressed(tmp_path, monkeypatch):
 
 def test_human_approval_events_use_correlated_ids_without_prompt_content(tmp_path, monkeypatch):
     path = tmp_path / "events.jsonl"
-    monkeypatch.setenv("DSH_PET_HERMES_EVENTS", str(path))
+    monkeypatch.setenv("PETWISP_HERMES_EVENTS", str(path))
     _reset()
     ctx = HookRegistry()
     bridge.register(ctx)
@@ -141,7 +141,7 @@ def test_human_approval_events_use_correlated_ids_without_prompt_content(tmp_pat
 
 
 def test_event_write_failure_is_silent(tmp_path, monkeypatch):
-    monkeypatch.setenv("DSH_PET_HERMES_EVENTS", str(tmp_path / "not-a-dir" / "events.jsonl"))
+    monkeypatch.setenv("PETWISP_HERMES_EVENTS", str(tmp_path / "not-a-dir" / "events.jsonl"))
     (tmp_path / "not-a-dir").write_text("occupied", encoding="utf-8")
     _reset()
     bridge._on_pre_llm_call(session_id="s")
@@ -150,7 +150,7 @@ def test_event_write_failure_is_silent(tmp_path, monkeypatch):
 
 def test_failed_tool_does_not_leave_session_permanently_working(tmp_path, monkeypatch):
     path = tmp_path / "events.jsonl"
-    monkeypatch.setenv("DSH_PET_HERMES_EVENTS", str(path))
+    monkeypatch.setenv("PETWISP_HERMES_EVENTS", str(path))
     _reset()
     bridge._on_pre_tool_call(session_id="recovering", tool_name="terminal")
     bridge._on_post_tool_call(session_id="recovering", status="error")
@@ -162,7 +162,7 @@ def test_failed_tool_does_not_leave_session_permanently_working(tmp_path, monkey
 
 def test_missing_tool_name_never_falls_back_to_private_arguments(tmp_path, monkeypatch):
     path = tmp_path / "events.jsonl"
-    monkeypatch.setenv("DSH_PET_HERMES_EVENTS", str(path))
+    monkeypatch.setenv("PETWISP_HERMES_EVENTS", str(path))
     _reset()
     bridge._on_pre_tool_call(session_id="s", args={"tool": "PRIVATE ARGUMENT"})
     assert "tool" not in _read(path)[-1]
@@ -171,7 +171,7 @@ def test_missing_tool_name_never_falls_back_to_private_arguments(tmp_path, monke
 
 def test_parallel_tools_stay_working_until_last_call_returns(tmp_path, monkeypatch):
     path = tmp_path / "events.jsonl"
-    monkeypatch.setenv("DSH_PET_HERMES_EVENTS", str(path))
+    monkeypatch.setenv("PETWISP_HERMES_EVENTS", str(path))
     _reset()
     bridge._on_pre_tool_call(session_id="s", tool_call_id="a", tool_name="terminal")
     bridge._on_pre_tool_call(session_id="s", tool_call_id="b", tool_name="read_file")
@@ -184,7 +184,7 @@ def test_parallel_tools_stay_working_until_last_call_returns(tmp_path, monkeypat
 
 def test_api_server_descendants_are_suppressed_but_cli_children_are_not(tmp_path, monkeypatch):
     path = tmp_path / "events.jsonl"
-    monkeypatch.setenv("DSH_PET_HERMES_EVENTS", str(path))
+    monkeypatch.setenv("PETWISP_HERMES_EVENTS", str(path))
     _reset()
     bridge._on_pre_llm_call(session_id="api", platform="api_server")
     bridge._on_pre_llm_call(session_id="child", platform="subagent", parent_session_id="api")
@@ -200,11 +200,11 @@ def test_api_server_descendants_are_suppressed_but_cli_children_are_not(tmp_path
 
 
 def test_independent_writers_have_distinct_owners_including_approvals(tmp_path, monkeypatch):
-    from pet.agent_link import record_owner
-    from pet.agent_link.dsh_state import fold_writer_states
+    from petwisp.agent_link import record_owner
+    from petwisp.agent_link.dsh_state import fold_writer_states
 
     path = tmp_path / "events.jsonl"
-    monkeypatch.setenv("DSH_PET_HERMES_EVENTS", str(path))
+    monkeypatch.setenv("PETWISP_HERMES_EVENTS", str(path))
     _reset()
     other = importlib.util.module_from_spec(SPEC)
     SPEC.loader.exec_module(other)
@@ -224,7 +224,7 @@ def test_independent_writers_have_distinct_owners_including_approvals(tmp_path, 
 
 def test_state_snapshot_and_append_share_one_critical_section(tmp_path, monkeypatch):
     path = tmp_path / "events.jsonl"
-    monkeypatch.setenv("DSH_PET_HERMES_EVENTS", str(path))
+    monkeypatch.setenv("PETWISP_HERMES_EVENTS", str(path))
     _reset()
     append = bridge._append_event
     locked = []
@@ -252,7 +252,7 @@ def test_state_snapshot_and_append_share_one_critical_section(tmp_path, monkeypa
 
 def test_background_fork_without_lifecycle_cannot_resurrect_finished_turn(tmp_path, monkeypatch):
     path = tmp_path / "events.jsonl"
-    monkeypatch.setenv("DSH_PET_HERMES_EVENTS", str(path))
+    monkeypatch.setenv("PETWISP_HERMES_EVENTS", str(path))
     _reset()
     bridge._on_pre_llm_call(session_id="shared", turn_id="foreground", platform="desktop")
     bridge._on_session_end(session_id="shared", turn_id="foreground", completed=True)
@@ -269,7 +269,7 @@ def test_background_fork_without_lifecycle_cannot_resurrect_finished_turn(tmp_pa
 
 def test_background_fork_is_ignored_even_while_parent_is_active(tmp_path, monkeypatch):
     path = tmp_path / "events.jsonl"
-    monkeypatch.setenv("DSH_PET_HERMES_EVENTS", str(path))
+    monkeypatch.setenv("PETWISP_HERMES_EVENTS", str(path))
     _reset()
     bridge._on_pre_llm_call(session_id="shared", turn_id="foreground")
     before = path.read_bytes()
@@ -285,7 +285,7 @@ def test_background_fork_is_ignored_even_while_parent_is_active(tmp_path, monkey
 
 def test_compression_session_rotation_preserves_turn_lifecycle(tmp_path, monkeypatch):
     path = tmp_path / "events.jsonl"
-    monkeypatch.setenv("DSH_PET_HERMES_EVENTS", str(path))
+    monkeypatch.setenv("PETWISP_HERMES_EVENTS", str(path))
     _reset()
     bridge._on_pre_llm_call(session_id="before-compression", turn_id="live")
     bridge._on_pre_tool_call(session_id="after-compression", turn_id="live", tool_call_id="a", tool_name="terminal")
@@ -300,7 +300,7 @@ def test_compression_session_rotation_preserves_turn_lifecycle(tmp_path, monkeyp
 
 def test_session_shutdown_without_turn_id_retires_registered_turns(tmp_path, monkeypatch):
     path = tmp_path / "events.jsonl"
-    monkeypatch.setenv("DSH_PET_HERMES_EVENTS", str(path))
+    monkeypatch.setenv("PETWISP_HERMES_EVENTS", str(path))
     _reset()
     bridge._on_pre_llm_call(session_id="s", turn_id="live")
     bridge._on_session_end(session_id="s", interrupted=True)

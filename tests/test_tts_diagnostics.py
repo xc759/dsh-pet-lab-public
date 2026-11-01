@@ -10,7 +10,7 @@ import sys
 
 import pytest
 
-from pet.tts_diagnostics import describe_failure, missing_dependency_hint
+from petwisp.tts_diagnostics import describe_failure, missing_dependency_hint
 
 
 class HandshakeRejected(Exception):

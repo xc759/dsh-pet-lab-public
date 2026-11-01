@@ -14,12 +14,12 @@ from types import SimpleNamespace
 from PySide6.QtCore import QPoint, QRect
 from PySide6.QtWidgets import QApplication
 
-from pet import collision
-from pet import physics as physics_mod
-from pet import window_placement
-from pet.config import Config
-from pet.island.dynamic_island import DynamicIsland
-from pet.island.collision import IslandCollisionBody
+from petwisp import collision
+from petwisp import physics as physics_mod
+from petwisp import window_placement
+from petwisp.config import Config
+from petwisp.island.dynamic_island import DynamicIsland
+from petwisp.island.collision import IslandCollisionBody
 
 
 def _qapp() -> QApplication:
@@ -557,7 +557,7 @@ def test_submit_pushes_out_resting_pet_when_island_moved_onto_it(tmp_path):
 
 
 def test_wall_hook_covers_pet_window_created_after_start(tmp_path):
-    """启动之后新生的桌宠（生小肥鱼）也必须受硬墙约束。
+    """启动之后新生的桌宠（生小宠）也必须受硬墙约束。
 
     回归背景：硬墙 hook 只在 start() 挂到当时已存在的窗口上；本进程 spawn
     出来的新窗不在那一刻的列表里，且 start() 二次调用直接 return——新鱼于是
@@ -633,7 +633,7 @@ def test_body_without_island_never_blocks_movement(tmp_path):
 
 def test_no_collision_body_is_built_when_the_island_is_disabled(monkeypatch):
     """岛没启用时 AppShell 不建碰撞体：不挂钩子、也不打「碰撞体已启动」。"""
-    from pet import app as app_module
+    from petwisp import app as app_module
 
     _qapp()
     built: list = []

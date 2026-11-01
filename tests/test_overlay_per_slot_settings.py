@@ -34,18 +34,18 @@ from PySide6.QtWidgets import QApplication
 
 import tests.test_overlay_collision_toggle as toggle
 import tests.test_sprite_menu_facade as fac
-from pet import catalog
-from pet import click_sound
-from pet import overlay_spawn_state as ovs
-from pet.physics import THROW_STRENGTH_CAPS
-from pet.sprite_menu_facade import SpriteMenuFacade, build_sprite_full_menu
+from petwisp import catalog
+from petwisp import click_sound
+from petwisp import overlay_spawn_state as ovs
+from petwisp.physics import THROW_STRENGTH_CAPS
+from petwisp.sprite_menu_facade import SpriteMenuFacade, build_sprite_full_menu
 
 app = QApplication.instance() or QApplication([])
 
 
 # ---------------------------------------------------------------- 脚手架
 def _write_slot(cfg, slot: int, **values) -> None:
-    """按"这只子肥鱼自己的设置页保存"的写法改它的 slot 配置（原子写单键）。"""
+    """按"这只子宠自己的设置页保存"的写法改它的 slot 配置（原子写单键）。"""
     for key, value in values.items():
         assert ovs.write_slot_setting(cfg.dir, slot, key, value,
                                       user_customized=True), key
@@ -266,7 +266,7 @@ def test_collision_sound_uses_participating_sprite_config(tmp_path, monkeypatch)
         _write_slot(cfg, 1, collision_sound_volume=0.2, collision_sound_enabled=True)
         _notify(shell)
 
-        from pet.sprite_collision import SpriteCollisionWorld
+        from petwisp.sprite_collision import SpriteCollisionWorld
 
         child_id = SpriteCollisionWorld._member_id(child)
         event = type("E", (), {"a": child_id, "b": "island", "j": 999.0})()
@@ -442,7 +442,7 @@ def test_character_menu_check_state_follows_clicked_sprite(tmp_path):
         main_character = str(cfg.get("character"))
         label = catalog.character_display_name(main_character)
 
-        # 这只子肥鱼自己的角色不是主宠那只 → 勾选态必须按它自己算
+        # 这只子宠自己的角色不是主宠那只 → 勾选态必须按它自己算
         _write_slot(cfg, 1, character="other-character")
         _notify(shell)
         assert _character_action(

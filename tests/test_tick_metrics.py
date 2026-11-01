@@ -23,14 +23,14 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from PySide6.QtWidgets import QApplication
 
-import pet.tick_driver as tick_driver
-from pet.tick_driver import (
+import petwisp.tick_driver as tick_driver
+from petwisp.tick_driver import (
     TICK_METRICS_REPORT_S,
     TICK_SLOW_MS,
     TickDriver,
     TickMetrics,
 )
-from pet.tick_governor import TIER_ACTIVE, TIER_IDLE_ANIM, TIER_IDLE_STILL
+from petwisp.tick_governor import TIER_ACTIVE, TIER_IDLE_ANIM, TIER_IDLE_STILL
 from tests.test_tick_driver import FakeOverlay, FakeScreen
 
 app = QApplication.instance() or QApplication([])
@@ -65,7 +65,7 @@ def test_report_line_has_percentiles_tier_and_period(caplog):
     for ms in (1.0, 2.0, 3.0, 4.0, 100.0):
         metrics.note_interval(ms)
 
-    with caplog.at_level(logging.INFO, logger="pet.tick_driver"):
+    with caplog.at_level(logging.INFO, logger="petwisp.tick_driver"):
         metrics.maybe_report(TIER_IDLE_ANIM, 42)
         assert caplog.text == ""              # 未到周期：不打
 
@@ -96,7 +96,7 @@ def test_interval_ring_is_preallocated_and_reused():
 
 def test_slow_tick_warning_contains_cost_and_tier(caplog):
     metrics = TickMetrics(clock=FakeClock())
-    with caplog.at_level(logging.WARNING, logger="pet.tick_driver"):
+    with caplog.at_level(logging.WARNING, logger="petwisp.tick_driver"):
         metrics.note_slow_tick(TICK_SLOW_MS, TIER_ACTIVE)   # 未超：静默
         assert caplog.text == ""
         metrics.note_slow_tick(TICK_SLOW_MS + 25.5, TIER_IDLE_ANIM)
@@ -123,7 +123,7 @@ def test_driver_logs_tier_transition_with_reason(caplog):
     driver = TickDriver(clock=FakeClock())
     driver.attach(FakeOverlay(screen=FakeScreen(170.0)))
 
-    with caplog.at_level(logging.INFO, logger="pet.tick_driver"):
+    with caplog.at_level(logging.INFO, logger="petwisp.tick_driver"):
         driver._apply_tier(TIER_IDLE_STILL, reason="quiet")
 
     assert "tick 档位 T0→T2 触发因=quiet" in caplog.text
@@ -136,7 +136,7 @@ def test_driver_warns_on_slow_tick(caplog):
     driver.attach(FakeOverlay(screen=FakeScreen(170.0)))
     driver.set_controllers(behavior=SlowController())
 
-    with caplog.at_level(logging.WARNING, logger="pet.tick_driver"):
+    with caplog.at_level(logging.WARNING, logger="petwisp.tick_driver"):
         driver.on_tick(dt=0.006)
 
     assert "tick 慢帧" in caplog.text
@@ -152,7 +152,7 @@ def test_driver_emits_interval_report_every_60s(monkeypatch, caplog):
     driver = TickDriver(clock=clock)
     driver.attach(FakeOverlay(screen=fast))
 
-    with caplog.at_level(logging.INFO, logger="pet.tick_driver"):
+    with caplog.at_level(logging.INFO, logger="petwisp.tick_driver"):
         driver.on_tick(dt=0.006)              # 首个样本 = 基线（无间隔）
         clock.advance(0.006)
         driver.on_tick(dt=0.006)              # 记一个 6ms 样本
@@ -173,7 +173,7 @@ def test_metrics_switch_off_silences_everything(monkeypatch, caplog):
 
     driver.attach(FakeOverlay(screen=FakeScreen(170.0)))
     driver.set_controllers(behavior=SlowController())
-    with caplog.at_level(logging.DEBUG, logger="pet.tick_driver"):
+    with caplog.at_level(logging.DEBUG, logger="petwisp.tick_driver"):
         driver.on_tick(dt=0.006)
         clock.advance(TICK_METRICS_REPORT_S + 1.0)
         driver.on_tick(dt=0.006)
@@ -194,7 +194,7 @@ def test_throttled_tier_intervals_are_not_counted_as_lag(monkeypatch, caplog):
     driver = TickDriver(clock=clock)
     driver.attach(FakeOverlay(screen=fast))
 
-    with caplog.at_level(logging.INFO, logger="pet.tick_driver"):
+    with caplog.at_level(logging.INFO, logger="petwisp.tick_driver"):
         driver.on_tick(dt=0.006)              # 基线
         clock.advance(0.006)
         driver.on_tick(dt=0.006)              # 满速 6ms 样本 → 记账

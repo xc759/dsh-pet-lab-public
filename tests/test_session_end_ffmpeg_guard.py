@@ -35,10 +35,10 @@ import pytest
 from PySide6.QtCore import QObject, Signal
 from PySide6.QtWidgets import QApplication
 
-from pet import session_watcher as session_watcher_mod
-from pet import webm_clip as webm_clip_mod
-from pet.session_watcher import SessionWatcher
-from pet.webm_clip import WebMClip
+from petwisp import session_watcher as session_watcher_mod
+from petwisp import webm_clip as webm_clip_mod
+from petwisp.session_watcher import SessionWatcher
+from petwisp.webm_clip import WebMClip
 
 WEBM_CLIP_SRC = Path(webm_clip_mod.__file__).read_text(encoding="utf-8")
 
@@ -247,7 +247,7 @@ class _LibraryStub:
 
 
 def test_library_stop_all_clips_stops_every_clip():
-    from pet.library import MovieLibrary
+    from petwisp.library import MovieLibrary
 
     clips = {"a": _RecordingClip(), "b": _RecordingClip(), "c": _RecordingClip()}
     MovieLibrary.stop_all_clips(_LibraryStub(clips))
@@ -263,7 +263,7 @@ def test_library_stop_all_clips_cancels_frameseq_provision():
     ``AppShell._on_session_end`` 逐窗 / overlay ``OverlayShell._on_session_end``
     逐库），闸门挂在它上面才算真的收口。
     """
-    from pet.library import MovieLibrary
+    from petwisp.library import MovieLibrary
 
     stub = _LibraryStub({"a": _RecordingClip()})
     MovieLibrary.stop_all_clips(stub)
@@ -274,7 +274,7 @@ def test_library_stop_all_clips_cancels_frameseq_provision():
 
 def test_library_stop_all_clips_survives_single_clip_failure():
     """单个 clip 抛异常不得影响其余 clip 收口（会话结束路径必须尽力而为）。"""
-    from pet.library import MovieLibrary
+    from petwisp.library import MovieLibrary
 
     clips = {"a": _RecordingClip(), "b": _RecordingClip(fail=True), "c": _RecordingClip()}
     MovieLibrary.stop_all_clips(_LibraryStub(clips))
@@ -286,8 +286,8 @@ def test_library_stop_all_clips_survives_single_clip_failure():
 
 def test_library_warm_predicted_refused_when_session_ending(monkeypatch):
     """预测式预热（每几秒一次的短命 ffmpeg）在会话结束后必须停手。"""
-    from pet import catalog
-    from pet.library import MovieLibrary
+    from petwisp import catalog
+    from petwisp.library import MovieLibrary
 
     asset_dir = catalog.resolve_character_video_dir("demo")
     if not asset_dir.is_dir():
@@ -409,7 +409,7 @@ def test_arming_is_idempotent_and_logs_once(fake_app, caplog):
     watcher = SessionWatcher(app=fake_app, on_session_end=lambda: ends.append(1),
                              install_native_filter=False)
 
-    with caplog.at_level(logging.INFO, logger="pet.session_watcher"):
+    with caplog.at_level(logging.INFO, logger="petwisp.session_watcher"):
         watcher.arm("query_end_session")
         watcher.arm("end_session")
         addr, keepalive = _msg_pointer(session_watcher_mod.WM_QUERYENDSESSION)
@@ -465,7 +465,7 @@ def test_arm_normalises_non_string_reason_for_logs(fake_app, caplog):
 
     watcher = SessionWatcher(app=fake_app, on_session_end=lambda: None,
                              install_native_filter=False)
-    with caplog.at_level(logging.INFO, logger="pet.session_watcher"):
+    with caplog.at_level(logging.INFO, logger="petwisp.session_watcher"):
         watcher.arm(object())  # 模拟 Qt 传进来的 QSessionManager 实例
 
     messages = [r.getMessage() for r in caplog.records]
@@ -522,8 +522,8 @@ def _shell_with_window(app, tmp_path, win):
     只替换 ``_instances[0].win``（PetInstance 内部构造不依赖），避免给
     ``_LIVE_SHELLS`` 收口路径塞入非 PetInstance 的替身。
     """
-    from pet.app import AppShell
-    from pet.config import Config
+    from petwisp.app import AppShell
+    from petwisp.config import Config
 
     shell = AppShell(app, Config(tmp_path), enable_chat=False)
     shell._instances[0].win = win
@@ -531,7 +531,7 @@ def _shell_with_window(app, tmp_path, win):
 
 
 def test_app_shell_on_session_end_freezes_window_and_arms_gate(app, tmp_path):
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     lib = _RecordingLibrary()
     win = _FakeWindow(lib=lib)
@@ -547,7 +547,7 @@ def test_app_shell_on_session_end_freezes_window_and_arms_gate(app, tmp_path):
 
 
 def test_app_shell_session_end_is_idempotent(app, tmp_path):
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     lib = _RecordingLibrary()
     win = _FakeWindow(lib=lib)
@@ -563,7 +563,7 @@ def test_app_shell_session_end_is_idempotent(app, tmp_path):
 
 def test_app_shell_session_end_survives_window_failure(app, tmp_path):
     """单窗收口抛异常不得阻断其余窗、素材库收口与闸门置位（关机路径尽力而为）。"""
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     class _BrokenWindow(_FakeWindow):
         def match_shutdown(self) -> None:
@@ -585,7 +585,7 @@ def test_app_shell_session_end_survives_window_failure(app, tmp_path):
 
 def test_app_shell_window_without_library_still_freezes(app, tmp_path):
     """窗口/素材库缺失（半销毁、未创建）不得阻断会话结束收口。"""
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     win = _FakeWindow(lib=None)
     shell = _shell_with_window(app, tmp_path, win)
@@ -604,7 +604,7 @@ def test_app_shell_about_to_quit_cancels_frameseq_provision(app, tmp_path):
     退出/关机窗口正是最不该再派生进程的时刻；库随窗口销毁时活线程还会被一起析构
     （Qt fatal）。与 overlay 的 ``OverlayShell._on_about_to_quit`` 同一收口位置。
     """
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     lib = _RecordingLibrary()
     win = _FakeWindow(lib=lib)
@@ -620,9 +620,9 @@ def test_app_shell_about_to_quit_cancels_frameseq_provision(app, tmp_path):
 
 def test_app_shell_start_installs_session_watcher(app, tmp_path, monkeypatch):
     """启动路径必须安装探测器并强引用保活（否则关机窗口期无人置位闸门）。"""
-    from pet import app as app_mod
-    from pet.app import AppShell
-    from pet.config import Config
+    from petwisp import app as app_mod
+    from petwisp.app import AppShell
+    from petwisp.config import Config
 
     installed: list = []
 
@@ -726,7 +726,7 @@ def test_ffmpeg_exe_probe_is_gated():
 
 
 def test_normal_quit_survives_a_missing_chat_module(app, tmp_path):
-    """no-chat 打包变体（excludes=['pet.chat']）的正常退出不许提前炸。
+    """no-chat 打包变体（excludes=['petwisp.chat']）的正常退出不许提前炸。
 
     ``_on_about_to_quit`` 以前在方法体第一行就 ``from .chat import session_store``。
     那个模块在纯桌宠版里被排除，于是**正常退出**（托盘退出/最后窗口关闭）第一步就
@@ -734,14 +734,14 @@ def test_normal_quit_survives_a_missing_chat_module(app, tmp_path):
     位置回写、共享子系统停表、ffmpeg reader 收尾全部被跳过（2026-10-10 终审附加项）。
 
     这里用 ``sys.modules[...] = None`` 模拟"模块不存在"（不新建打包变体）：导入系统
-    对 None 条目直接抛 ImportError，与真实缺失同一条路径。**必须同时毒 ``pet.chat``
-    本身**——只毒 ``pet.chat.session_store`` 不够：``from .chat import session_store``
-    会先在已导入的 ``pet.chat`` 上取同名属性，而测试进程里它早被别处导入过（打包变体里
-    连 ``pet.chat`` 都不存在，那才是真实入口）。
+    对 None 条目直接抛 ImportError，与真实缺失同一条路径。**必须同时毒 ``petwisp.chat``
+    本身**——只毒 ``petwisp.chat.session_store`` 不够：``from .chat import session_store``
+    会先在已导入的 ``petwisp.chat`` 上取同名属性，而测试进程里它早被别处导入过（打包变体里
+    连 ``petwisp.chat`` 都不存在，那才是真实入口）。
     """
     import sys
 
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     lib = _RecordingLibrary()
     win = _FakeWindow(lib=lib)
@@ -749,7 +749,7 @@ def test_normal_quit_survives_a_missing_chat_module(app, tmp_path):
     calls: list[str] = []
     shell._shared.stop_all = lambda: calls.append("shared")
     shell._decode_hub.stop_all = lambda: calls.append("decode-hub")
-    poisoned = ("pet.chat", "pet.chat.session_store")
+    poisoned = ("petwisp.chat", "petwisp.chat.session_store")
     saved = {name: sys.modules.get(name) for name in poisoned}
     try:
         for name in poisoned:

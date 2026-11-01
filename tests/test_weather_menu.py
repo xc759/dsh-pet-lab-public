@@ -22,9 +22,9 @@ pytest.importorskip("PySide6")
 from PySide6.QtCore import QObject, Signal  # noqa: E402
 from PySide6.QtWidgets import QApplication, QMenu  # noqa: E402
 
-from pet import weather as W  # noqa: E402
-from pet.weather import menu as M  # noqa: E402
-from pet.context_menus.registry import MENU_ACTIONS  # noqa: E402
+from petwisp import weather as W  # noqa: E402
+from petwisp.weather import menu as M  # noqa: E402
+from petwisp.context_menus.registry import MENU_ACTIONS  # noqa: E402
 
 app = QApplication.instance() or QApplication([])
 
@@ -472,7 +472,7 @@ def test_results_of_the_current_query_still_land():
 
 # ---------------------------------------------------------------- 注册表
 def test_registry_exposes_weather_actions_with_labels_and_icons():
-    from pet.context_menus.registry import ACTION_ICONS, ACTION_LABELS
+    from petwisp.context_menus.registry import ACTION_ICONS, ACTION_LABELS
 
     assert {"weather", "weather_cities"} <= MENU_ACTIONS.ids
     assert ACTION_LABELS["weather"] == "查看天气"
@@ -498,7 +498,7 @@ def test_registry_gates_weather_on_the_callback_and_the_switch():
 
 
 def test_modern_default_layout_places_weather_beside_the_other_tools():
-    from pet.menu_layout import load_default_menu_layout
+    from petwisp.menu_layout import load_default_menu_layout
 
     nodes = load_default_menu_layout("modern-default-v1")["nodes"]
     ids = [node["id"] for node in nodes]
@@ -512,7 +512,7 @@ def test_modern_default_layout_places_weather_beside_the_other_tools():
 def test_real_petwindow_menu_contains_weather_entries(tmp_path):
     """真 PetWindow + 真建造器：两个天气入口都在现代树里。"""
     import tests.test_sprite_menu_parity as parity
-    from pet.config import Config
+    from petwisp.config import Config
 
     config = Config(base=tmp_path)
     win = parity._reference_window(config)
@@ -533,7 +533,7 @@ def test_real_petwindow_menu_greys_weather_when_switched_off(tmp_path):
     状态自相矛盾）。
     """
     import tests.test_sprite_menu_parity as parity
-    from pet.config import Config
+    from petwisp.config import Config
 
     config = Config(base=tmp_path)
     config.set("weather_enabled", False)

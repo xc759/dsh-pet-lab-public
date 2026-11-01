@@ -18,8 +18,8 @@ from pathlib import Path
 
 import pytest
 
-from pet import agent_link
-from pet.agent_link import DshMonitor
+from petwisp import agent_link
+from petwisp.agent_link import DshMonitor
 
 
 def _profile(tmp_path: Path, name: str = "web", deps: dict | None = None) -> Path:
@@ -67,7 +67,7 @@ class TestMissingDependencySpecs:
     def test_ok_when_target_exists(self, tmp_path):
         target = tmp_path / "plugins" / "bridge"
         target.mkdir(parents=True)
-        profile = _profile(tmp_path, deps={"@dsh-pet/bridge": f"link:{target}"})
+        profile = _profile(tmp_path, deps={"@petwisp/bridge": f"link:{target}"})
         assert agent_link._missing_dependency_specs(profile, _manifest(profile)) == []
 
     def test_names_dependency_and_missing_path(self, tmp_path):
@@ -81,14 +81,14 @@ class TestMissingDependencySpecs:
     def test_suggests_renamed_build_directory(self, tmp_path):
         """打包构建目录改名（dist-onedir/<name>/...）→ 给出新目录下同一相对路径。"""
         new_target = (
-            tmp_path / "dist-onedir" / "new-build" / "_internal" / "integrations" / "dsh-pet-bridge"
+            tmp_path / "dist-onedir" / "new-build" / "_internal" / "integrations" / "petwisp-bridge"
         )
         new_target.mkdir(parents=True)
         (tmp_path / "dist-onedir" / "old-build" / "_internal" / "integrations").mkdir(parents=True)
         missing = (
-            tmp_path / "dist-onedir" / "old-build" / "_internal" / "integrations" / "dsh-pet-bridge"
+            tmp_path / "dist-onedir" / "old-build" / "_internal" / "integrations" / "petwisp-bridge"
         )
-        profile = _profile(tmp_path, deps={"@dsh-pet/bridge": f"link:{missing}"})
+        profile = _profile(tmp_path, deps={"@petwisp/bridge": f"link:{missing}"})
 
         finding = agent_link._missing_dependency_specs(profile, _manifest(profile))[0]
 
@@ -154,12 +154,12 @@ class TestMissingDependencySpecs:
 
 class TestInstallFailureDiagnostics:
     def test_failure_message_names_the_broken_spec(self, tmp_path, monkeypatch):
-        plugin = tmp_path / "dsh-pet-bridge"
+        plugin = tmp_path / "petwisp-bridge"
         plugin.mkdir()
         profile = _profile(
             tmp_path,
             deps={
-                "@dsh-pet/bridge": f"link:{plugin}",
+                "@petwisp/bridge": f"link:{plugin}",
                 "ghost-ext": "file:W:/nonexistent/ghost-ext-0.12.80.tgz",
             },
         )
@@ -182,7 +182,7 @@ class TestInstallFailureDiagnostics:
 
 class TestBridgeLinkStaleness:
     def _setup(self, tmp_path, monkeypatch, deps: dict):
-        plugin = tmp_path / "current-build" / "integrations" / "dsh-pet-bridge"
+        plugin = tmp_path / "current-build" / "integrations" / "petwisp-bridge"
         plugin.mkdir(parents=True)
         _profile(tmp_path, name="web", deps=deps)
         monkeypatch.setattr(agent_link, "DSH_PROFILE_HOME", tmp_path)
@@ -220,7 +220,7 @@ class TestBridgeLinkStaleness:
 
 class TestRefreshStaleBridgeLinks:
     def test_refreshes_only_stale_profiles(self, tmp_path, monkeypatch):
-        plugin = tmp_path / "current-build" / "integrations" / "dsh-pet-bridge"
+        plugin = tmp_path / "current-build" / "integrations" / "petwisp-bridge"
         plugin.mkdir(parents=True)
         other = tmp_path / "old-build"
         other.mkdir()
@@ -248,7 +248,7 @@ class TestRefreshStaleBridgeLinks:
         启动自检与安装路径同源失败原因（manifest 指向不存在的旧路径）：裸
         _run_pnpm 一次失败就放弃，每次启动都重复同一轮静默失败，link 永远刷不新。
         """
-        plugin = tmp_path / "current-build" / "integrations" / "dsh-pet-bridge"
+        plugin = tmp_path / "current-build" / "integrations" / "petwisp-bridge"
         plugin.mkdir(parents=True)
         other = tmp_path / "old-build"
         other.mkdir()
@@ -285,7 +285,7 @@ class TestRefreshStaleBridgeLinks:
         assert "0.13.6" in _manifest(profile)["dependencies"]["ext"]
 
     def test_never_installs_absent_plugin(self, tmp_path, monkeypatch):
-        plugin = tmp_path / "current-build" / "integrations" / "dsh-pet-bridge"
+        plugin = tmp_path / "current-build" / "integrations" / "petwisp-bridge"
         plugin.mkdir(parents=True)
         _profile(tmp_path, name="web", deps={"dsh-other": "^1.0.0"})
         monkeypatch.setattr(agent_link, "DSH_PROFILE_HOME", tmp_path)
@@ -316,8 +316,8 @@ class TestScheduling:
 
     def test_apply_config_schedules_check_when_dsh_enabled(self, tmp_path, monkeypatch):
         from PySide6.QtWidgets import QApplication
-        from pet.config import Config
-        from pet.agent_link import AgentLinkManager
+        from petwisp.config import Config
+        from petwisp.agent_link import AgentLinkManager
 
         QApplication.instance() or QApplication([])
         scheduled: list[str] = []
@@ -346,8 +346,8 @@ class TestScheduling:
 
     def test_apply_config_skips_check_when_dsh_disabled(self, tmp_path, monkeypatch):
         from PySide6.QtWidgets import QApplication
-        from pet.config import Config
-        from pet.agent_link import AgentLinkManager
+        from petwisp.config import Config
+        from petwisp.agent_link import AgentLinkManager
 
         QApplication.instance() or QApplication([])
         scheduled: list[str] = []
@@ -401,16 +401,16 @@ class TestSpecRepair:
         assert list(profile.glob("package.json.bak-*")), "改写前必须备份"
 
     def test_repairs_link_spec_keeping_prefix(self, tmp_path):
-        new_target = tmp_path / "dist-onedir" / "new-build" / "dsh-pet-bridge"
+        new_target = tmp_path / "dist-onedir" / "new-build" / "petwisp-bridge"
         new_target.mkdir(parents=True)
         (tmp_path / "dist-onedir" / "old-build").mkdir(parents=True)
-        missing = tmp_path / "dist-onedir" / "old-build" / "dsh-pet-bridge"
-        profile = _profile(tmp_path, deps={"@dsh-pet/bridge": f"link:{missing}"})
+        missing = tmp_path / "dist-onedir" / "old-build" / "petwisp-bridge"
+        profile = _profile(tmp_path, deps={"@petwisp/bridge": f"link:{missing}"})
 
         changed = agent_link._repair_missing_dependency_specs(profile, _manifest(profile))
 
         assert len(changed) == 1
-        assert _manifest(profile)["dependencies"]["@dsh-pet/bridge"] == f"link:{new_target}"
+        assert _manifest(profile)["dependencies"]["@petwisp/bridge"] == f"link:{new_target}"
 
     def test_leaves_unfixable_specs_alone(self, tmp_path):
         spec = "file:W:/nowhere/ghost-1.0.0.tgz"
@@ -425,7 +425,7 @@ class TestSpecRepair:
     def test_install_bridge_repairs_then_retries(self, tmp_path, monkeypatch):
         import json as _json
 
-        plugin = tmp_path / "dsh-pet-bridge"
+        plugin = tmp_path / "petwisp-bridge"
         plugin.mkdir()
         artifacts = tmp_path / "artifacts"
         artifacts.mkdir()
@@ -458,7 +458,7 @@ class TestSpecRepair:
         assert "0.13.6" in _manifest(profile)["dependencies"]["ext"]
 
     def test_install_bridge_does_not_retry_unfixable(self, tmp_path, monkeypatch):
-        plugin = tmp_path / "dsh-pet-bridge"
+        plugin = tmp_path / "petwisp-bridge"
         plugin.mkdir()
         _profile(tmp_path, deps={"ghost": "file:W:/nowhere/ghost-1.0.0.tgz"})
         monkeypatch.setattr(agent_link, "DSH_PROFILE_HOME", tmp_path)
@@ -492,7 +492,7 @@ class TestInstallBridgeScaffoldsMissingProfile:
     """
 
     def test_install_creates_default_web_profile_when_none_exists(self, tmp_path, monkeypatch):
-        plugin = tmp_path / "bundled" / "dsh-pet-bridge"
+        plugin = tmp_path / "bundled" / "petwisp-bridge"
         plugin.mkdir(parents=True)
         (tmp_path / "profiles").mkdir()
         monkeypatch.setattr(agent_link, "DSH_PROFILE_HOME", tmp_path)

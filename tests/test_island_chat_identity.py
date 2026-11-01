@@ -21,11 +21,11 @@ from types import SimpleNamespace  # noqa: E402
 from PySide6.QtCore import QObject, Signal  # noqa: E402
 from PySide6.QtWidgets import QApplication, QWidget  # noqa: E402
 
-from pet import catalog  # noqa: E402
-from pet import pet_profiles  # noqa: E402
-from pet.app import AppShell  # noqa: E402
-from pet.config import Config  # noqa: E402
-from pet.settings_slot_config import route_settings_config  # noqa: E402
+from petwisp import catalog  # noqa: E402
+from petwisp import pet_profiles  # noqa: E402
+from petwisp.app import AppShell  # noqa: E402
+from petwisp.config import Config  # noqa: E402
+from petwisp.settings_slot_config import route_settings_config  # noqa: E402
 
 app = QApplication.instance() or QApplication([])
 
@@ -62,7 +62,7 @@ class _SpyBubble(QObject):
 
 def _make_shell(base, monkeypatch, *, child_roles=()):
     """真 AppShell（``__new__`` 装配）：全局 Config + slot0 路由视图 + 可选的子宠。"""
-    import pet.island.chat as island_chat_mod
+    import petwisp.island.chat as island_chat_mod
 
     global_cfg = Config(base=base)
     config_dir = global_cfg.dir          # Config 会把 base 再拼一层 APP_DIR_NAME
@@ -164,7 +164,7 @@ def test_chat_identity_helper_falls_back_when_there_is_no_instance(tmp_path):
 # ---------------------------------------------------------------- F01 暖缓存（2026-10-10 终审）
 def _sync_instance(config):
     """只装配 ``sync_chat_character`` 真正碰到的字段（跑的是**真**方法）。"""
-    from pet.app import PetInstance
+    from petwisp.app import PetInstance
 
     instance = PetInstance.__new__(PetInstance)
     instance.config = config

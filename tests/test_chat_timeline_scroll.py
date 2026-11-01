@@ -29,10 +29,10 @@ def _pump(app, seconds):
 
 
 def _window_with_long_history(tmp_path: Path):
-    from pet.chat.models import ChatMessage
-    from pet.chat.session_store import SessionStore
-    from pet.chat.widgets import ChatWindow
-    from pet.config import Config
+    from petwisp.chat.models import ChatMessage
+    from petwisp.chat.session_store import SessionStore
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.config import Config
 
     cfg = Config(tmp_path)
     store = SessionStore(cfg.dir)
@@ -49,7 +49,7 @@ def _window_with_long_history(tmp_path: Path):
 
 
 def _last_bubble_geometry(win):
-    from pet.chat.widgets import MessageBubble
+    from petwisp.chat.widgets import MessageBubble
 
     viewport = win.scroll.viewport()
     last = [b for b in win.findChildren(MessageBubble) if b.isVisible()][-1]

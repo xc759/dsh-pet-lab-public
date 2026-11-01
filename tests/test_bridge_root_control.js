@@ -12,7 +12,7 @@ import test from "node:test";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const bridgeDir = path.resolve(here, "../integrations/dsh-pet-bridge");
+const bridgeDir = path.resolve(here, "../integrations/petwisp-bridge");
 const source = fs.readFileSync(path.join(bridgeDir, "index.js"), "utf8");
 
 test("控制队列机制不存在于源码", () => {

@@ -13,8 +13,8 @@ import ssl
 import threading
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
-from pet.chat.models import ProviderConfig
-from pet.chat.providers import test_connection
+from petwisp.chat.models import ProviderConfig
+from petwisp.chat.providers import test_connection
 
 
 class Handler(BaseHTTPRequestHandler):

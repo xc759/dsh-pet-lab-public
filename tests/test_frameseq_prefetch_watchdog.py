@@ -24,8 +24,8 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 from PySide6.QtGui import QImage
 from PySide6.QtWidgets import QApplication
 
-from pet import frameseq_clip
-from pet.frameseq_clip import (
+from petwisp import frameseq_clip
+from petwisp.frameseq_clip import (
     PREFETCH_STALL_LIMIT,
     PREFETCH_STALL_MS,
     FrameSeqClip,

@@ -6,7 +6,7 @@
 - 其他实例仍使用 DSH 联动时桥接插件保留（skipped）；
 - other_instances_use_agent 的逐类判定：本变体自己的 slot 档案不算“别的实例”，
   旧式独立实例配置 / peer 变体 / 旧共享目录照旧保护；
-- __main__ 把 --uninstall-cleanup 派发给共享入口 pet.uninstall_cleanup.main。
+- __main__ 把 --uninstall-cleanup 派发给共享入口 petwisp.uninstall_cleanup.main。
 """
 
 from __future__ import annotations
@@ -18,8 +18,8 @@ from pathlib import Path
 
 import pytest
 
-from pet.config import Config
-from pet import uninstall_cleanup
+from petwisp.config import Config
+from petwisp import uninstall_cleanup
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -32,7 +32,7 @@ def _variant_config(tmp_path, variant: str) -> Config:
     """把“当前被卸载的变体”指到合成目录。
 
     源码树里 ``APP_DIR_NAME`` 没有变体后缀，真机上它由打包变体决定
-    （``pet.config._app_dir_name``）；这里直接指过去——判定的消费面只有
+    （``petwisp.config._app_dir_name``）；这里直接指过去——判定的消费面只有
     ``config.dir`` / ``config.path`` 两个属性。
     """
     config = _config(tmp_path)
@@ -49,12 +49,12 @@ def _write_json(path: Path, payload: dict) -> None:
 
 def test_uninstall_cleanup_runs_all_steps(tmp_path, monkeypatch):
     config = _config(tmp_path)
-    monkeypatch.setattr("pet.autostart.disable", lambda: True)
+    monkeypatch.setattr("petwisp.autostart.disable", lambda: True)
     monkeypatch.setattr(
-        "pet.agent_link.ClaudeCodeMonitor.uninstall_hooks", classmethod(lambda cls: True)
+        "petwisp.agent_link.ClaudeCodeMonitor.uninstall_hooks", classmethod(lambda cls: True)
     )
     monkeypatch.setattr(
-        "pet.agent_link.DshMonitor.uninstall_bridge", classmethod(lambda cls: True)
+        "petwisp.agent_link.DshMonitor.uninstall_bridge", classmethod(lambda cls: True)
     )
     monkeypatch.setattr(uninstall_cleanup, "other_instances_use_agent", lambda config, key: False)
 
@@ -66,12 +66,12 @@ def test_uninstall_cleanup_runs_all_steps(tmp_path, monkeypatch):
 
 def test_uninstall_cleanup_reports_step_failures(tmp_path, monkeypatch):
     config = _config(tmp_path)
-    monkeypatch.setattr("pet.autostart.disable", lambda: False)
+    monkeypatch.setattr("petwisp.autostart.disable", lambda: False)
     monkeypatch.setattr(
-        "pet.agent_link.ClaudeCodeMonitor.uninstall_hooks", classmethod(lambda cls: False)
+        "petwisp.agent_link.ClaudeCodeMonitor.uninstall_hooks", classmethod(lambda cls: False)
     )
     monkeypatch.setattr(
-        "pet.agent_link.DshMonitor.uninstall_bridge", classmethod(lambda cls: False)
+        "petwisp.agent_link.DshMonitor.uninstall_bridge", classmethod(lambda cls: False)
     )
     monkeypatch.setattr(uninstall_cleanup, "other_instances_use_agent", lambda config, key: False)
 
@@ -83,9 +83,9 @@ def test_uninstall_cleanup_reports_step_failures(tmp_path, monkeypatch):
 
 def test_uninstall_cleanup_skips_bridge_when_other_instance_uses_dsh(tmp_path, monkeypatch):
     config = _config(tmp_path)
-    monkeypatch.setattr("pet.autostart.disable", lambda: True)
+    monkeypatch.setattr("petwisp.autostart.disable", lambda: True)
     monkeypatch.setattr(
-        "pet.agent_link.ClaudeCodeMonitor.uninstall_hooks", classmethod(lambda cls: True)
+        "petwisp.agent_link.ClaudeCodeMonitor.uninstall_hooks", classmethod(lambda cls: True)
     )
     # 其他实例仍在使用 DSH 联动：桥接插件必须保留
     def fake_other_instances(cfg, key):
@@ -101,9 +101,9 @@ def test_uninstall_cleanup_skips_bridge_when_other_instance_uses_dsh(tmp_path, m
 
 def test_uninstall_cleanup_skips_claude_when_other_instance_uses_claude(tmp_path, monkeypatch):
     config = _config(tmp_path)
-    monkeypatch.setattr("pet.autostart.disable", lambda: True)
+    monkeypatch.setattr("petwisp.autostart.disable", lambda: True)
     monkeypatch.setattr(
-        "pet.agent_link.DshMonitor.uninstall_bridge", classmethod(lambda cls: True)
+        "petwisp.agent_link.DshMonitor.uninstall_bridge", classmethod(lambda cls: True)
     )
     # 其他实例仍在使用 Claude 联动：hooks 必须保留
     def fake_other_instances(cfg, key):
@@ -119,12 +119,12 @@ def test_uninstall_cleanup_skips_claude_when_other_instance_uses_claude(tmp_path
 
 def test_uninstall_cleanup_deletes_claude_when_no_other_instance(tmp_path, monkeypatch):
     config = _config(tmp_path)
-    monkeypatch.setattr("pet.autostart.disable", lambda: True)
+    monkeypatch.setattr("petwisp.autostart.disable", lambda: True)
     monkeypatch.setattr(
-        "pet.agent_link.ClaudeCodeMonitor.uninstall_hooks", classmethod(lambda cls: True)
+        "petwisp.agent_link.ClaudeCodeMonitor.uninstall_hooks", classmethod(lambda cls: True)
     )
     monkeypatch.setattr(
-        "pet.agent_link.DshMonitor.uninstall_bridge", classmethod(lambda cls: True)
+        "petwisp.agent_link.DshMonitor.uninstall_bridge", classmethod(lambda cls: True)
     )
     monkeypatch.setattr(uninstall_cleanup, "other_instances_use_agent", lambda config, key: False)
 
@@ -158,7 +158,7 @@ def test_other_instances_use_agent_detects_peers(tmp_path):
 def test_other_instances_use_agent_cross_variant(tmp_path):
     this_cfg = _config(tmp_path)
     # 另一个变体目录（如 webm）开启了 dsh——桥接插件是跨变体共享的，必须识别
-    variant_dir = tmp_path / "dsh-pet-standalone-webm"
+    variant_dir = tmp_path / "petwisp-webm"
     variant_dir.mkdir()
     (variant_dir / "config.json").write_text(
         json.dumps({"agent_link": {"dsh": True}}), encoding="utf-8"
@@ -236,7 +236,7 @@ def test_empty_or_broken_config_dir_never_raises(tmp_path):
     assert uninstall_cleanup.other_instances_use_agent(config, "dsh") is False
 
     # 正对照：目录坏了也不会把别的安装点看漏
-    _write_json(tmp_path / "dsh-pet-standalone-webm" / "config.json", {"agent_link": {"dsh": True}})
+    _write_json(tmp_path / "petwisp-webm" / "config.json", {"agent_link": {"dsh": True}})
     assert uninstall_cleanup.other_instances_use_agent(config, "dsh") is True
 
 
@@ -253,14 +253,14 @@ def test_uninstall_cleanup_removes_hooks_despite_own_slot_residue(tmp_path, monk
     )
     removed = []
     monkeypatch.setattr(
-        "pet.autostart.disable", lambda: (removed.append("autostart"), True)[1]
+        "petwisp.autostart.disable", lambda: (removed.append("autostart"), True)[1]
     )
     monkeypatch.setattr(
-        "pet.agent_link.ClaudeCodeMonitor.uninstall_hooks",
+        "petwisp.agent_link.ClaudeCodeMonitor.uninstall_hooks",
         classmethod(lambda cls: (removed.append("claude"), True)[1]),
     )
     monkeypatch.setattr(
-        "pet.agent_link.DshMonitor.uninstall_bridge",
+        "petwisp.agent_link.DshMonitor.uninstall_bridge",
         classmethod(lambda cls: (removed.append("dsh"), True)[1]),
     )
 
@@ -272,12 +272,12 @@ def test_uninstall_cleanup_removes_hooks_despite_own_slot_residue(tmp_path, monk
 
 def test_peer_variant_and_legacy_shared_dir_keep_protecting(tmp_path):
     """peer 变体与旧共享目录（历史安装）的配置照旧保护：跨变体共享的全局状态不许误删。"""
-    config = _variant_config(tmp_path, "dsh-pet-standalone-webm-chat")
+    config = _variant_config(tmp_path, "petwisp-webm-chat")
     _write_json(config.path, {"agent_link": {"dsh": False, "claude": False}})
     # 本变体自己的 slot 档案同时存在：不许影响 peer 判定
     _write_json(config.dir / "config-slot-2.json", {"agent_link": {"dsh": True, "claude": True}})
 
-    peer = tmp_path / "dsh-pet-standalone-webm"
+    peer = tmp_path / "petwisp-webm"
     legacy_shared = tmp_path / "dsh-pet-standalone"
     _write_json(peer / "config.json", {"agent_link": {"dsh": True, "claude": False}})
     _write_json(legacy_shared / "config-lan.json", {"agent_link": {"dsh": False, "claude": True}})
@@ -298,9 +298,9 @@ def test_peer_variant_slot_profiles_stay_conservative(tmp_path):
     本次只收“本变体自己的档案”这一类误保护；别人的目录不动，方向偏保守——
     最多多保护一次，不会误删别的变体还在用的全局 hooks / 桥接。
     """
-    config = _variant_config(tmp_path, "dsh-pet-standalone-webm-chat")
+    config = _variant_config(tmp_path, "petwisp-webm-chat")
     _write_json(config.path, {"agent_link": {"dsh": False}})
-    peer = tmp_path / "dsh-pet-standalone-webm"
+    peer = tmp_path / "petwisp-webm"
     _write_json(peer / "config-slot-2.json", {"agent_link": {"dsh": True}})
 
     assert uninstall_cleanup.other_instances_use_agent(config, "dsh") is True
@@ -314,7 +314,7 @@ import json, runpy, sys, types
 sys.path.insert(0, sys.argv[1])  # 仓库根：runpy 要能 import pet（子进程 cwd 不进 sys.path）
 record = {"legacy": [], "main": [], "app": []}
 
-uninstall = types.ModuleType("pet.uninstall_cleanup")
+uninstall = types.ModuleType("petwisp.uninstall_cleanup")
 
 
 def run_uninstall_cleanup(*args, **kwargs):
@@ -331,7 +331,7 @@ def main(*args, **kwargs):
 uninstall.run_uninstall_cleanup = run_uninstall_cleanup
 uninstall.main = main
 
-app = types.ModuleType("pet.app")
+app = types.ModuleType("petwisp.app")
 
 
 def app_main(*args, **kwargs):
@@ -341,16 +341,16 @@ def app_main(*args, **kwargs):
 
 app.main = app_main
 
-import pet
-pet.uninstall_cleanup = uninstall
-pet.app = app
-sys.modules["pet.uninstall_cleanup"] = uninstall
-sys.modules["pet.app"] = app
+import petwisp
+petwisp.uninstall_cleanup = uninstall
+petwisp.app = app
+sys.modules["petwisp.uninstall_cleanup"] = uninstall
+sys.modules["petwisp.app"] = app
 
-sys.argv = ["dsh-pet-standalone", "--uninstall-cleanup"]
+sys.argv = ["petwisp", "--uninstall-cleanup"]
 exit_code = 0
 try:
-    runpy.run_module("pet.__main__", run_name="__main__")
+    runpy.run_module("petwisp.__main__", run_name="__main__")
 except SystemExit as exc:
     exit_code = exc.code if isinstance(exc.code, int) else 1
 
@@ -368,7 +368,7 @@ print(json.dumps({
 def test_main_entry_delegates_uninstall_cleanup_without_qt_or_desktop_main(tmp_path):
     """真实入口进程里跑 `--uninstall-cleanup`：走共享 main，不建 Qt、不跑桌宠 main。
 
-    spy 经 ``sys.modules`` 注入（清理实现与 ``pet.app``）：即使入口漏了分流也只会
+    spy 经 ``sys.modules`` 注入（清理实现与 ``petwisp.app``）：即使入口漏了分流也只会
     调到 spy——不卸真实自启/hooks/桥接插件、不碰真实用户配置、不启动桌宠。
     """
     runner = tmp_path / "_pet_main_runner.py"
@@ -401,7 +401,7 @@ def test_main_entry_dispatches_before_importing_app():
     这个导入（2026-10-14 切片 5 的 ``_run_ocr_worker`` 就是这么写红的），照字符串
     取位置的话，一句注释就能让这条顺序断言失效。
     """
-    source = (ROOT / "pet" / "__main__.py").read_text(encoding="utf-8")
+    source = (ROOT / "petwisp" / "__main__.py").read_text(encoding="utf-8")
 
     dispatch_at = source.index('"--uninstall-cleanup" in sys.argv')
     app_import_at = source.index("\n    from .app import main as app_main")
@@ -411,7 +411,7 @@ def test_main_entry_dispatches_before_importing_app():
 
 def test_main_dispatches_uninstall_cleanup_to_shared_entry(monkeypatch):
     """``--uninstall-cleanup`` 派发给共享入口，并把它自己的退出码原样返回。"""
-    import pet.__main__ as m
+    import petwisp.__main__ as m
 
     calls = []
     legacy = []
@@ -431,7 +431,7 @@ def test_main_dispatches_uninstall_cleanup_to_shared_entry(monkeypatch):
 
 def test_main_returns_shared_entry_failure_code(monkeypatch):
     """共享入口返回非零（有步骤失败）时，入口原样透传。"""
-    import pet.__main__ as m
+    import petwisp.__main__ as m
 
     monkeypatch.setattr(sys, "argv", ["pet", "--uninstall-cleanup"])
     monkeypatch.setattr(uninstall_cleanup, "main", lambda *a, **k: 1)

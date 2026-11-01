@@ -19,7 +19,7 @@ import sys
 import pytest
 from PySide6.QtCore import QObject
 
-from pet.music import foobar as foobar_playing, now_playing, title as music_title
+from petwisp.music import foobar as foobar_playing, now_playing, title as music_title
 
 MUSIC = 1
 PLAYING = 4
@@ -260,7 +260,7 @@ class _SongWindow(QObject):
 
 
 def _controller(monkeypatch, cfg=None):
-    from pet.music.lyric_controller import MusicLyricController
+    from petwisp.music.lyric_controller import MusicLyricController
 
     win = _SongWindow(cfg)
     ctrl = MusicLyricController(win)
@@ -270,7 +270,7 @@ def _controller(monkeypatch, cfg=None):
 
 
 def _playback(app_id: str, *, title="t", artist="a"):
-    from pet.music.now_playing import Playback, Track
+    from petwisp.music.now_playing import Playback, Track
 
     return Playback(
         track=Track(title=title, artist=artist, playing=True),
@@ -392,7 +392,7 @@ def test_foobar_config_readers_tolerate_dirty_values(monkeypatch):
 
 
 def test_foobar_config_keys_default_off_and_round_trip(tmp_path):
-    from pet.config import Config
+    from petwisp.config import Config
 
     cfg = Config(tmp_path)
     assert cfg.get("foobar_lyrics_enabled") is False, "窗口标题源默认必须关"
@@ -411,8 +411,8 @@ def test_dirty_foobar_config_is_normalized(tmp_path):
     """手改脏值：字符串 "false" 不得被 bool() 判真；超长格式串要截断。"""
     import json
 
-    from pet import config as config_mod
-    from pet.config import Config
+    from petwisp import config as config_mod
+    from petwisp.config import Config
 
     cfg_dir = tmp_path / config_mod.APP_DIR_NAME
     cfg_dir.mkdir(parents=True, exist_ok=True)

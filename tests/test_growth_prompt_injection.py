@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""成长档案 → 对话提示词注入（``pet.chat.prompt`` 的 growth 钩子）。
+"""成长档案 → 对话提示词注入（``petwisp.chat.prompt`` 的 growth 钩子）。
 
 红线：**未注册 provider 时输出必须逐字节不变**（上游有"无记忆 == 老版本"的
 字节级断言），注册了但档案为空时同样不加任何字符。
@@ -13,9 +13,9 @@ import pytest
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
-from pet.chat.models import ChatSettings
-from pet.chat.prompt import PromptBuilder, growth_text, set_growth_text_provider
-from pet.growth.service import GrowthService
+from petwisp.chat.models import ChatSettings
+from petwisp.chat.prompt import PromptBuilder, growth_text, set_growth_text_provider
+from petwisp.growth.service import GrowthService
 
 
 @pytest.fixture(autouse=True)

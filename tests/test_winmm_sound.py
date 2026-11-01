@@ -24,7 +24,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from pet import click_sound, sound_winmm
+from petwisp import click_sound, sound_winmm
 
 WINDOWS_ONLY = pytest.mark.skipif(sys.platform != "win32", reason="winmm 仅 Windows")
 ROOT = Path(__file__).resolve().parents[1]
@@ -203,7 +203,7 @@ _QT_FREE_SCRIPT = textwrap.dedent(
     from pathlib import Path
 
     sys.path.insert(0, r"{root}")
-    from pet import click_sound, sound_winmm
+    from petwisp import click_sound, sound_winmm
 
 
     class FakeApi:
@@ -923,7 +923,7 @@ def test_pool_follows_default_device_change(tmp_path, monkeypatch):
     旧行为：切了默认输出，已开句柄继续往旧设备播（waveOutOpen 只在打开
     那一刻解析默认设备）。现在每次播放前限频对一次默认端点 ID。
     """
-    import pet.sound_winmm as sm
+    import petwisp.sound_winmm as sm
 
     api = FakeWinmmApi()
     pool = sm.WinmmSoundPool(api=api)
@@ -955,7 +955,7 @@ def test_pool_follows_default_device_change(tmp_path, monkeypatch):
 
 def test_pool_device_check_is_rate_limited(tmp_path, monkeypatch):
     """默认设备对账限频：热路径不许每次播放都走 COM 往返。"""
-    import pet.sound_winmm as sm
+    import petwisp.sound_winmm as sm
 
     api = FakeWinmmApi()
     pool = sm.WinmmSoundPool(api=api)
@@ -1009,7 +1009,7 @@ def test_default_render_device_id_com_init_balance(monkeypatch, init_hr, expecte
     """GUI 线程通常已是 STA：CoInitializeEx(MTA) 返回 RPC_E_CHANGED_MODE 且
     **不**增加引用计数，此时无条件 CoUninitialize 会错扣别人的 COM 计数
     （播放热路径每 2s 一次，是无 traceback native 崩溃的隐患）。"""
-    import pet.sound_winmm as sm
+    import petwisp.sound_winmm as sm
 
     monkeypatch.setattr(sm.sys, "platform", "win32")
     fake = _FakeOle32(init_hr)

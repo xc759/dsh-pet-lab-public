@@ -36,7 +36,7 @@ python tools/convert_frameseq.py --character <角色id> --include random,events
 
 ```powershell
 python scripts/build_character_pack.py --character demo --version 2.0.0 `
-    --url-base "https://github.com/MerZlin/dsh-pet-indesktop/releases/download/assets-v1"
+    --url-base "https://github.com/MerZlin/petwisp-indesktop/releases/download/assets-v1"
 ```
 
 参数：
@@ -88,7 +88,7 @@ git push
 
 用户端看到的是 main 分支上的清单（经 jsdelivr 分发）。**jsdelivr 有小时级缓存**，
 刚 push 不一定立刻生效，急用的话手动 purge：
-`https://purge.jsdelivr.net/gh/MerZlin/dsh-pet-indesktop@main/packs-index.json`
+`https://purge.jsdelivr.net/gh/MerZlin/petwisp-indesktop@main/packs-index.json`
 
 ## 4. 什么时候用户需要更新桌宠版本（app_min）
 
@@ -121,7 +121,7 @@ git push
 
 ## 7. 发完自验（5 分钟）
 
-1. 浏览器打开 `https://cdn.jsdelivr.net/gh/MerZlin/dsh-pet-indesktop@main/packs-index.json`，
+1. 浏览器打开 `https://cdn.jsdelivr.net/gh/MerZlin/petwisp-indesktop@main/packs-index.json`，
    能看到新包条目（看不到 = 清单没 push 或缓存没刷）。
 2. 桌宠设置 → 桌宠 → 角色与素材：新包出现在「可下载」（没出现 = 同上）。
 3. 点一个最小的分件下载 → 显示「已安装，重启后生效」。

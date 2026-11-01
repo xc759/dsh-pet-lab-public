@@ -25,9 +25,9 @@ from PySide6.QtCore import QPointF, QRect
 from PySide6.QtGui import QRegion
 from PySide6.QtWidgets import QApplication
 
-from pet.overlay_window import OverlayWindow
-from pet.pet_sprite import PetSprite
-from pet.tick_driver import TickDriver
+from petwisp.overlay_window import OverlayWindow
+from petwisp.pet_sprite import PetSprite
+from petwisp.tick_driver import TickDriver
 
 app = QApplication.instance() or QApplication([])
 

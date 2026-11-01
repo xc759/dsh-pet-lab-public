@@ -25,7 +25,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from pet.tts import edge as edge_mod  # noqa: E402
+from petwisp.tts import edge as edge_mod  # noqa: E402
 
 #: 2026-09-22 实测已从微软在线音色表消失的 10 款（我方老清单里的）
 KNOWN_DEAD_VOICES = (
@@ -281,11 +281,11 @@ def test_synth_refreshes_live_voice_list_in_background(monkeypatch, tmp_path):
 
 def test_service_announces_voice_substitution_once(monkeypatch):
     """服务层把 preflight 的说明转达给用户，且同一进程内只弹一次。"""
-    from pet.voice_chime import normalize_chime_config
-    from pet.voice.chime_service import VoiceChimeService
+    from petwisp.voice_chime import normalize_chime_config
+    from petwisp.voice.chime_service import VoiceChimeService
 
     _install_fake_edge_tts(monkeypatch, live_voices=["zh-CN-XiaoxiaoNeural"])
-    import pet.voice.chime_service as svc_mod
+    import petwisp.voice.chime_service as svc_mod
 
     monkeypatch.setattr(svc_mod, "_ANNOUNCED_NOTES", set())
 

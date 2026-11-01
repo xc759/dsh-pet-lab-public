@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import multiprocessing
 
-from pet import overlay_settings_command as cmd
+from petwisp import overlay_settings_command as cmd
 
 
 def _writer(directory, started, done):

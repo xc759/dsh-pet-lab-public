@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""主动性调度（``pet.growth.proactive``）：三类开关 + 硬静默。
+"""主动性调度（``petwisp.growth.proactive``）：三类开关 + 硬静默。
 
 覆盖阶段B3 的验收口径：
 
@@ -17,11 +17,11 @@ import pytest
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
-from pet.config import Config
-from pet.growth import nudge, proactive
-from pet.growth import service as service_mod
-from pet.growth.service import GrowthService
-from pet.growth.store import GrowthStore
+from petwisp.config import Config
+from petwisp.growth import nudge, proactive
+from petwisp.growth import service as service_mod
+from petwisp.growth.service import GrowthService
+from petwisp.growth.store import GrowthStore
 
 
 def _moment(text: str) -> datetime:

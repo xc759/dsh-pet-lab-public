@@ -32,10 +32,10 @@ import pytest
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication
 
-from pet import platform_mac
-from pet.config import Config
-from pet.overlay_window import OverlayWindow
-from pet.window import PetWindow, build_window_flags
+from petwisp import platform_mac
+from petwisp.config import Config
+from petwisp.overlay_window import OverlayWindow
+from petwisp.window import PetWindow, build_window_flags
 from tests.test_window_pause import FakeLibrary
 
 app = QApplication.instance() or QApplication([])

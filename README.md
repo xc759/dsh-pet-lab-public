@@ -1,4 +1,4 @@
-# dsh-pet · 开源学习陪伴桌宠
+# PetWisp（微光）· 开源学习陪伴桌宠
 
 一只住在 Windows 桌面上的透明小宠物。它会自己走动、发呆、探头、被你拖着玩，
 也会在你学习时安静陪着——记你的专注时长、在你走神太久时轻轻提醒、把阶段成果整理成一份可回看的成长档案。
@@ -10,7 +10,7 @@
 - **可离线**：核心功能（形象、动作、成长、提醒）零网络依赖
 - **代码 MIT**：可读、可改、可自己加动作
 
-> 本项目 fork 自 [MerZlin/dsh-pet-indesktop](https://github.com/MerZlin/dsh-pet-indesktop)（MIT），
+> 本项目 fork 自 [MerZlin/petwisp-indesktop](https://github.com/MerZlin/petwisp-indesktop)（MIT），
 > 在此基础上重构了形象引擎、成长档案与首次使用向导，并剥离了所有第三方角色素材
 > 与外部软件强绑定。上游署名与第三方许可详见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
 
@@ -21,15 +21,15 @@
 **环境**：Windows 10/11、Python 3.11+（开发与验证环境为 3.12）。
 
 ```bat
-git clone <你的仓库地址> dsh-pet
-cd dsh-pet
+git clone <你的仓库地址> petwisp
+cd petwisp
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
-python -m pet
+python -m petwisp
 ```
 
-也可以直接双击 `run.bat`（内部是 `pythonw -m pet`，不弹控制台）。
+也可以直接双击 `run.bat`（内部是 `pythonw -m petwisp`，不弹控制台）。
 
 首次启动会走一次「首次使用向导」，随后宠物出现在桌面右下角。
 
@@ -41,7 +41,7 @@ python -m pet
 ## 形象包：换一只自己的宠物
 
 形象包就是一个目录，放进 `assets/characters/<角色名>/`（随仓库走），
-或 `%APPDATA%\dsh-pet-standalone\characters\<角色名>\`（本机自用，不入库）。
+或 `%APPDATA%\petwisp\characters\<角色名>\`（本机自用，不入库）。
 
 ```
 assets/characters/<角色名>/
@@ -78,7 +78,7 @@ assets/characters/<角色名>/
 | `handoff_scheme = "xxx"` | 拼成 `xxx://...` 深链调用你指定的客户端 |
 | `handoff_agent_label` | 界面上按钮显示的名字，例如「交给我的助手」 |
 
-配置写在 `config.json`（位于 `%APPDATA%\dsh-pet-standalone\`）。**本项目不内置任何
+配置写在 `config.json`（位于 `%APPDATA%\petwisp\`）。**本项目不内置任何
 特定软件的协议、也不依赖任何特定助手**——填什么就调用什么，不填就只走剪贴板。
 
 ---
@@ -89,7 +89,7 @@ assets/characters/<角色名>/
 
 | 形态 | 体积 | 说明 |
 | --- | --- | --- |
-| 源码仓（`git clone` 后） | 约 17 MB / 802 文件 | 装完依赖即可 `python -m pet` |
+| 源码仓（`git clone` 后） | 约 17 MB / 802 文件 | 装完依赖即可 `python -m petwisp` |
 | 绿色包解压后 | 约 280 MB | PySide6 约 115 MB + 随包 ffmpeg 约 84 MB |
 | 分发压缩包（zip / deflate 最大压缩） | 约 119 MB | 系统自带解压即可 |
 | 分发压缩包（7z / LZMA2） | 约 78 MB | **推荐**，体积最小 |
@@ -112,7 +112,7 @@ assets/characters/<角色名>/
 ## 目录结构
 
 ```
-pet/            主程序（形象引擎、动作状态机、成长档案、设置与向导）
+petwisp/        主程序（形象引擎、动作状态机、成长档案、设置与向导）
 assets/         形象素材（只有 placeholder/ 随仓库分发）
 scripts/        构建、素材生成、校验脚本
 tests/          测试套件（pytest）
@@ -120,6 +120,14 @@ docs/           设计文档与打包说明
 integrations/   外部桥接插件
 .github/        CI 工作流
 ```
+
+## 命名与品牌
+
+产品名 **PetWisp（微光）**，代码侧一律小写 `petwisp`。
+改名（旧名 dsh-pet）后的中文名方案、写法约定与老用户兼容策略见
+[docs/BRANDING.md](docs/BRANDING.md)。
+
+---
 
 ## 许可
 

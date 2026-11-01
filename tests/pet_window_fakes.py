@@ -14,9 +14,9 @@ from __future__ import annotations
 from PySide6.QtCore import QObject, Signal
 from PySide6.QtGui import QPixmap
 
-from pet import catalog
-from pet.config import Config
-from pet.window import PetWindow
+from petwisp import catalog
+from petwisp.config import Config
+from petwisp.window import PetWindow
 
 NAMES = [
     catalog.IDLE,

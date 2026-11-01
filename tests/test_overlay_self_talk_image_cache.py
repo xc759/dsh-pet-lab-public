@@ -25,12 +25,12 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 from PySide6.QtGui import QColor, QImage, QPixmap
 from PySide6.QtWidgets import QApplication
 
-import pet.overlay_shell as overlay_shell_mod
+import petwisp.overlay_shell as overlay_shell_mod
 import tests.test_overlay_self_talk as st
 import tests.test_overlay_window_capabilities as cap
 import tests.test_sprite_menu_facade as fac
-from pet.overlay_shell import OverlayShell
-from pet.pet_sprite import PetSprite
+from petwisp.overlay_shell import OverlayShell
+from petwisp.pet_sprite import PetSprite
 
 app = QApplication.instance() or QApplication([])
 
@@ -82,7 +82,7 @@ def test_cache_edge_tracks_display_box_scale_and_dpr():
     两处共用同一份常量，避免"缓存改了显示没改"。
     """
     edge = overlay_shell_mod.self_talk_image_cache_edge
-    from pet.speech_bubble import SELF_TALK_IMAGE_BOX_H, SELF_TALK_IMAGE_BOX_W
+    from petwisp.speech_bubble import SELF_TALK_IMAGE_BOX_H, SELF_TALK_IMAGE_BOX_W
 
     box = max(SELF_TALK_IMAGE_BOX_W, SELF_TALK_IMAGE_BOX_H)
 

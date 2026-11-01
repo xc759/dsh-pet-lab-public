@@ -28,9 +28,9 @@ from PySide6.QtCore import QCoreApplication, QEvent, QPointF, QRectF, QTimer
 from PySide6.QtGui import QColor, QImage, QPainterPath, QPainter
 from PySide6.QtWidgets import QApplication
 
-import pet.island.dynamic_island as island_mod
-from pet.config import Config
-from pet.island.dynamic_island import DynamicIsland
+import petwisp.island.dynamic_island as island_mod
+from petwisp.config import Config
+from petwisp.island.dynamic_island import DynamicIsland
 
 # dark 主题下的期望色：中性 = 主题次色、工作/待确认 = 主题色（默认 blue）
 _NEUTRAL = "#a0aabe"
@@ -788,7 +788,7 @@ def test_status_dot_off_config_draws_nothing(tmp_path):
 def test_appshell_forwards_converged_state_verbatim(tmp_path):
     """接线契约：AppShell 把**收敛态原文**交给岛，不再压成活跃布尔。"""
     _qapp()
-    import pet.app as app_mod
+    import petwisp.app as app_mod
     from PySide6.QtWidgets import QWidget
 
     class _StubIsland(QWidget):
@@ -822,7 +822,7 @@ def test_dsh_converger_to_dot_end_to_end(tmp_path):
     带 requestId 的 ``cordis/request-run`` 才算。
     """
     _qapp()
-    from pet.agent_link.dsh_state import DshStateConverger
+    from petwisp.agent_link.dsh_state import DshStateConverger
 
     converger = DshStateConverger()
     island = _island(tmp_path)

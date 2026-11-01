@@ -21,8 +21,8 @@ from PySide6.QtCore import QObject, Qt, Signal
 from PySide6.QtGui import QColor, QImage, QPainter, QPixmap
 from PySide6.QtWidgets import QApplication, QWidget
 
-from pet import catalog
-from pet import window as window_mod
+from petwisp import catalog
+from petwisp import window as window_mod
 
 
 def _qapp() -> QApplication:

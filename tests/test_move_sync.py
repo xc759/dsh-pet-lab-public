@@ -22,15 +22,15 @@ from PySide6.QtCore import QObject, QPoint, QRect, Signal
 from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QApplication
 
-from pet import catalog
-from pet.config import Config
-from pet.movement import (
+from petwisp import catalog
+from petwisp.config import Config
+from petwisp.movement import (
     curve_progress_at_time,
     move_position_at_frame,
     quantize_move,
 )
-import pet.window as window_mod
-from pet.window import PetWindow
+import petwisp.window as window_mod
+from petwisp.window import PetWindow
 
 MOVE = catalog.MOVES[0]  # 螃蟹走路
 
@@ -161,7 +161,7 @@ def test_curve_progress_degrades_safely_on_empty_inputs():
 
 
 def _lib_on_dir(tmp_path):
-    from pet.library import MovieLibrary
+    from petwisp.library import MovieLibrary
 
     lib = MovieLibrary.__new__(MovieLibrary)
     lib._asset_dir = tmp_path
@@ -228,7 +228,7 @@ def test_move_curves_missing_file_returns_empty(tmp_path):
 
 def test_demo_move_curves_cover_move_clips():
     """demo 角色包：每个移动动画都必须带逐帧位移曲线（动帧才动）。"""
-    from pet.library import MovieLibrary
+    from petwisp.library import MovieLibrary
 
     lib = MovieLibrary(character_id='demo')
     for name in catalog.MOVES:
@@ -242,7 +242,7 @@ def test_demo_move_curves_cover_move_clips():
 
 
 def test_demo_move_strides_sidecar_covers_move_clips():
-    from pet.library import MovieLibrary
+    from petwisp.library import MovieLibrary
 
     lib = MovieLibrary(character_id='demo')
     for name in catalog.MOVES:
@@ -382,9 +382,9 @@ def _close(win, app):
 
 def _pin_rng(monkeypatch, distance=150):
     # 方向与纵向目标都用 random 模块：钉死后计划完全确定（恒向右）。
-    # 显式写 pet.movement.random 路径：movement.py 必须保持模块级 import
+    # 显式写 petwisp.movement.random 路径：movement.py 必须保持模块级 import
     # （from-import 会让这里的注入静默失效，测试仍绿但确定性丢失）。
-    import pet.movement as movement_mod
+    import petwisp.movement as movement_mod
 
     monkeypatch.setattr(movement_mod.random, "randint", lambda a, b: distance)
     monkeypatch.setattr(movement_mod.random, "choice", lambda seq: seq[-1])
@@ -634,7 +634,7 @@ def _setup_anim_tick_win(tmp_path, monkeypatch):
     lib.move_strides = {MOVE: 100.0}
     win = _make_win(tmp_path, monkeypatch, lib)
     clock = _FakeClock()
-    monkeypatch.setattr(window_mod.time, 'monotonic', clock)  # window.py 测试 seam：pet.window.time 命名空间
+    monkeypatch.setattr(window_mod.time, 'monotonic', clock)  # window.py 测试 seam：petwisp.window.time 命名空间
     _pin_rng(monkeypatch, distance=144)  # stride=72 → 恰 2 圈
     monkeypatch.setattr(win, '_predict_prewarm', lambda *a: None)
     moves = []
@@ -712,7 +712,7 @@ def test_anim_tick_ignores_legacy_plan(app, tmp_path, monkeypatch):
     lib = FakeLibrary(move_frames=10)
     win = _make_win(tmp_path, monkeypatch, lib)
     clock = _FakeClock()
-    monkeypatch.setattr(window_mod.time, 'monotonic', clock)  # window.py 测试 seam：pet.window.time 命名空间
+    monkeypatch.setattr(window_mod.time, 'monotonic', clock)  # window.py 测试 seam：petwisp.window.time 命名空间
     try:
         win._switch(MOVE)
         win._move_plan = {'start_x': 0, 'target_x': 20, 'start_y': 0,
@@ -748,7 +748,7 @@ def test_anim_tick_respects_move_curve(app, tmp_path, monkeypatch):
     lib.move_curves = {MOVE: [0.0, 0.0, 0.0, 0.0, 0.0, 0.2, 0.4, 0.6, 0.8, 1.0]}
     win = _make_win(tmp_path, monkeypatch, lib)
     clock = _FakeClock()
-    monkeypatch.setattr(window_mod.time, 'monotonic', clock)  # window.py 测试 seam：pet.window.time 命名空间
+    monkeypatch.setattr(window_mod.time, 'monotonic', clock)  # window.py 测试 seam：petwisp.window.time 命名空间
     try:
         _pin_rng(monkeypatch, distance=144)
         monkeypatch.setattr(win, '_predict_prewarm', lambda *a: None)

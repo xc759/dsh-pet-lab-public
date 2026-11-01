@@ -13,7 +13,7 @@ import sys
 
 import pytest
 
-from pet import platform_win
+from petwisp import platform_win
 
 
 @pytest.mark.skipif(sys.platform != "win32", reason="QUNS 是 Windows API")

@@ -18,9 +18,9 @@ from pathlib import Path
 
 import pytest
 
-from pet.island import fps_monitor as fm
-from pet.island import game_fps as gf
-from pet.island import segments as seg
+from petwisp.island import fps_monitor as fm
+from petwisp.island import game_fps as gf
+from petwisp.island import segments as seg
 
 
 # ---------------------------------------------------------------- 替身
@@ -400,7 +400,7 @@ def test_frames_become_ok_snapshot_with_target_identity():
     assert _wait_until(lambda: log.sessions), "应当为前台目标开会话"
     session = log.latest
     assert (session.pid, session.target_name) == (4242, "game.exe")
-    assert session.started == 1 and session.session_name.startswith("dsh-pet-fps-")
+    assert session.started == 1 and session.session_name.startswith("petwisp-fps-")
 
     session.feed_frames(70, with_header=True)
     assert _wait_until(lambda: monitor.snapshot().state == gf.STATE_OK)
@@ -681,7 +681,7 @@ def test_excluded_foreground_holds_briefly_then_clears_without_measuring_others(
     log.latest.feed_frames(_READING_FRAMES, with_header=True)
     assert _wait_until(lambda: monitor.snapshot().state == gf.STATE_OK)
 
-    fg.value = (own_pid, "dsh-pet.exe")      # 切到桌宠自己
+    fg.value = (own_pid, "petwisp.exe")      # 切到桌宠自己
     time.sleep(0.05)
     assert len(log.sessions) == 1, "短暂切走不该立刻换会话"
     assert log.sessions[0].stopped == 0
@@ -984,8 +984,8 @@ def test_module_import_pulls_no_heavy_visual_dependency():
     repo = Path(__file__).resolve().parents[1]
     code = (
         "import sys, importlib\n"
-        "importlib.import_module('pet.island.fps_monitor')\n"
-        "print('numpy' in sys.modules, 'pet.vision' in sys.modules, 'PySide6' in sys.modules)\n"
+        "importlib.import_module('petwisp.island.fps_monitor')\n"
+        "print('numpy' in sys.modules, 'petwisp.vision' in sys.modules, 'PySide6' in sys.modules)\n"
     )
     proc = sp.run([sys.executable, "-c", code], cwd=str(repo),
                   capture_output=True, text=True, timeout=120)
@@ -1090,12 +1090,12 @@ def _collect(session, sink: list[str]) -> bool:
 def test_real_session_spawns_pid_scoped_args_and_stops_gracefully(fake_popen, tmp_path):
     spawned, adopted = fake_popen
     session = fm.FpsSession(pid=4242, name="game.exe", backend=_backend_file(tmp_path),
-                            session_name="dsh-pet-fps-1-ab", stop_timeout=0.2)
+                            session_name="petwisp-fps-1-ab", stop_timeout=0.2)
     session.start()
     assert len(spawned) == 1
     argv = spawned[0].argv
     assert argv[0] == str(_backend_file(tmp_path)) or argv[0].endswith(gf.BACKEND_EXE_NAME)
-    assert argv[argv.index("--session_name") + 1] == "dsh-pet-fps-1-ab"
+    assert argv[argv.index("--session_name") + 1] == "petwisp-fps-1-ab"
     assert argv[argv.index("--process_id") + 1] == "4242"
     for forbidden in ("--stop_existing_session", "--restart_as_admin", "--output_file"):
         assert forbidden not in argv
@@ -1105,7 +1105,7 @@ def test_real_session_spawns_pid_scoped_args_and_stops_gracefully(fake_popen, tm
     assert len(spawned) == 2, "收口靠官方终止命令，不是 CTRL_BREAK/信号"
     terminate_argv = spawned[1].argv
     assert terminate_argv[-1] == "--terminate_existing_session"
-    assert terminate_argv[terminate_argv.index("--session_name") + 1] == "dsh-pet-fps-1-ab"
+    assert terminate_argv[terminate_argv.index("--session_name") + 1] == "petwisp-fps-1-ab"
     assert not any("BREAK" in " ".join(p.argv) for p in spawned)
     assert spawned[0].terminated == 0, "官方终止命令兑现时不该再硬杀"
     session.close()
@@ -1210,8 +1210,8 @@ def test_real_session_rejects_missing_backend_before_spawning(fake_popen, tmp_pa
 _SWEEP_LISTING = """\
 Data Collector Set                      Type                          Status
 -------------------------------------------------------------------------------
-dsh-pet-fps-1-1-aabbccdd                Trace                         Running
-dsh-pet-fps-2-2-11223344                Trace                         Running
+petwisp-fps-1-1-aabbccdd                Trace                         Running
+petwisp-fps-2-2-11223344                Trace                         Running
 SomeOtherCapture                        Trace                         Running
 """
 
@@ -1245,10 +1245,10 @@ def test_sweep_stale_sessions_stops_only_own_prefix_and_spares_current(
         monkeypatch, sweep_gate):
     fake = _FakeLogman(_SWEEP_LISTING)
     monkeypatch.setattr(fm.subprocess, "run", fake)
-    stopped = fm.sweep_stale_sessions("dsh-pet-fps-2-2-11223344")
-    assert stopped == ["dsh-pet-fps-1-1-aabbccdd"], "只停自己前缀、且不是本次会话"
+    stopped = fm.sweep_stale_sessions("petwisp-fps-2-2-11223344")
+    assert stopped == ["petwisp-fps-1-1-aabbccdd"], "只停自己前缀、且不是本次会话"
     assert [c[1] for c in fake.calls] == ["query", "stop"], "别人的采集会话不许碰"
-    assert fake.calls[1] == ["logman", "stop", "dsh-pet-fps-1-1-aabbccdd", "-ets"]
+    assert fake.calls[1] == ["logman", "stop", "petwisp-fps-1-1-aabbccdd", "-ets"]
 
 
 def test_sweep_stale_sessions_survives_logman_failure(monkeypatch, sweep_gate):
@@ -1267,9 +1267,9 @@ def test_sweep_stale_sessions_runs_once_per_process(monkeypatch, sweep_gate):
     """
     fake = _FakeLogman(_SWEEP_LISTING)
     monkeypatch.setattr(fm.subprocess, "run", fake)
-    first = fm.sweep_stale_sessions("dsh-pet-fps-2-2-11223344")
-    second = fm.sweep_stale_sessions("dsh-pet-fps-3-3-99999999")
-    assert first == ["dsh-pet-fps-1-1-aabbccdd"]
+    first = fm.sweep_stale_sessions("petwisp-fps-2-2-11223344")
+    second = fm.sweep_stale_sessions("petwisp-fps-3-3-99999999")
+    assert first == ["petwisp-fps-1-1-aabbccdd"]
     assert second == []
     assert [c[1] for c in fake.calls].count("query") == 1
 
@@ -1296,14 +1296,14 @@ def test_sweep_never_stops_a_session_this_process_created(monkeypatch, sweep_gat
     ``logman query`` 里，新 worker 已经把采集会话起来了；旧查询若只排除自己那个
     尚未启动的名字，就会把**新会话当残留停掉**，FPS 当场断掉。
     """
-    listing = _SWEEP_LISTING + "dsh-pet-fps-9-9-ours                Trace    Running\n"
+    listing = _SWEEP_LISTING + "petwisp-fps-9-9-ours                Trace    Running\n"
     fake = _FakeLogman(listing)
     monkeypatch.setattr(fm.subprocess, "run", fake)
-    fm.sweep_stale_sessions("dsh-pet-fps-9-9-ours")  # 本进程的这一场
-    fm.sweep_stale_sessions("dsh-pet-fps-3-3-next", once=False)
+    fm.sweep_stale_sessions("petwisp-fps-9-9-ours")  # 本进程的这一场
+    fm.sweep_stale_sessions("petwisp-fps-3-3-next", once=False)
     stopped = [call[2] for call in fake.calls if call[1] == "stop"]
-    assert "dsh-pet-fps-9-9-ours" not in stopped
-    assert set(stopped) == {"dsh-pet-fps-1-1-aabbccdd", "dsh-pet-fps-2-2-11223344"}
+    assert "petwisp-fps-9-9-ours" not in stopped
+    assert set(stopped) == {"petwisp-fps-1-1-aabbccdd", "petwisp-fps-2-2-11223344"}
 
 
 def test_sweep_failure_leaves_the_gate_open(monkeypatch, sweep_gate):
@@ -1335,6 +1335,6 @@ def test_sweep_keeps_the_gate_open_when_logman_reports_failure(
     # 下一次开会话再试：这次读到了，就该真清理并关闸
     ok = _FakeLogman(_SWEEP_LISTING)
     monkeypatch.setattr(fm.subprocess, "run", ok)
-    assert fm.sweep_stale_sessions("s") == ["dsh-pet-fps-1-1-aabbccdd",
-                                           "dsh-pet-fps-2-2-11223344"]
+    assert fm.sweep_stale_sessions("s") == ["petwisp-fps-1-1-aabbccdd",
+                                           "petwisp-fps-2-2-11223344"]
     assert fm._swept_stale_sessions is True

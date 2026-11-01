@@ -12,9 +12,9 @@ from types import SimpleNamespace
 import pytest
 from PySide6.QtWidgets import QApplication
 
-from pet.app import PetInstance
-from pet.config import Config
-from pet.window import PetWindow
+from petwisp.app import PetInstance
+from petwisp.config import Config
+from petwisp.window import PetWindow
 from tests.test_window_pause import FakeLibrary
 
 
@@ -102,7 +102,7 @@ def test_enabling_mouse_through_hint_suppressed_when_hidden_or_suppressed(tmp_pa
 
 
 def test_dock_hidden_recovery_hint_uses_bubble_when_visible(tmp_path, monkeypatch):
-    import pet.app as app_mod
+    import petwisp.app as app_mod
 
     monkeypatch.setattr(app_mod.sys, "platform", "darwin")
     inst = _bare_instance(tmp_path)
@@ -118,7 +118,7 @@ def test_dock_hidden_recovery_hint_uses_bubble_when_visible(tmp_path, monkeypatc
 
 
 def test_dock_hidden_recovery_hint_uses_tray_when_pet_hidden(tmp_path, monkeypatch):
-    import pet.app as app_mod
+    import petwisp.app as app_mod
 
     monkeypatch.setattr(app_mod.sys, "platform", "darwin")
     inst = _bare_instance(tmp_path)
@@ -136,7 +136,7 @@ def test_dock_hidden_recovery_hint_uses_tray_when_pet_hidden(tmp_path, monkeypat
 
 
 def test_dock_hidden_recovery_hint_noop_off_macos(tmp_path, monkeypatch):
-    import pet.app as app_mod
+    import petwisp.app as app_mod
 
     monkeypatch.setattr(app_mod.sys, "platform", "win32")
     inst = _bare_instance(tmp_path)

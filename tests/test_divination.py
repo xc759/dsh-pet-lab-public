@@ -15,8 +15,8 @@ import sys
 
 import pytest
 
-from pet import divination
-from pet.divination.quotes import RAW_QUOTES
+from petwisp import divination
+from petwisp.divination.quotes import RAW_QUOTES
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
 
@@ -85,7 +85,7 @@ def test_draw_is_reproducible_across_processes() -> None:
     """**跨进程**也必须一致（专抓 `hash()` 随机化：同一天不能出不同的签）。"""
     script = (
         "import datetime as dt, json;"
-        "from pet import divination;"
+        "from petwisp import divination;"
         "days=[dt.date(2026,10,16), dt.date(2026,1,1), dt.date(2027,3,20)];"
         "print(json.dumps([divination.draw_for_day(d).id for d in days]))"
     )

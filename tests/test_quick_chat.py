@@ -11,9 +11,9 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication
 
-from pet.config import Config
-from pet.quick_chat import _surface_radius
-from pet.speech_bubble import BUBBLE_STYLE_PRESETS
+from petwisp.config import Config
+from petwisp.quick_chat import _surface_radius
+from petwisp.speech_bubble import BUBBLE_STYLE_PRESETS
 
 
 def test_breath_bubble_preset_gets_rounded_fallback_radius():
@@ -39,7 +39,7 @@ def test_switch_character_moves_session_and_prompt_to_new_character(tmp_path):
     主宠切角色不同步就等于聊天面永远停在旧角色。
     """
     app = QApplication.instance() or QApplication([])
-    from pet.quick_chat import QuickChatBubble
+    from petwisp.quick_chat import QuickChatBubble
 
     bubble = QuickChatBubble(Config(base=tmp_path))
     try:
@@ -62,7 +62,7 @@ def test_switch_character_moves_session_and_prompt_to_new_character(tmp_path):
 def test_switch_character_ignores_empty_and_same_character(tmp_path):
     """空身份/同角色不动作（会话不被无谓重建，避免丢掉当前会话）。"""
     app = QApplication.instance() or QApplication([])
-    from pet.quick_chat import QuickChatBubble
+    from petwisp.quick_chat import QuickChatBubble
 
     bubble = QuickChatBubble(Config(base=tmp_path))
     try:
@@ -128,7 +128,7 @@ def test_switch_character_drops_inflight_answer(tmp_path):
     （``chat/widgets.py::switch_character`` 清 request ID + 停旧请求）同款闸门。
     """
     app = QApplication.instance() or QApplication([])
-    from pet.quick_chat import QuickChatBubble
+    from petwisp.quick_chat import QuickChatBubble
 
     bubble = QuickChatBubble(Config(base=tmp_path))
     try:
@@ -236,7 +236,7 @@ def test_switch_character_drops_queued_late_delta_and_completion(tmp_path):
     并显示在新角色的气泡里——既有用例没造出这条信号，等于这条路径没被动态验过。
     """
     app = QApplication.instance() or QApplication([])
-    from pet.quick_chat import QuickChatBubble
+    from petwisp.quick_chat import QuickChatBubble
 
     bubble = QuickChatBubble(Config(base=tmp_path))
     try:
@@ -256,7 +256,7 @@ def test_switch_character_drops_queued_late_delta_and_completion(tmp_path):
 def test_switch_character_drops_queued_late_error(tmp_path):
     """astra #1：错误信号同样先 emit 再切角色 → 不许把「请求失败：…」写上新角色气泡。"""
     app = QApplication.instance() or QApplication([])
-    from pet.quick_chat import QuickChatBubble
+    from petwisp.quick_chat import QuickChatBubble
 
     bubble = QuickChatBubble(Config(base=tmp_path))
     try:
@@ -276,7 +276,7 @@ def test_switch_character_drops_queued_late_error(tmp_path):
 def test_switch_character_without_inflight_request_only_swaps_session(tmp_path):
     """非回归：空闲切角色行为不变（只换身份 + 重取会话，不触碰在途状态字段）。"""
     app = QApplication.instance() or QApplication([])
-    from pet.quick_chat import QuickChatBubble
+    from petwisp.quick_chat import QuickChatBubble
 
     bubble = QuickChatBubble(Config(base=tmp_path))
     try:
@@ -293,7 +293,7 @@ def test_reply_renders_markdown(tmp_path):
     """快捷气泡的助手回复按 Markdown 渲染（对齐现代聊天窗 #249 的口径）——
     用户反馈 v4.3.0 快捷气泡里 markdown 原文直出（**、## 符号裸露）。"""
     app = QApplication.instance() or QApplication([])
-    from pet.quick_chat import QuickChatBubble
+    from petwisp.quick_chat import QuickChatBubble
 
     bubble = QuickChatBubble(Config(base=tmp_path))
     try:

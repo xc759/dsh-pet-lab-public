@@ -4,26 +4,26 @@
 **这条守卫守的是一次真实的交付事故**：三个构建脚本都把 OCR 模型和 rapidocr 配置打进
 了包，却没有一个把**引擎模块本身**推进 PyInstaller 的模块图。截图动作走的是动态
 seam——``pet/screen_capture/actions.py::_resolve_engine`` 用 ``importlib`` 按字符串
-（``OCR_MODULE = "ocr"``）解析 ``pet.screen_capture.ocr``，而全仓（``pet/`` 下）没有
+（``OCR_MODULE = "ocr"``）解析 ``petwisp.screen_capture.ocr``，而全仓（``pet/`` 下）没有
 任何一处静态 import 指向它。静态分析从入口出发摸不到这个模块，于是冻结包里"模型都在、
 引擎不在"：产品不崩，只是右键「截图 → 提取文字」永远置灰。
 
 切片 5 把识别搬进独立子进程（``<exe> --ocr-worker``）之后，同一个坑多了一个入口：
-``pet.screen_capture.ocr_worker`` 的模块名只以**命令行字符串**的形式出现在代码里
+``petwisp.screen_capture.ocr_worker`` 的模块名只以**命令行字符串**的形式出现在代码里
 （``ocr.worker_command``），静态分析同样摸不到。缺它不会崩——只是每次识屏报一句
 "起不了本地 OCR 工作进程"。
 
 所以要钉住五件事，缺一条这族测试就又会骗人：
 
-1. **三个脚本都带**两个 ``--hidden-import``（``pet.screen_capture.ocr`` 与
-   ``pet.screen_capture.ocr_worker``），且真的挂在 PyInstaller 调用上（写了但没传
+1. **三个脚本都带**两个 ``--hidden-import``（``petwisp.screen_capture.ocr`` 与
+   ``petwisp.screen_capture.ocr_worker``），且真的挂在 PyInstaller 调用上（写了但没传
    进去等于没写）；
 2. **产物侧有门**：三个脚本都调 ``verify_rapidocr_models.py --app-dir``——只判写没写
    在源码里没用，得从产物模块图里读出来（门的行为测试在 test_verify_rapidocr_models.py）；
 3. **假设前提还成立**：``pet/`` 下仍然没有静态 import 指向那个**宿主引擎模块**
    （有人加了静态 import 的那天，这条 hidden-import 仍然是承重的，但守卫要提醒他别
    当成多余行删掉）；
-4. **冻结入口有路由**：``packaging/pet_entry*.py`` 必须在 import ``pet.app`` 之前
+4. **冻结入口有路由**：``packaging/pet_entry*.py`` 必须在 import ``petwisp.app`` 之前
    把 ``--ocr-worker`` 分流出去——冻结包里 exe 自己就是解释器，工作端只能由那两条
    路由提供（``pet/__main__.py`` 在冻结启动时根本不参与）；
 5. **判据是单一真相源**：门的期望模块清单来自 ``ocr.BUNDLE_MODULES``，不是在门里
@@ -47,8 +47,8 @@ SHELLS = {
     "macos": REPO / "scripts" / "build_macos.sh",
 }
 #: 两个静态分析摸不到、只能靠 --hidden-import 进包的模块。
-MODULE = "pet.screen_capture.ocr"
-WORKER_MODULE = "pet.screen_capture.ocr_worker"
+MODULE = "petwisp.screen_capture.ocr"
+WORKER_MODULE = "petwisp.screen_capture.ocr_worker"
 BUNDLED_MODULES = (MODULE, WORKER_MODULE)
 
 #: 冻结入口（exe 的 ``__main__``）。两条都要能分流 --ocr-worker。
@@ -57,8 +57,8 @@ FROZEN_ENTRIES = (REPO / "packaging" / "pet_entry.py",
 
 #: 加静态 import 的人会在这里看到理由，而不是以为那行 hidden-import 是多余的。
 STATIC_IMPORT_HINT = (
-    "pet/ 下出现了一处指向 pet.screen_capture.ocr 的静态 import。构建脚本里的 "
-    "--hidden-import pet.screen_capture.ocr 仍然是承重的（产品走的是 actions 的"
+    "petwisp/ 下出现了一处指向 petwisp.screen_capture.ocr 的静态 import。构建脚本里的 "
+    "--hidden-import petwisp.screen_capture.ocr 仍然是承重的（产品走的是 actions 的"
     "动态 seam），删掉它冻结包会再次解析不出引擎、菜单永远置灰。"
 )
 
@@ -117,7 +117,7 @@ def test_no_module_under_pet_statically_imports_the_engine():
         re.compile(r"^\s*import\s+pet\.screen_capture\.ocr\b", re.MULTILINE),
     )
     offenders: list[str] = []
-    for path in sorted((REPO / "pet").rglob("*.py")):
+    for path in sorted((REPO / "petwisp").rglob("*.py")):
         text = path.read_text(encoding="utf-8")
         if any(pattern.search(text) for pattern in patterns):
             offenders.append(path.relative_to(REPO).as_posix())
@@ -127,7 +127,7 @@ def test_no_module_under_pet_statically_imports_the_engine():
 
 def test_the_actions_seam_still_resolves_the_engine_dynamically():
     """seam 的形状（importlib + 字符串模块名）是上面那一切的成因，也要钉住。"""
-    text = (REPO / "pet" / "screen_capture" / "actions.py").read_text(encoding="utf-8")
+    text = (REPO / "petwisp" / "screen_capture" / "actions.py").read_text(encoding="utf-8")
 
     assert "import importlib" in text
     assert 'importlib.import_module(f"{__package__}.{module_name}")' in text
@@ -141,28 +141,28 @@ def test_the_actions_seam_still_resolves_the_engine_dynamically():
 def test_frozen_entries_route_the_ocr_worker_flag(entry):
     """冻结包里 exe 自己就是解释器：工作端只能由入口的 ``--ocr-worker`` 分流提供。
 
-    分流必须**早于** ``from pet.app import main``：晚一步就会把 Qt / 素材库 / 托盘
+    分流必须**早于** ``from petwisp.app import main``：晚一步就会把 Qt / 素材库 / 托盘
     整份拉起来，而这条路径存在的全部理由就是"别付那份成本"。
     """
     text = entry.read_text(encoding="utf-8")
 
     assert "ocr.OCR_WORKER_FLAG" not in text, "开关的字面量应该只有一份（ocr.py）"
     assert '"--ocr-worker" in sys.argv' in text
-    assert "from pet.__main__ import _run_ocr_worker" in text
-    app_import = text.index("\nfrom pet.app import main")
+    assert "from petwisp.__main__ import _run_ocr_worker" in text
+    app_import = text.index("\nfrom petwisp.app import main")
     assert text.index('"--ocr-worker" in sys.argv') < app_import
 
 
 def test_the_package_entry_offers_the_worker_route():
     """源码态入口同样要能分流（冻结入口复用它的实现）。"""
-    text = (REPO / "pet" / "__main__.py").read_text(encoding="utf-8")
+    text = (REPO / "petwisp" / "__main__.py").read_text(encoding="utf-8")
 
     assert '"--ocr-worker" in sys.argv' in text
     assert "def _run_ocr_worker()" in text
     assert "from .screen_capture.ocr_worker import main as ocr_worker_main" in text
     route = text.index('"--ocr-worker" in sys.argv')
     app_import = text.index("\n    from .app import main as app_main")
-    assert route < app_import, "分流必须早于 import pet.app，否则独立进程省的东西全白省"
+    assert route < app_import, "分流必须早于 import petwisp.app，否则独立进程省的东西全白省"
 
 
 def _load_verifier():
@@ -183,7 +183,7 @@ def test_gate_judges_the_modules_the_product_actually_needs():
     """门的判据必须等于产品声明的清单（写死第二份就会漂移）。"""
     module = _load_verifier()
 
-    from pet.screen_capture import ocr
+    from petwisp.screen_capture import ocr
 
     assert ocr.BUNDLE_MODULES == (MODULE, WORKER_MODULE)
     assert module.required_bundle_modules() == ocr.BUNDLE_MODULES

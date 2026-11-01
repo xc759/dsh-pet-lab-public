@@ -7,10 +7,10 @@ from types import SimpleNamespace
 import pytest
 from PySide6.QtWidgets import QApplication
 
-from pet.agent_link import AgentLinkManager
-from pet.config import Config
-from pet.multi_window_shared import MultiWindowProxy
-from pet.music.lyric_controller import MusicLyricController
+from petwisp.agent_link import AgentLinkManager
+from petwisp.config import Config
+from petwisp.multi_window_shared import MultiWindowProxy
+from petwisp.music.lyric_controller import MusicLyricController
 from tests.test_sprite_menu_facade import _make_shell
 
 app = QApplication.instance() or QApplication([])

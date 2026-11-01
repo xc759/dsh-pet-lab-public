@@ -1,5 +1,5 @@
 param(
-    [string]$ToolsRoot = "$env:LOCALAPPDATA/dsh-pet-android",
+    [string]$ToolsRoot = "$env:LOCALAPPDATA/petwisp-android",
     [string]$Python = '',
     [string[]]$Tasks = @('testDebugUnitTest', 'lintDebug', 'assembleDebug')
 )
@@ -28,7 +28,7 @@ try {
         New-Item -ItemType Directory -Force -Path $destination | Out-Null
         $metadata = Get-Content -LiteralPath 'app/build/outputs/apk/debug/output-metadata.json' -Raw | ConvertFrom-Json
         $output = $metadata.elements[0]
-        $apk = Join-Path $destination "dsh-pet-android-$($output.versionName)-debug.apk"
+        $apk = Join-Path $destination "petwisp-android-$($output.versionName)-debug.apk"
         Copy-Item -LiteralPath (Join-Path 'app/build/outputs/apk/debug' $output.outputFile) -Destination $apk -Force
         $digest = Get-FileHash -LiteralPath $apk -Algorithm SHA256
         "$($digest.Hash.ToLowerInvariant())  $(Split-Path $apk -Leaf)" |

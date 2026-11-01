@@ -28,11 +28,11 @@ from PySide6.QtCore import Qt  # noqa: E402
 from PySide6.QtTest import QTest  # noqa: E402
 from PySide6.QtWidgets import QApplication, QLabel, QScrollArea  # noqa: E402
 
-import pet.modern_settings_dialog as settings_mod  # noqa: E402
-from pet import settings_page_guide  # noqa: E402
-from pet.config import Config  # noqa: E402
-from pet.modern_settings_dialog import SettingRow, SettingsSection  # noqa: E402
-from pet.settings_pet_controls import GLOBAL_SCOPE_NOTE  # noqa: E402
+import petwisp.modern_settings_dialog as settings_mod  # noqa: E402
+from petwisp import settings_page_guide  # noqa: E402
+from petwisp.config import Config  # noqa: E402
+from petwisp.modern_settings_dialog import SettingRow, SettingsSection  # noqa: E402
+from petwisp.settings_pet_controls import GLOBAL_SCOPE_NOTE  # noqa: E402
 
 app = QApplication.instance() or QApplication([])
 

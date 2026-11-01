@@ -32,13 +32,13 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from PySide6.QtWidgets import QApplication
 
-import pet.sprite_behavior as sprite_behavior_mod
+import petwisp.sprite_behavior as sprite_behavior_mod
 import tests.test_sprite_behavior as beh
 import tests.test_sprite_menu_facade as fac
-from pet.festival.service import FestivalReminderService
-from pet.pet_sprite import INTERACTION_NORMAL, INTERACTION_THROWN
-from pet.sprite_behavior import STATE_IDLE, STATE_THROWN, BehaviorController
-from pet.voice.chime_service import VoiceChimeService
+from petwisp.festival.service import FestivalReminderService
+from petwisp.pet_sprite import INTERACTION_NORMAL, INTERACTION_THROWN
+from petwisp.sprite_behavior import STATE_IDLE, STATE_THROWN, BehaviorController
+from petwisp.voice.chime_service import VoiceChimeService
 
 app = QApplication.instance() or QApplication([])
 
@@ -204,9 +204,9 @@ def test_flight_bubble_other_sprite_still_bubbles(tmp_path):
 
         assert shell._bubble_blocked() is True
         assert shell._bubble_blocked(child) is False
-        assert shell._sprite_host(child).show_bubble("小肥鱼在") is True
+        assert shell._sprite_host(child).show_bubble("小宠在") is True
         app.processEvents()
-        assert child_bubble._raw_text == "小肥鱼在"
+        assert child_bubble._raw_text == "小宠在"
         assert child_bubble.isVisible() is True, "未飞的子宠气泡不受牵连"
 
         host = shell._self_talk_hosts.get(child)

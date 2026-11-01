@@ -9,8 +9,8 @@ import pytest
 from PySide6.QtCore import QRect, Qt
 from PySide6.QtTest import QTest
 
-from pet import pet_profiles
-from pet.speech_bubble import BUBBLE_STYLE_PRESETS, PetSpeechBubble
+from petwisp import pet_profiles
+from petwisp.speech_bubble import BUBBLE_STYLE_PRESETS, PetSpeechBubble
 from tests.test_sprite_menu_facade import _make_shell, app
 
 

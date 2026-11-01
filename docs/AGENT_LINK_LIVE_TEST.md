@@ -1,7 +1,7 @@
 # Agent 联动实机测试说明（交给 Kimi Code）
 
 > 用途：让 Kimi Code 在用户本机（Windows）直接运行桌宠，做真实端到端验证。
-> 前提：工作区 `D:\dsh-pet-pr`，当前分支 `perf/startup-and-hidden-cpu`。
+> 前提：工作区 `D:\petwisp-pr`，当前分支 `perf/startup-and-hidden-cpu`。
 > **不要 git commit / push。**
 
 ---
@@ -35,10 +35,10 @@
 
 | 文件 | 说明 |
 |---|---|
-| `pet/window.py` | 实例化 `AgentLinkManager`；右键菜单 5 项开关；隐藏/恢复时 `pause()/resume()` |
-| `pet/settings_dialog.py` | 主动识屏设置组（含「清除陪伴记忆」按钮） |
-| `pet/vision.py` | 视觉链路 bytes 级重构 + 前台窗口信息 + 短期记忆注入 |
-| `pet/proactive.py` | 主动识屏 Watcher + 频控 + dry_run + 短期记忆 |
+| `petwisp/window.py` | 实例化 `AgentLinkManager`；右键菜单 5 项开关；隐藏/恢复时 `pause()/resume()` |
+| `petwisp/settings_dialog.py` | 主动识屏设置组（含「清除陪伴记忆」按钮） |
+| `petwisp/vision.py` | 视觉链路 bytes 级重构 + 前台窗口信息 + 短期记忆注入 |
+| `petwisp/proactive.py` | 主动识屏 Watcher + 频控 + dry_run + 短期记忆 |
 | `tests/test_agent_link.py`（新增） | 10 个 Agent 联动测试 |
 | `tests/test_proactive.py` | 主动识屏全链路测试 |
 
@@ -72,8 +72,8 @@
 
 ### 0) 启动源码版桌宠
 ```powershell
-cd D:\dsh-pet-pr
-python -m pet
+cd D:\petwisp-pr
+python -m petwisp
 ```
 
 ### 1) 先验证右键菜单不崩
@@ -100,7 +100,7 @@ python -m pet
 
 ### 5) 验证 DSH / OpenCode 手动注入（插件未装，先验证链路）
 1. 勾选 **DSH**；
-2. 手动向 `<APPDATA>\dsh-pet-standalone\agent-events\dsh.jsonl` 追加：
+2. 手动向 `<APPDATA>\petwisp\agent-events\dsh.jsonl` 追加：
    ```json
    {"ts": 1750000000.1, "agent": "dsh", "session_id": "x", "event": "UserPromptSubmit", "state": "thinking"}
    ```

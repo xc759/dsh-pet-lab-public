@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from PySide6.QtWidgets import QApplication
 
-from pet.golden_spin import (
+from petwisp.golden_spin import (
     GOLDEN_SPIN_ACCEL,
     GOLDEN_SPIN_CLICK_RUSH_MS,
     GOLDEN_SPIN_DURATION_MS,

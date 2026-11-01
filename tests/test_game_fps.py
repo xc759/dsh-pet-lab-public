@@ -19,7 +19,7 @@ from pathlib import Path
 
 import pytest
 
-from pet.island import game_fps as gf
+from petwisp.island import game_fps as gf
 
 
 # ---------------------------------------------------------------- 官方表头 fixture
@@ -507,8 +507,8 @@ def test_platform_support_never_lies_on_posix(monkeypatch):
 
 # ---------------------------------------------------------------- 命令行（纯函数）
 def test_capture_args_use_the_default_metric_set():
-    args = gf.build_capture_args(session_name="dsh-pet-fps-1-ab", pid=4242)
-    assert args[0:2] == ["--session_name", "dsh-pet-fps-1-ab"]
+    args = gf.build_capture_args(session_name="petwisp-fps-1-ab", pid=4242)
+    assert args[0:2] == ["--session_name", "petwisp-fps-1-ab"]
     assert args[args.index("--process_id") + 1] == "4242"
     assert "--output_stdout" in args and "--no_console_stats" in args
     assert "--terminate_on_proc_exit" in args
@@ -534,8 +534,8 @@ def test_capture_args_require_a_target():
 
 
 def test_terminate_args_only_touch_our_own_session_name():
-    args = gf.build_terminate_args("dsh-pet-fps-1-ab")
-    assert args == ["--session_name", "dsh-pet-fps-1-ab", "--terminate_existing_session"]
+    args = gf.build_terminate_args("petwisp-fps-1-ab")
+    assert args == ["--session_name", "petwisp-fps-1-ab", "--terminate_existing_session"]
     assert "--stop_existing_session" not in args
 
 
@@ -543,7 +543,7 @@ def test_session_name_is_unique_and_bounded(monkeypatch):
     monkeypatch.setattr(gf.secrets, "token_hex", lambda n: "a" * (n * 2))
     assert gf.new_session_name() != gf.new_session_name()
     name = gf.new_session_name()
-    assert name.startswith("dsh-pet-fps-")
+    assert name.startswith("petwisp-fps-")
     assert len(name) <= gf.MAX_SESSION_NAME_CHARS
     assert name == name.strip() and " " not in name
 
@@ -574,7 +574,7 @@ def test_classify_permission_denied_is_terminal():
 def test_classify_unknown_session_on_terminate_is_not_an_error():
     """``--terminate_existing_session`` 找不到会话 = 本来就已经停了（退出码 7）。"""
     state, reason = gf.classify_backend_failure(
-        7, "error: no existing sessions found: dsh-pet-fps-1-ab\n")
+        7, "error: no existing sessions found: petwisp-fps-1-ab\n")
     assert state == gf.STATE_OK and reason == ""
 
 
@@ -603,35 +603,35 @@ def test_classify_bounds_huge_stderr():
 
 def test_parse_session_names_takes_first_column():
     """``logman query -ets`` 的输出里只认本应用前缀的会话名（每行首列）。"""
-    import pet.island.game_fps as gf
+    import petwisp.island.game_fps as gf
 
     output = (
         "\nData Collector Set                      Type                          Status\n"
         "-------------------------------------------------------------------------------\n"
         "NT Kernel Logger                        Trace                         Running\n"
-        "dsh-pet-fps-15520-37-b4e46ca9           Trace                         Running\n"
+        "petwisp-fps-15520-37-b4e46ca9           Trace                         Running\n"
         "Eventlog-Security                       Trace                         Running\n"
-        "dsh-pet-fps-31060-20-c4294783           Trace                         Running\n"
+        "petwisp-fps-31060-20-c4294783           Trace                         Running\n"
     )
     assert gf.parse_session_names(output) == [
-        "dsh-pet-fps-15520-37-b4e46ca9",
-        "dsh-pet-fps-31060-20-c4294783",
+        "petwisp-fps-15520-37-b4e46ca9",
+        "petwisp-fps-31060-20-c4294783",
     ]
 
 
 def test_stale_session_names_excludes_the_current_session():
     """残留清理只针对**不是本次**的会话，且绝不碰别人前缀的采集。"""
-    import pet.island.game_fps as gf
+    import petwisp.island.game_fps as gf
 
     output = (
-        "dsh-pet-fps-15520-37-b4e46ca9  Trace  Running\n"
-        "dsh-pet-fps-99999-1-aaaaaaaa   Trace  Running\n"
+        "petwisp-fps-15520-37-b4e46ca9  Trace  Running\n"
+        "petwisp-fps-99999-1-aaaaaaaa   Trace  Running\n"
         "NVIDIA-Nsight-Etw              Trace  Running\n"
-        "dsh-pet-fps-other-tool-x       Trace  Running\n"
+        "petwisp-fps-other-tool-x       Trace  Running\n"
     )
-    keep = "dsh-pet-fps-99999-1-aaaaaaaa"
+    keep = "petwisp-fps-99999-1-aaaaaaaa"
     assert gf.stale_session_names(output, keep=keep) == [
-        "dsh-pet-fps-15520-37-b4e46ca9",
-        "dsh-pet-fps-other-tool-x",
+        "petwisp-fps-15520-37-b4e46ca9",
+        "petwisp-fps-other-tool-x",
     ]
-    assert gf.stop_session_args("dsh-pet-fps-a") == ["logman", "stop", "dsh-pet-fps-a", "-ets"]
+    assert gf.stop_session_args("petwisp-fps-a") == ["logman", "stop", "petwisp-fps-a", "-ets"]

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""错题本排期（``pet.growth.review`` + ``GrowthService`` 的错题接口）。
+"""错题本排期（``petwisp.growth.review`` + ``GrowthService`` 的错题接口）。
 
 口径：
 
@@ -14,8 +14,8 @@ from datetime import datetime, timedelta
 
 import pytest
 
-from pet.growth import review
-from pet.growth.service import GrowthService
+from petwisp.growth import review
+from petwisp.growth.service import GrowthService
 
 
 class _Cfg:

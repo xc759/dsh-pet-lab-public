@@ -9,8 +9,8 @@ from PySide6.QtCore import QEvent, QEventLoop, QPoint, QPointF, QRect, Qt, QTime
 from PySide6.QtGui import QColor, QGuiApplication, QImage, QMouseEvent, QPixmap
 from PySide6.QtWidgets import QApplication
 
-from pet.config import Config
-from pet.island.dynamic_island import (
+from petwisp.config import Config
+from petwisp.island.dynamic_island import (
     DynamicIsland,
     _CAPSULE_HEIGHT,
     _CAPSULE_INSET,

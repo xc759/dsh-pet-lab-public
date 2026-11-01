@@ -23,10 +23,10 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 import pytest
 from PySide6.QtWidgets import QApplication
 
-import pet.app as app_mod
+import petwisp.app as app_mod
 import tests.test_overlay_window_capabilities as cap
-from pet import pet_profiles
-from pet.overlay_shell import OverlayShell
+from petwisp import pet_profiles
+from petwisp.overlay_shell import OverlayShell
 
 app = QApplication.instance() or QApplication([])
 
@@ -53,7 +53,7 @@ def test_overlay_zero_pet_startup_warns(tmp_path, caplog):
     _write_empty_active_set(tmp_path)
     screen = cap.FakeScreen((0, 0, 1920, 1080), (0, 0, 1920, 1040))
 
-    with caplog.at_level(logging.WARNING, logger="pet.overlay_shell"):
+    with caplog.at_level(logging.WARNING, logger="petwisp.overlay_shell"):
         shell = _empty_shell(tmp_path, screen)
 
     assert shell._all_sprites() == [], "前提：这个壳确实一只宠物都没有"
@@ -132,7 +132,7 @@ def test_overlay_with_a_pet_keeps_quiet(tmp_path, caplog):
     cap.CapConfig(tmp_path, {"scale": 0.5})
     screen = cap.FakeScreen((0, 0, 1920, 1080), (0, 0, 1920, 1040))
 
-    with caplog.at_level(logging.WARNING, logger="pet.overlay_shell"):
+    with caplog.at_level(logging.WARNING, logger="petwisp.overlay_shell"):
         shell = _empty_shell(tmp_path, screen)
 
     assert shell._all_sprites(), "前提：默认档案下 slot0 应当建起来"
@@ -179,7 +179,7 @@ def test_legacy_empty_pet_tray_warns(caplog):
     """legacy 零宠物（只剩托盘、没有捕获窗）同样必须留 WARN 并点名配置目录。"""
     stub = _TrayStub()
 
-    with caplog.at_level(logging.WARNING, logger="pet.app"):
+    with caplog.at_level(logging.WARNING, logger="petwisp.app"):
         stub._build_empty_pet_tray()
 
     warnings = [r.getMessage() for r in caplog.records if r.levelno >= logging.WARNING]
@@ -192,7 +192,7 @@ def test_legacy_empty_pet_tray_keeps_recovery_entry(caplog):
     """可见入口不许被日志改动挤掉：菜单里仍有「生成 / 恢复 slot0」。"""
     stub = _TrayStub()
 
-    with caplog.at_level(logging.WARNING, logger="pet.app"):
+    with caplog.at_level(logging.WARNING, logger="petwisp.app"):
         stub._build_empty_pet_tray()
 
     menu = stub._tray_menu

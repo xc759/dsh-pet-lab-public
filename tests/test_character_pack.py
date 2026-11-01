@@ -6,7 +6,7 @@ import json
 
 import pytest
 
-from pet import character_pack as cp
+from petwisp import character_pack as cp
 
 SHA = "a" * 64
 
@@ -208,7 +208,7 @@ def test_core_gaps_rejects_nan_fps(tmp_path):
     """meta.fps = NaN 不许穿过闭包（运行时 admissible 会拒，准入不能更松）。"""
     import json as _json
 
-    from pet import frameseq_provision as _fp
+    from petwisp import frameseq_provision as _fp
 
     root = tmp_path / "pack"
     clips = []

@@ -19,8 +19,8 @@ from PySide6.QtCore import QEvent, QPoint, QPointF, QRect, Qt
 from PySide6.QtGui import QCloseEvent, QHideEvent, QMouseEvent
 from PySide6.QtWidgets import QApplication
 
-from pet.config import Config
-from pet.window import DRAG_MOVE_COALESCE_MS, PetWindow
+from petwisp.config import Config
+from petwisp.window import DRAG_MOVE_COALESCE_MS, PetWindow
 from tests.test_window_pause import FakeLibrary
 
 
@@ -67,7 +67,7 @@ def _single_screen_desktop(monkeypatch):
     （实测：注入 2×1920×1080 的多屏快照后本文件 6 条全红）。多屏钳位语义由
     ``tests/test_edge_reachability.py`` 专门锁定，不在此重复。
     """
-    from pet import window_placement
+    from petwisp import window_placement
 
     monkeypatch.setattr(window_placement, "desktop_area", lambda: None)
 

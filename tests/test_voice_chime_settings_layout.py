@@ -23,11 +23,11 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from pet import tts  # noqa: E402
-from pet.settings_widgets import SettingRow, SettingsCard  # noqa: E402
-from pet.voice_chime import DEFAULT_BACKEND, clean_backend, default_chime_config  # noqa: E402
-from pet.voice.chime_settings import VoiceChimeSettingsPage  # noqa: E402
-from pet.voice_chime_tts_panel import (  # noqa: E402
+from petwisp import tts  # noqa: E402
+from petwisp.settings_widgets import SettingRow, SettingsCard  # noqa: E402
+from petwisp.voice_chime import DEFAULT_BACKEND, clean_backend, default_chime_config  # noqa: E402
+from petwisp.voice.chime_settings import VoiceChimeSettingsPage  # noqa: E402
+from petwisp.voice_chime_tts_panel import (  # noqa: E402
     COLLAPSE_TEXT,
     CREDENTIAL_HINT,
     CREDENTIAL_TITLE,
@@ -66,7 +66,7 @@ def _qapp():
 
 
 def _page(tmp_path, backend: str | None = None) -> VoiceChimeSettingsPage:
-    from pet.config import Config
+    from petwisp.config import Config
 
     _qapp()
     cfg = Config(base=tmp_path)
@@ -217,7 +217,7 @@ def test_credential_group_is_hidden_when_the_backend_needs_no_key(tmp_path):
 
 def test_secret_row_hint_tells_where_it_is_saved(tmp_path, monkeypatch):
     """凭据行只说状态（已保存 / 还没设置 / 没保存上），存放位置交给组标题那一句。"""
-    from pet import tts_secrets
+    from petwisp import tts_secrets
 
     monkeypatch.setattr(tts_secrets, "get", lambda ref: "")
     monkeypatch.setattr(tts_secrets, "persisted", lambda ref: False)
@@ -248,7 +248,7 @@ def test_secret_write_failure_is_reported_and_never_claims_saved(tmp_path, monke
     """
     from PySide6.QtWidgets import QApplication, QMessageBox
 
-    from pet import tts_secrets
+    from petwisp import tts_secrets
 
     app = QApplication.instance() or QApplication([])
     warnings: list = []
@@ -311,7 +311,7 @@ def test_page_never_teaches_technical_details(tmp_path):
 
 def test_provider_docstrings_keep_the_technical_details():
     """删掉的技术细节必须还在 provider 模块里（换个地方存档，不是丢掉）。"""
-    from pet.tts import doubao, edge, mimo
+    from petwisp.tts import doubao, edge, mimo
 
     assert "openspeech.bytedance.com" in doubao.__doc__
     assert "seed-tts-2.0" in doubao.__doc__
@@ -325,7 +325,7 @@ def test_provider_docstrings_keep_the_technical_details():
 
 def test_default_backend_is_edge_and_free_of_credentials(tmp_path):
     """默认后端＝edge（免凭据）：陌生人开箱就有声，失败照走既有自动回退。"""
-    from pet.config import Config
+    from petwisp.config import Config
 
     assert DEFAULT_BACKEND == "edge"
     assert Config(base=tmp_path).data["voice_chime_tts_backend"] == "edge"
@@ -340,9 +340,9 @@ def test_default_backend_is_edge_and_free_of_credentials(tmp_path):
 
 def test_domain_card_keeps_the_current_backend_on_top(tmp_path, monkeypatch):
     """行被搬进「语音」域的平卡后，折叠与行序仍然成立（容器在那一步会散架）。"""
-    from pet import modern_settings_dialog as settings_mod
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp import modern_settings_dialog as settings_mod
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     app = _qapp()
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -371,9 +371,9 @@ def test_domain_card_keeps_the_current_backend_on_top(tmp_path, monkeypatch):
 
 def test_search_reveals_a_row_inside_a_folded_backend(tmp_path, monkeypatch):
     """搜索命中折叠里的行：必须自动展开，否则「搜到了却看不见」。"""
-    from pet import modern_settings_dialog as settings_mod
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp import modern_settings_dialog as settings_mod
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     app = _qapp()
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)

@@ -20,8 +20,8 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication
 
-from pet.config import Config
-from pet.window import STREAM_CAPTURE_TITLE, PetWindow
+from petwisp.config import Config
+from petwisp.window import STREAM_CAPTURE_TITLE, PetWindow
 from tests.test_window_pause import FakeLibrary
 
 app = QApplication.instance() or QApplication([])
@@ -44,7 +44,7 @@ def _write_slot_file(tmp_path, slot_id: int, payload: dict):
     裸 slot ``Config.save`` 会被归属表拒绝。这里造的是旧版留下的真实文件——
     "主配置 true + 槽档案里还残着 false"正是窗口能力归并要处理的输入。
     """
-    from pet.config import APP_DIR_NAME
+    from petwisp.config import APP_DIR_NAME
 
     cfg_dir = tmp_path / APP_DIR_NAME
     cfg_dir.mkdir(parents=True, exist_ok=True)

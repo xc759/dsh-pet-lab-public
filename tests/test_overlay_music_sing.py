@@ -33,7 +33,7 @@ class _MusicSingHarness:
         self.playing = playing
 
     def check(self):
-        from pet.music import detect as music_detect
+        from petwisp.music import detect as music_detect
         original = music_detect.is_music_playing
         try:
             music_detect.is_music_playing = lambda: self.playing
@@ -75,7 +75,7 @@ def test_music_sing_switches_to_sing_anim_and_back(tmp_path):
     """检测到音乐 → 播唱歌动画；音乐停 + 宽限期过 → 退出唱歌态。"""
     shell, lib = _make_shell(tmp_path, {"music_sing_enabled": True})
     # 唱歌素材名与旧架构同源常量（window_alerts.check_music_sing 读它）
-    from pet.window import SING_ANIM
+    from petwisp.window import SING_ANIM
     lib._clips[SING_ANIM] = fac.FakeClip(SING_ANIM, 24)
     try:
         shell.overlay.show()
@@ -111,10 +111,10 @@ def test_music_sing_replays_clip_while_music_continues(tmp_path):
     手工注入 provider，否则「壳到底接没接」永远测不到。
     """
     shell, lib = _make_shell(tmp_path, {"music_sing_enabled": True})
-    from pet.window import SING_ANIM
+    from petwisp.window import SING_ANIM
     lib._clips[SING_ANIM] = fac.FakeClip(SING_ANIM, 24)
     try:
-        from pet.sprite_behavior import STATE_ACTS
+        from petwisp.sprite_behavior import STATE_ACTS
         from tests.test_sprite_behavior import ScriptedRng
 
         shell.overlay.show()
@@ -144,14 +144,14 @@ def test_music_sing_replays_clip_while_music_continues(tmp_path):
 
 def _sing_scene():
     """BehaviorController 直连现场：唱歌素材当一次性动画播（无壳/无 extras 链）。"""
-    from pet.sprite_behavior import BehaviorController
+    from petwisp.sprite_behavior import BehaviorController
     from tests.test_sprite_behavior import (
         BOUNDS,
         ScriptedRng,
         _make_library,
         _make_sprite,
     )
-    from pet.window import SING_ANIM
+    from petwisp.window import SING_ANIM
 
     lib = _make_library(idles=["idle1", SING_ANIM])
     sprite = _make_sprite(lib, facing="right")
@@ -162,14 +162,14 @@ def _sing_scene():
 
 
 def _sing_expire(c, sprite, lib, sing):
-    from pet.sprite_behavior import STATE_ACTS
+    from petwisp.sprite_behavior import STATE_ACTS
     assert c.state_of(sprite) == STATE_ACTS
     c.tick([sprite], lib.duration(sing) + 0.1)
 
 
 def test_behavior_continues_singing_when_roll_lands_outside_idle():
     """掷骰命中移动桶（0.85）也必须续唱：判据在状态机，不看掷骰结果。"""
-    from pet.sprite_behavior import STATE_ACTS
+    from petwisp.sprite_behavior import STATE_ACTS
 
     c, sprite, lib, sing = _sing_scene()
     c.sing_continue_provider = lambda: True
@@ -181,7 +181,7 @@ def test_behavior_continues_singing_when_roll_lands_outside_idle():
 
 def test_behavior_does_not_continue_singing_without_provider_or_when_false():
     """默认（壳未注入）与 provider 返假：都走原掷骰链——默认行为零变化。"""
-    from pet.sprite_behavior import STATE_ACTS
+    from petwisp.sprite_behavior import STATE_ACTS
 
     for provider in (None, lambda: False):
         c, sprite, lib, sing = _sing_scene()
@@ -193,7 +193,7 @@ def test_behavior_does_not_continue_singing_without_provider_or_when_false():
 
 def test_behavior_does_not_continue_singing_for_other_anim():
     """续唱只认唱歌素材本身：同一 provider 对普通动作绝不放行。"""
-    from pet.sprite_behavior import STATE_ACTS
+    from petwisp.sprite_behavior import STATE_ACTS
 
     c, sprite, lib, sing = _sing_scene()
     c.sing_continue_provider = lambda: True

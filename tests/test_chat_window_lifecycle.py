@@ -31,9 +31,9 @@ from PySide6.QtWidgets import QApplication, QWidget  # noqa: E402
 
 import shiboken6  # noqa: E402
 
-from pet.app import PetInstance  # noqa: E402
-from pet.chat.service import ChatService  # noqa: E402
-from pet.config import Config  # noqa: E402
+from petwisp.app import PetInstance  # noqa: E402
+from petwisp.chat.service import ChatService  # noqa: E402
+from petwisp.config import Config  # noqa: E402
 
 app = QApplication.instance() or QApplication([])
 
@@ -251,8 +251,8 @@ def test_repeated_open_close_does_not_leak_widgets_or_subscriptions(tmp_path, ki
 # ---------------------------------------------------------------- 契约 4：重开仍走分页
 def test_reopen_keeps_history_paging(tmp_path, kind):
     """销毁重建不得绕过分页（#318）：重开首屏仍只渲染最新一页。"""
-    from pet.chat.models import ChatMessage
-    from pet.chat.session_store import SessionStore
+    from petwisp.chat.models import ChatMessage
+    from petwisp.chat.session_store import SessionStore
 
     total, page = 120, 50
     config = Config(base=tmp_path)
@@ -310,8 +310,8 @@ def test_flash_hint_timer_uses_context_object(tmp_path, kind, monkeypatch):
     """提示栏 5s 复位定时器必须带上下文对象：关闭即销毁后定时器自动取消，
     不回调已删控件（ubuntu CI 实测 RuntimeError: QLabel already deleted——
     缓存单例时代窗口永不销毁，这条是潜伏隐患，关闭即销毁把它变成生产路径）。"""
-    import pet.chat.legacy_widgets as legacy_mod
-    import pet.chat.widgets as widgets_mod
+    import petwisp.chat.legacy_widgets as legacy_mod
+    import petwisp.chat.widgets as widgets_mod
 
     inst = _make_instance(tmp_path)
     win = _open(kind, inst)

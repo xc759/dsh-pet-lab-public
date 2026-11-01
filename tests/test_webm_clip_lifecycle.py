@@ -10,9 +10,9 @@ import pytest
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication
 
-from pet import catalog
-from pet import webm_clip as webm_clip_module
-from pet.webm_clip import WebMClip
+from petwisp import catalog
+from petwisp import webm_clip as webm_clip_module
+from petwisp.webm_clip import WebMClip
 
 
 def test_rapid_start_stop_no_leaked_running_threads():
@@ -59,7 +59,7 @@ def test_reader_cancelled_before_ffmpeg_process_start(monkeypatch):
     stop_evt.set()
     calls = []
     monkeypatch.setattr(
-        "pet.webm_clip.imageio_ffmpeg.read_frames",
+        "petwisp.webm_clip.imageio_ffmpeg.read_frames",
         lambda *args, **kwargs: calls.append((args, kwargs)),
     )
 
@@ -83,7 +83,7 @@ def test_reader_cancelled_during_metadata_handshake_does_not_request_a_frame(mon
         frame_requests.append(True)
         yield b""
 
-    monkeypatch.setattr("pet.webm_clip.imageio_ffmpeg.read_frames", controlled_frames)
+    monkeypatch.setattr("petwisp.webm_clip.imageio_ffmpeg.read_frames", controlled_frames)
     reader = threading.Thread(
         target=clip._reader,
         args=(stop_evt, clip._generation),
@@ -185,13 +185,13 @@ def _clip_with_controlled_frames(tmp_path, monkeypatch):
     clip._frame_count = 0         # 非精确帧数 → 不进程内循环（线性路径）
     clip._fps = 24.0
     clip._w, clip._h, clip._bpp = 4, 4, 4
-    monkeypatch.setattr("pet.webm_clip.imageio_ffmpeg.read_frames", frames)
+    monkeypatch.setattr("petwisp.webm_clip.imageio_ffmpeg.read_frames", frames)
     return clip, frames
 
 
 def _drops() -> int:
     """reader 侧"队列满丢帧"计数（产品打点 webm.queue_drop）。"""
-    from pet import perfstats
+    from petwisp import perfstats
 
     return perfstats.snapshot().get("webm.queue_drop", {}).get("count", 0)
 
@@ -239,7 +239,7 @@ def test_pause_backpressures_reader_without_dropping_frames(tmp_path, monkeypatc
     持续解码持续丢帧——暂停位置丢失（恢复后跳帧）且隐藏期 CPU 白烧，与
     pause() docstring 承诺的"队列写满即背压、从暂停处续播"直接矛盾。
     """
-    from pet import perfstats
+    from petwisp import perfstats
 
     app = QApplication.instance() or QApplication([])
     clip, frames = _clip_with_controlled_frames(tmp_path, monkeypatch)
@@ -308,7 +308,7 @@ def test_pause_then_interrupt_recycles_blocked_reader(
     复查，置位后立即退出、由 finally 收尾——不会出现"没人消费就永远醒不来"
     的 reader（那才是拿背压换丢帧的代价）。
     """
-    from pet import perfstats
+    from petwisp import perfstats
 
     app = QApplication.instance() or QApplication([])
     clip, frames = _clip_with_controlled_frames(tmp_path, monkeypatch)

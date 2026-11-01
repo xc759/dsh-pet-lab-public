@@ -31,9 +31,9 @@ from PySide6.QtGui import (
     QColor, QGuiApplication, QImage, QPainter, QPixmap, QShowEvent)
 from PySide6.QtWidgets import QApplication
 
-from pet import catalog
-from pet.overlay_window import OverlayWindow
-from pet.pet_sprite import PetSprite
+from petwisp import catalog
+from petwisp.overlay_window import OverlayWindow
+from petwisp.pet_sprite import PetSprite
 
 app = QApplication.instance() or QApplication([])
 

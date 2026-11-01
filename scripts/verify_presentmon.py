@@ -16,7 +16,7 @@
 就红，而不是等用户在 ARM 机器上看到一段永远采不到数的读数。
 运行期**不**做摘要校验（每次启动读 980KB 只为一个 CI 该做的事，见 ``game_fps`` 注释）。
 
-**约束**：只读文件系统（一个字节都不写）；只 import ``pet.island.game_fps``（零 Qt、零子
+**约束**：只读文件系统（一个字节都不写）；只 import ``petwisp.island.game_fps``（零 Qt、零子
 进程、零系统调用，连带链是 ``pet/__init__.py`` + ``pet/island_segments``，都是标准库），
 因此不拉 PySide6、可在最小构建机环境跑。
 
@@ -67,7 +67,7 @@ def load_expectations():
     root = repo_root()
     if str(root) not in sys.path:
         sys.path.insert(0, str(root))
-    from pet.island import game_fps  # noqa: PLC0415 —— 路径先就位才能 import
+    from petwisp.island import game_fps  # noqa: PLC0415 —— 路径先就位才能 import
 
     expected = root.joinpath(*game_fps.BACKEND_RELATIVE_DIR, game_fps.BACKEND_EXE_NAME)
     return expected, game_fps.BACKEND_EXE_NAME, game_fps.REQUIRED_SHA256

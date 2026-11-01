@@ -9,7 +9,7 @@
 - T3 心跳不跑仿真（仿真段钩子不被调用）。
 
 注（M-2）：档位状态机随 tick 时钟迁到统一驱动器
-（``pet.tick_driver.TickDriver``），集成断言的挂点从 overlay 内部属性面
+（``petwisp.tick_driver.TickDriver``），集成断言的挂点从 overlay 内部属性面
 平移到 ``overlay.tick_driver``——语义逐条等价。
 
 纪律（AGENTS.md 时序测试）：governor 用注入假钟；驱动器侧同步直调
@@ -25,9 +25,9 @@ from PySide6.QtCore import QObject, QPointF, QRect, Qt, Signal
 from PySide6.QtGui import QImage
 from PySide6.QtWidgets import QApplication
 
-from pet.overlay_window import OverlayWindow
-from pet.pet_sprite import PetSprite
-from pet.tick_governor import (
+from petwisp.overlay_window import OverlayWindow
+from petwisp.pet_sprite import PetSprite
+from petwisp.tick_governor import (
     ACTIVE_HOLD_MS,
     DOWNGRADE_HOLD_MS,
     TIER_ACTIVE,

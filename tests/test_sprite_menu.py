@@ -14,8 +14,8 @@ from PySide6.QtCore import QEvent, QPoint, QPointF, Qt
 from PySide6.QtGui import QContextMenuEvent, QMouseEvent
 from PySide6.QtWidgets import QApplication, QMenu
 
-from pet.overlay_window import OverlayWindow
-from pet.sprite_menu import SCALE_PRESETS, build_sprite_menu
+from petwisp.overlay_window import OverlayWindow
+from petwisp.sprite_menu import SCALE_PRESETS, build_sprite_menu
 from tests.test_overlay_window import FakeSprite
 
 app = QApplication.instance() or QApplication([])
@@ -167,7 +167,7 @@ def test_context_menu_event_hit_execs_menu_miss_ignores(monkeypatch):
     # PySide6 的 QMenu.exec 类级 monkeypatch 不生效（shiboken 方法表绕过
     # Python 类型字典，实测类级 patch 后真 exec 仍跑模态）——包装工厂函数，
     # 给返回的 menu 装实例级 exec 桩（实例字典优先，生效）
-    import pet.overlay_window as overlay_mod
+    import petwisp.overlay_window as overlay_mod
 
     execs = []
     real_build = overlay_mod.build_sprite_menu

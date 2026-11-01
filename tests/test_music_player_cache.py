@@ -30,7 +30,7 @@ import shiboken6
 from PySide6.QtCore import QObject
 from PySide6.QtWidgets import QApplication, QMenu
 
-from pet.music import players as music_players
+from petwisp.music import players as music_players
 
 # 模块导入时捕获真实现：conftest 的禁扫桩会在用例运行期替换 _search，
 # 串行化用例需要显式恢复它（只替身扫描体 _search_filesystem）。
@@ -133,9 +133,9 @@ def _menu_actions(menu: QMenu) -> list:
 
 
 def _build_full_menu(monkeypatch, pet) -> QMenu:
-    from pet import catalog
-    from pet.context_menu import populate_context_menu
-    from pet.context_menus import shared
+    from petwisp import catalog
+    from petwisp.context_menu import populate_context_menu
+    from petwisp.context_menus import shared
 
     monkeypatch.setattr(shared.autostart_mod, "is_enabled", lambda: False)
     monkeypatch.setattr(catalog, "list_available_characters", lambda: ["demo"])
@@ -150,7 +150,7 @@ def _build_full_menu(monkeypatch, pet) -> QMenu:
 
 def test_cold_cache_menu_build_never_scans_filesystem(monkeypatch):
     """冷缓存下构建**完整**菜单：不浅扫、不查目录、乐观启用 + 触发一次后台预热。"""
-    from pet.context_menus import shared
+    from petwisp.context_menus import shared
 
     scans: list = []
     searches: list = []
@@ -202,7 +202,7 @@ def test_cold_cache_menu_build_never_scans_filesystem(monkeypatch):
 
 def test_warm_cache_menu_build_needs_no_scan_and_enables(monkeypatch):
     """缓存已暖（found）：照常启用，且不再触发预热、不扫描。"""
-    from pet.context_menus import shared
+    from petwisp.context_menus import shared
 
     music_players._cache["netease"] = "D:/CloudMusic/cloudmusic.exe"
     searches: list = []
@@ -224,7 +224,7 @@ def test_warm_cache_menu_build_needs_no_scan_and_enables(monkeypatch):
 
 def test_negative_cache_disables_action_with_hint(monkeypatch):
     """负缓存命中（此前扫过、本机没有）：禁用 + 保留原文案，绝不重扫。"""
-    from pet.context_menus import shared
+    from petwisp.context_menus import shared
 
     music_players._cache["netease"] = None
     searches: list = []
@@ -697,7 +697,7 @@ def test_warm_cache_async_skips_manual_path_and_caches_negative_result(monkeypat
 
 def test_ui_ready_prewarm_schedules_music_player_cache_warm(monkeypatch):
     """UI 就绪后的统一预热点要带上播放器路径缓存：延迟 2~3s、后台线程、两个播放器。"""
-    import pet.app as app_mod
+    import petwisp.app as app_mod
 
     scheduled: list = []
     monkeypatch.setattr(
@@ -728,8 +728,8 @@ def test_ui_ready_prewarm_schedules_music_player_cache_warm(monkeypatch):
 
 def test_launch_player_resolves_in_worker_thread_not_calling_thread(monkeypatch):
     """路径解析必须发生在 worker 线程（冷缓存时 6s+ 的扫描不能压回 GUI 线程）。"""
-    from pet.music import now_playing
-    from pet.context_menus import shared
+    from petwisp.music import now_playing
+    from petwisp.context_menus import shared
 
     _qapp()
     caller = threading.get_ident()
@@ -762,7 +762,7 @@ def test_launch_player_resolves_in_worker_thread_not_calling_thread(monkeypatch)
 
 def test_launch_player_bubbles_hint_when_player_missing(monkeypatch):
     """找不到播放器不再静默 return：经 queued 信号回 GUI 线程弹气泡。"""
-    from pet.context_menus import shared
+    from petwisp.context_menus import shared
 
     app = _qapp()
     monkeypatch.setattr(music_players, "find_player", lambda key, manual="": None)
@@ -780,8 +780,8 @@ def test_launch_player_bubbles_hint_when_player_missing(monkeypatch):
 
 def test_launch_player_reads_manual_path_from_config(monkeypatch):
     """点击路径仍把设置里的手填路径交给解析（配置读取留在调用线程，无扫描）。"""
-    from pet.music import now_playing
-    from pet.context_menus import shared
+    from petwisp.music import now_playing
+    from petwisp.context_menus import shared
 
     _qapp()
     seen: list = []
@@ -810,7 +810,7 @@ def test_launch_player_survives_bridge_destroyed_midflight(monkeypatch):
     RuntimeError 防护），daemon 线程以未捕获异常收尾，"找不到播放器"这条用户
     可见提示恰好丢掉。标准防护写法见 pet/agent_link.py 的同款槽。
     """
-    from pet.context_menus import shared
+    from petwisp.context_menus import shared
 
     _qapp()
     ready = threading.Event()
@@ -865,8 +865,8 @@ def test_launch_bridge_registry_collects_finished_workers(monkeypatch):
     ``_LAUNCH_BRIDGES`` 强引用保活；成功路径（找到播放器且会话在跑）不发
     notice，于是每点一次菜单就永久多留一个桥对象。
     """
-    from pet.music import now_playing
-    from pet.context_menus import shared
+    from petwisp.music import now_playing
+    from petwisp.context_menus import shared
 
     app = _qapp()
     monkeypatch.setattr(

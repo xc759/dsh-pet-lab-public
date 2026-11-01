@@ -49,9 +49,9 @@ def _exec_pump(app, ms: int = 150):
 
 
 def _make_session(tmp_path: Path, count: int = _TOTAL):
-    from pet.chat.models import ChatMessage
-    from pet.chat.session_store import SessionStore
-    from pet.config import Config
+    from petwisp.chat.models import ChatMessage
+    from petwisp.chat.session_store import SessionStore
+    from petwisp.config import Config
 
     cfg = Config(tmp_path)
     store = SessionStore(cfg.dir)
@@ -70,14 +70,14 @@ def _make_session(tmp_path: Path, count: int = _TOTAL):
 
 
 def _modern_window(tmp_path: Path, count: int = _TOTAL):
-    from pet.chat.widgets import ChatWindow
+    from petwisp.chat.widgets import ChatWindow
 
     cfg, session = _make_session(tmp_path, count)
     return ChatWindow(cfg, "demo"), session
 
 
 def _legacy_window(tmp_path: Path, count: int = _TOTAL):
-    from pet.chat.legacy_widgets import ChatWindow
+    from petwisp.chat.legacy_widgets import ChatWindow
 
     cfg, session = _make_session(tmp_path, count)
     return ChatWindow(cfg, "demo"), session
@@ -235,7 +235,7 @@ def test_legacy_load_renders_only_latest_page(tmp_path):
 def test_load_calls_update_bubble_widths_constant_times(tmp_path, monkeypatch):
     """_load() 期间 _update_bubble_widths 全量循环必须 O(1)，不随条数线性。"""
     _app()
-    from pet.chat import widgets as modern
+    from petwisp.chat import widgets as modern
 
     win, _session = _modern_window(tmp_path)
     try:
@@ -256,7 +256,7 @@ def test_load_calls_update_bubble_widths_constant_times(tmp_path, monkeypatch):
 
 def test_legacy_load_calls_update_bubble_widths_constant_times(tmp_path, monkeypatch):
     _app()
-    from pet.chat import legacy_widgets as legacy
+    from petwisp.chat import legacy_widgets as legacy
 
     win, _session = _legacy_window(tmp_path)
     try:
@@ -277,7 +277,7 @@ def test_legacy_load_calls_update_bubble_widths_constant_times(tmp_path, monkeyp
 
 def test_load_earlier_calls_update_bubble_widths_constant_times(tmp_path, monkeypatch):
     _app()
-    from pet.chat import widgets as modern
+    from petwisp.chat import widgets as modern
 
     win, _session = _modern_window(tmp_path)
     try:
@@ -303,8 +303,8 @@ def test_refresh_sessions_does_not_accumulate_row_widgets(tmp_path):
     """QListWidget.clear() 不销毁 index widget：旧行必须显式 removeItemWidget +
     deleteLater，连续刷新后 viewport 子控件数不增长。"""
     app = _app()
-    from pet.chat.widgets import ChatWindow, SessionListRow
-    from pet.chat.session_store import SessionStore
+    from petwisp.chat.widgets import ChatWindow, SessionListRow
+    from petwisp.chat.session_store import SessionStore
 
     win, _session = _modern_window(tmp_path)
     try:
@@ -332,7 +332,7 @@ def test_delete_session_dialog_is_disposed(tmp_path, monkeypatch):
     """DeleteConversationDialog exec() 结束后必须 deleteLater（实测每次删除
     泄漏一个隐藏顶层窗）。"""
     _app()
-    from pet.chat import widgets as modern
+    from petwisp.chat import widgets as modern
 
     win, _session = _modern_window(tmp_path)
     try:
@@ -363,7 +363,7 @@ def test_delete_session_dialog_is_disposed(tmp_path, monkeypatch):
 def test_session_row_menu_deletes_on_close(tmp_path):
     """SessionListRow 的 QMenu 必须 WA_DeleteOnClose（每次右键泄漏一个菜单）。"""
     _app()
-    from pet.chat.widgets import SessionListRow
+    from petwisp.chat.widgets import SessionListRow
     from PySide6.QtCore import Qt
 
     win, _session = _modern_window(tmp_path)
@@ -371,7 +371,7 @@ def test_session_row_menu_deletes_on_close(tmp_path):
         row = SessionListRow(win.session, win.session_list)
         menus = []
 
-        from pet.chat import widgets as modern
+        from petwisp.chat import widgets as modern
 
         real_menu = modern.QMenu
 

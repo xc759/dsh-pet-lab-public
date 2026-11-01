@@ -38,7 +38,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "check_frameseq_bundle.py"
 BUILD_SCRIPT = ROOT / "scripts" / "build_onedir.ps1"
-PROVISION_SOURCE = ROOT / "pet" / "frameseq_provision.py"
+PROVISION_SOURCE = ROOT / "petwisp" / "frameseq_provision.py"
 
 # 旧档串（改档前的产物）：用来构造「世代陈旧」的假素材。取自
 # pet/frameseq_provision.py 的 LEGACY_ENCODER_DESCS，只作测试输入。
@@ -389,7 +389,7 @@ class TestGateConstraints:
                     imported.add(node.module.split(".")[0])
         assert imported, "脚本必须至少导入 argparse/sys"
         assert imported <= set(sys.stdlib_module_names), f"非标准库依赖: {imported}"
-        assert "pet" not in imported, "构建门不许 import pet 包（会连带 PySide6）"
+        assert "petwisp" not in imported, "构建门不许 import petwisp 包（会连带 PySide6）"
         assert not any(name.lower().startswith("pyside") for name in imported)
 
     def test_gate_is_read_only(self, tmp_path):
@@ -408,7 +408,7 @@ class TestGateConstraints:
 def _source_constant(name: str) -> str:
     text = PROVISION_SOURCE.read_text(encoding="utf-8")
     match = re.search(rf"^{re.escape(name)}\s*=\s*(.+)$", text, flags=re.MULTILINE)
-    assert match, f"pet/frameseq_provision.py 里找不到 {name}（改名/删除了？）"
+    assert match, f"petwisp/frameseq_provision.py 里找不到 {name}（改名/删除了？）"
     raw = match.group(1).split("#", 1)[0].strip()
     return raw
 
@@ -668,7 +668,7 @@ class TestPrepareConstraints:
                     imported.add(node.module.split(".")[0])
         assert imported, "脚本必须至少导入 argparse/sys"
         assert imported <= set(sys.stdlib_module_names), f"非标准库依赖: {imported}"
-        assert "pet" not in imported, "供给入口不许 import pet 包（会连带 PySide6 起 GUI）"
+        assert "petwisp" not in imported, "供给入口不许 import petwisp 包（会连带 PySide6 起 GUI）"
 
     def test_never_touches_user_runtime_or_gui(self, tmp_path):
         text = PREPARE_SCRIPT.read_text(encoding="utf-8")

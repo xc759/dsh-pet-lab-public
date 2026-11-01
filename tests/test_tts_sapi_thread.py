@@ -14,7 +14,7 @@ import threading
 
 import pytest
 
-sapi = pytest.importorskip("pet.tts.sapi")
+sapi = pytest.importorskip("petwisp.tts.sapi")
 comtypes = pytest.importorskip("comtypes")
 
 
@@ -81,8 +81,8 @@ def test_sapi_synth_writes_a_wav_from_a_background_thread(tmp_path):
 
 def test_worker_thread_releases_com_on_exit(monkeypatch):
     """合成 worker 收尾时配对释放本线程的 COM（只在**我们自己的短命线程**里）。"""
-    from pet import tts
-    from pet.voice import chime_service as vcs
+    from petwisp import tts
+    from petwisp.voice import chime_service as vcs
 
     calls: list[str] = []
 
@@ -103,7 +103,7 @@ def test_release_thread_com_is_noop_when_thread_never_initialized():
     """
     import threading
 
-    from pet import tts
+    from petwisp import tts
 
     calls: list[str] = []
 

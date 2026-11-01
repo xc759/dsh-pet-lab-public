@@ -4,7 +4,7 @@
 import math
 import pytest
 
-from pet.physics import (
+from petwisp.physics import (
     ACCEL_GAIN_MAX,
     DEAD_ZONE_SPEED,
     MAX_THROW_SPEED,
@@ -167,7 +167,7 @@ def test_slingshot_trajectory_handles_invalid_sampling():
     assert slingshot_trajectory(100.0, 0.0, duration=1.0, points=1) == [(0.0, 0.0)]
 
 def test_flight_anim_speed_scales_with_speed():
-    from pet.physics import flight_anim_speed
+    from petwisp.physics import flight_anim_speed
     assert flight_anim_speed(0.0) == 1.0          # 静止不变速
     assert flight_anim_speed(300.0) == pytest.approx(1.0 + 300 / 1400 * 0.75)
     assert flight_anim_speed(1400.0) == 1.75      # 顶格 1.75×
@@ -178,7 +178,7 @@ def test_flight_anim_speed_scales_with_speed():
 def test_wall_low_speed_slides_instead_of_sticky_bounce():
     """低速撞侧墙：vx 直接归零沿墙滑落（地板有 bounce_stop_vy 同款截止，
     侧墙漏了——用户实机「速度较低时在屏幕边黏住一下又反弹回来」）。"""
-    from pet.physics import WALL_BOUNCE_STOP_VX, throw_step
+    from petwisp.physics import WALL_BOUNCE_STOP_VX, throw_step
 
     # 低速（低于截止）：撞左墙 vx 归零、位置贴墙、不再弹回
     px, py, vx, vy, bounced = throw_step(5.0, 100.0, -30.0, 0.0, 0.016, 10.0, 0.0, 500.0, 800.0)

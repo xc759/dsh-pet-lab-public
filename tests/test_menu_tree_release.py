@@ -30,7 +30,7 @@ from PySide6.QtGui import QContextMenuEvent
 from PySide6.QtWidgets import QApplication, QMenu
 
 import tests.test_sprite_menu_facade as fac
-from pet.context_menus.shared import release_menu_tree
+from petwisp.context_menus.shared import release_menu_tree
 
 app = QApplication.instance() or QApplication([])
 

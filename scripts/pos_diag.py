@@ -12,10 +12,10 @@ sys.path.insert(0, ROOT)
 from PySide6.QtGui import QGuiApplication  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
-from pet import catalog  # noqa: E402
-from pet.config import Config  # noqa: E402
-from pet.library import MovieLibrary  # noqa: E402
-from pet.window import PetWindow  # noqa: E402
+from petwisp import catalog  # noqa: E402
+from petwisp.config import Config  # noqa: E402
+from petwisp.library import MovieLibrary  # noqa: E402
+from petwisp.window import PetWindow  # noqa: E402
 
 app = QApplication([])
 screens = QGuiApplication.screens()

@@ -23,8 +23,8 @@ from pathlib import Path
 import pytest
 from PySide6.QtWidgets import QApplication
 
-from pet.config import Config
-from pet.window import PetWindow
+from petwisp.config import Config
+from petwisp.window import PetWindow
 from tests.test_window_pause import FakeLibrary
 
 # 本文件必须跑在真实窗口系统上：offscreen 平台根本没有原生 HWND

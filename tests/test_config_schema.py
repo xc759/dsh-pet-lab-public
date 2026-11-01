@@ -25,9 +25,9 @@ import re
 
 import pytest
 
-from pet import config as config_mod
-from pet.config import Config
-from pet.island.segments import CPU, NETWORK
+from petwisp import config as config_mod
+from petwisp.config import Config
+from petwisp.island.segments import CPU, NETWORK
 
 # reload() 白名单键集合现状快照（与 pet/config.py reload() 的
 # "for key in (...)" 元组一致；任何增删必须同步更新本快照）。
@@ -351,7 +351,7 @@ def _dirty_music_cost_config(tmp_path):
 
 def test_dirty_music_and_cost_keys_are_normalized(tmp_path):
     """脏 config.json 加载后：布尔判真、数值有类型且落在可用区间内。"""
-    from pet.music.lyric_controller import LEAD_MAX_SECONDS, LEAD_MIN_SECONDS
+    from petwisp.music.lyric_controller import LEAD_MAX_SECONDS, LEAD_MIN_SECONDS
 
     cfg = _dirty_music_cost_config(tmp_path)
 
@@ -473,7 +473,7 @@ def test_dirty_memory_trim_keys_are_normalized(tmp_path):
     阈值下限 0 有语义（0 = 连 0 字节进程都纳入），上限与
     ``pet/memory_trim.py::MIN_SIZE_MB_MAX`` 同值（漂移由 test_memory_trim 钉住）。
     """
-    from pet import memory_trim
+    from petwisp import memory_trim
 
     assert _memory_trim_config(
         tmp_path / "str-bool", {"mem_skip_foreground": "false"},
@@ -510,7 +510,7 @@ def test_dirty_weather_keys_are_normalized(tmp_path):
 
 def test_set_normalizes_weather_keys(tmp_path):
     """set() 的归一化名单同样覆盖天气键（设置页/菜单写回不得绕过钳制）。"""
-    from pet.weather import MAX_CITIES, normalize_city_list
+    from petwisp.weather import MAX_CITIES, normalize_city_list
 
     cfg = Config(base=tmp_path)
     cfg.set("weather_enabled", "yes")
@@ -697,8 +697,8 @@ def test_dirty_music_and_cost_config_does_not_break_settings_page(tmp_path):
     """设置页（settings_pet_controls）面对脏配置必须能构造出来。"""
     from PySide6.QtWidgets import QApplication
 
-    from pet.modern_settings_dialog import ModernSettingsDialog
-    from pet.music.lyric_controller import LEAD_MAX_SECONDS, LEAD_MIN_SECONDS
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
+    from petwisp.music.lyric_controller import LEAD_MAX_SECONDS, LEAD_MIN_SECONDS
 
     QApplication.instance() or QApplication([])
     cfg = _dirty_music_cost_config(tmp_path)
@@ -808,7 +808,7 @@ def test_music_player_paths_accepts_all_registered_players(tmp_path):
 
 def test_music_player_paths_keys_track_registry(tmp_path):
     """清洗键集 = 注册表键集（不许在 config 里另抄一份固定键表）。"""
-    from pet.music import players as music_players
+    from petwisp.music import players as music_players
 
     assert set(music_players.player_keys()) == {"netease", "qqmusic", "kugou", "soda"}
     payload = {key: f"D:/{key}/player.exe" for key in music_players.player_keys()}
@@ -937,7 +937,7 @@ def test_retired_menu_template_key_is_not_written_back(tmp_path):
 
 
 def test_retired_menu_template_key_is_dropped_in_slot_config(tmp_path):
-    """每个 slot 配置同样丢弃（子肥鱼各有自己那份 config-slot-N.json）。"""
+    """每个 slot 配置同样丢弃（子宠各有自己那份 config-slot-N.json）。"""
     import json
 
     slot_dir = tmp_path / "slot"

@@ -31,8 +31,8 @@ from PySide6.QtWidgets import QApplication
 
 import tests.test_overlay_window_capabilities as cap
 import tests.test_sprite_menu_facade as fac
-from pet.overlay_shell import OverlayShell
-from pet.pet_sprite import PetSprite
+from petwisp.overlay_shell import OverlayShell
+from petwisp.pet_sprite import PetSprite
 
 app = QApplication.instance() or QApplication([])
 

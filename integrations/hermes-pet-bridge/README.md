@@ -45,16 +45,16 @@ the request transport, not an activity hook.
 
 ## Install on Windows
 
-1. Copy this directory to `%LOCALAPPDATA%\hermes\plugins\dsh-pet-bridge`.
-2. Enable it with `hermes plugins enable dsh-pet-bridge`.
+1. Copy this directory to `%LOCALAPPDATA%\hermes\plugins\petwisp-bridge`.
+2. Enable it with `hermes plugins enable petwisp-bridge`.
 3. In the pet's data `config.json`, add this item under `agent_link.custom_agents`:
 
    ```json
-   {"key":"hermes","name":"Hermes","path":"C:\\Users\\<user>\\AppData\\Roaming\\dsh-pet-standalone-webm-chat\\agent-events\\hermes.jsonl"}
+   {"key":"hermes","name":"Hermes","path":"C:\\Users\\<user>\\AppData\\Roaming\\petwisp-webm-chat\\agent-events\\hermes.jsonl"}
    ```
 
    The plugin creates the event directory on first write. For a different pet
-   variant or location, set `DSH_PET_HERMES_EVENTS` in the Hermes process
+   variant or location, set `PETWISP_HERMES_EVENTS` in the Hermes process
    environment and use that same file path in the pet configuration.
 4. Restart the pet and enable **Agent Link → Hermes** from the pet's menu.
 5. Restart the Hermes Gateway after enabling the plugin. CLI sessions load the

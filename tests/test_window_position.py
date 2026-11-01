@@ -1,6 +1,6 @@
 from PySide6.QtCore import QRect
 
-from pet.window import PetWindow
+from petwisp.window import PetWindow
 
 
 class _Config(dict):
@@ -78,7 +78,7 @@ def test_restore_position_uses_saved_secondary_screen_after_restart():
 def test_named_screen_lookup_and_config_persistence(tmp_path, monkeypatch):
     from PySide6.QtGui import QGuiApplication
 
-    from pet.config import Config
+    from petwisp.config import Config
 
     primary = _Screen("primary", QRect(0, 0, 1920, 1080))
     secondary = _Screen("secondary", QRect(1920, 0, 1920, 1080))
@@ -95,7 +95,7 @@ def test_named_screen_lookup_and_config_persistence(tmp_path, monkeypatch):
     config = Config(tmp_path)
     config.set("screen_name", "secondary")
     config.save()
-    from pet.settings_slot_config import route_settings_config
+    from petwisp.settings_slot_config import route_settings_config
 
     assert route_settings_config(Config(tmp_path, instance_id="slot-0")).get("screen_name") == "secondary"
 

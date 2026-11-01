@@ -24,8 +24,8 @@ import threading
 
 import pytest
 
-from pet.island import extension_host as host
-from pet.island import segments as isl
+from petwisp.island import extension_host as host
+from petwisp.island import segments as isl
 from tests.test_island_extension_host import (
     PROVIDER, _wait_for, _write_component,
 )

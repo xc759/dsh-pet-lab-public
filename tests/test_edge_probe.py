@@ -5,7 +5,7 @@ from __future__ import annotations
 from PySide6.QtCore import QObject, QPoint, QRect
 from PySide6.QtWidgets import QApplication
 
-from pet.edge_probe import (
+from petwisp.edge_probe import (
     EDGE_ENGAGE_EXPOSURE,
     EDGE_ENTER_MS,
     EDGE_IDLE_SECONDS,

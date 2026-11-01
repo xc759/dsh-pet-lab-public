@@ -24,8 +24,8 @@ from PySide6.QtCore import QPoint, QRect  # noqa: E402
 from PySide6.QtGui import QCursor, QGuiApplication  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
-import pet.catalog as catalog  # noqa: E402
-from pet import window_placement  # noqa: E402
+import petwisp.catalog as catalog  # noqa: E402
+from petwisp import window_placement  # noqa: E402
 
 
 class _Config(dict):

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """4.2b 纯逻辑单测：活跃宠清单（D5）+ 无锁 slot 身份分配（D6）+ 每身份几何。
 
-零 Qt：本文件只 import ``pet.overlay_spawn_state``（纯逻辑模块），不起
+零 Qt：本文件只 import ``petwisp.overlay_spawn_state``（纯逻辑模块），不起
 QApplication。覆盖：清单原子读写/顺序保持、缺失=首次运行、损坏或缺首字段
 回退「只有主宠」、身份分配单调不撞且跳过既有配置与活跃身份、分配上限报错、
 几何合并写回（保留身份其它键）、非法几何丢弃。
@@ -14,7 +14,7 @@ import os
 
 import pytest
 
-from pet import overlay_spawn_state as ovs
+from petwisp import overlay_spawn_state as ovs
 
 
 def _write(path, text: str) -> None:
@@ -98,7 +98,7 @@ def test_allocate_slot_reuses_smallest_retired_when_history_is_full(tmp_path):
     """B01：历史身份占满 1..MAX_SCAN_SLOTS 时复用**最小退役身份**，不抛错。
 
     普通用户反复生/退累计 128 次后目录里全是历史 ``config-slot-N.json``；旧实现
-    直接抛 ``SpawnStateError`` → 「生小肥鱼」永久失效（UI 也只有日志）。
+    直接抛 ``SpawnStateError`` → 「生小宠」永久失效（UI 也只有日志）。
     """
     for slot in range(1, ovs.MAX_SCAN_SLOTS + 1):
         _write(tmp_path / f"config-slot-{slot}.json", "{}")

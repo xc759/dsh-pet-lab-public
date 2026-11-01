@@ -13,7 +13,7 @@ import time
 
 import pytest
 
-from pet import net_monitor as nm
+from petwisp import net_monitor as nm
 
 
 # ---------------------------------------------------------------- 替身

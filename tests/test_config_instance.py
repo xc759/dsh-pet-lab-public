@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-"""多开配置隔离：instance_id（--slot / 生小肥鱼）使用独立 config 文件，单开行为不变。"""
+"""多开配置隔离：instance_id（--slot / 生小宠）使用独立 config 文件，单开行为不变。"""
 from __future__ import annotations
 
 import json
 import os
 
-from pet.config import Config
+from petwisp.config import Config
 
 
 def test_instance_config_is_isolated_from_default(tmp_path):
@@ -95,7 +95,7 @@ def test_reload_preserves_memory_api_key_when_keyring_unavailable(tmp_path, monk
         def set(self, ref, value):
             return False
 
-    monkeypatch.setattr("pet.chat.models.SecretStore", _UnavailableStore)
+    monkeypatch.setattr("petwisp.chat.models.SecretStore", _UnavailableStore)
 
     config = Config(base=tmp_path)
     settings = config.chat_settings()

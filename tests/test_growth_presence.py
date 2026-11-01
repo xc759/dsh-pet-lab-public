@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-"""养成表现档位（``pet.growth.presence``）：只算档位，不许编数字。"""
+"""养成表现档位（``petwisp.growth.presence``）：只算档位，不许编数字。"""
 from __future__ import annotations
 
 from datetime import date, datetime
 
-from pet.growth import presence
-from pet.growth.dashboard import build_dashboard
+from petwisp.growth import presence
+from petwisp.growth.dashboard import build_dashboard
 
 MOMENT = datetime(2026, 10, 30, 20, 0, tzinfo=datetime.now().astimezone().tzinfo)
 

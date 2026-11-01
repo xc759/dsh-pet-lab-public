@@ -26,10 +26,10 @@ from pathlib import Path
 
 import pytest
 
-from pet import overlay_spawn_state as spawn_state
-from pet import settings_slot_config
-from pet.catalog import DEFAULT_SCALE
-from pet.config import DEFAULT_SELF_TALK_TEXTS, Config
+from petwisp import overlay_spawn_state as spawn_state
+from petwisp import settings_slot_config
+from petwisp.catalog import DEFAULT_SCALE
+from petwisp.config import DEFAULT_SELF_TALK_TEXTS, Config
 
 
 @pytest.fixture
@@ -40,7 +40,7 @@ def app():
 
 
 def _dialog(config, *, include_ai: bool = False, standalone: bool = False):
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     return ModernSettingsDialog(config, include_ai=include_ai,
                                 standalone=standalone)
@@ -163,7 +163,7 @@ def test_child_reset_touches_slot_file_only(tmp_path, app, monkeypatch):
     "回到默认落位"是独立操作）、偏好键从档案里**移除**（读侧落回同源默认）、
     ``user_customized`` 是本地旗标而非偏好值，原样保留。
     """
-    from pet import pet_profiles, settings_reset_defaults
+    from petwisp import pet_profiles, settings_reset_defaults
 
     main = Config(base=tmp_path)
     main.set("pet_opacity", 66)
@@ -205,7 +205,7 @@ def test_child_reset_confirm_copy_promise_equals_actual_scope(tmp_path, app, mon
     一段不成立的话在做不可撤销的决策。这条用例同时取**真确认框**与**真落盘结果**：
     文案说"只重置这只桌宠自己的那份设置（位置保留）"，盘上也确实只有这只的档案变了。
     """
-    from pet import pet_profiles, settings_reset_defaults
+    from petwisp import pet_profiles, settings_reset_defaults
 
     main = Config(base=tmp_path)
     main.set("voice_chime_enabled", True)          # 全局键：文案承诺"不受影响"
@@ -361,7 +361,7 @@ def test_child_page_keeps_clean_slot_values(tmp_path, app):
 # ------------------------------------------------------------ 6. 点击台词绑定保存
 def _save_click_talk_binding(config, action_id: str, text: str) -> str:
     """走真实对话框保存一条绑定（`编辑…` 按钮那条路），返回实际角色 id。"""
-    from pet.click_talk_dialog import ClickTalkBindingsDialog
+    from petwisp.click_talk_dialog import ClickTalkBindingsDialog
 
     dialog = ClickTalkBindingsDialog(config, click_names=[action_id])
     try:
@@ -436,7 +436,7 @@ def test_harness_controls_are_editable_on_the_child_page(tmp_path, app):
         assert dialog.harness_autostart_check.isEnabled() is True
         assert dialog.harness_launch_target_select.isEnabled() is True
         assert dialog.harness_autostart_check.toolTip() != "仅主桌宠可设置"
-        from pet.settings_widgets import SettingRow
+        from petwisp.settings_widgets import SettingRow
         for name in ("harness_autostart", "harness_launch_target"):
             row = dialog.findChild(SettingRow, f"settingRow_{name}")
             assert row is not None
@@ -468,7 +468,7 @@ def test_main_pet_config_is_routed_to_slot0(tmp_path):
     还报成功，用户重开设置看到的是出厂默认（#271：主宠改尺寸/气泡不生效）。
     故空身份与显式 ``slot-0`` 同规：每宠键落 slot0 档案、全局键落主 ``config.json``。
     """
-    from pet import pet_profiles
+    from petwisp import pet_profiles
 
     main = Config(base=tmp_path, instance_id="")
     assert main.save() is True
@@ -489,7 +489,7 @@ def test_main_pet_config_is_routed_to_slot0(tmp_path):
 
 def test_legacy_topology_slot_config_is_not_routed(tmp_path, monkeypatch):
     """legacy 单窗：那只宠读的就是自己那份 slot 文件的全部键，不许分流。"""
-    from pet import overlay_settings_command as cmd_mod
+    from petwisp import overlay_settings_command as cmd_mod
 
     monkeypatch.setenv(cmd_mod.ENV_TOPOLOGY, "legacy")
     cfg = Config(base=tmp_path, instance_id="slot-1")
@@ -506,16 +506,16 @@ def test_non_slot_instance_is_not_routed(tmp_path):
 def test_slot_compat_launch_main_config_is_that_process_main(tmp_path, monkeypatch):
     """F2 定论：``--slot N`` 兼容启动下，路由的"主配置"= 该进程的 config-slot-N.json。
 
-    ``--slot N`` 启动把 ``DSH_PET_INSTANCE=slot-N`` 写进进程环境，设置子进程继承它，
+    ``--slot N`` 启动把 ``PETWISP_INSTANCE=slot-N`` 写进进程环境，设置子进程继承它，
     于是 ``route_settings_config`` 里的主配置构造（``Config(base=...)``，不传
     ``instance_id``）解析出 ``config-slot-N.json``。那就是**该进程**的主配置：运行期
     壳的非 per-slot 键读源是 ``shell._config``（``_SpriteConfig.get`` 的兜底分支），
     而 ``shell._config`` 正是 ``Config(instance_id="slot-N")``。故这不是"读错了主配置"，
     写进去立刻生效（详见模块 docstring 的「主配置身份」一节）。
     """
-    from pet import overlay_settings_command as cmd_mod
+    from petwisp import overlay_settings_command as cmd_mod
 
-    monkeypatch.setenv("DSH_PET_INSTANCE", "slot-2")
+    monkeypatch.setenv("PETWISP_INSTANCE", "slot-2")
     monkeypatch.setenv(cmd_mod.ENV_TOPOLOGY, "overlay")
 
     cfg = Config(base=tmp_path, instance_id="slot-2")
@@ -539,7 +539,7 @@ def test_routed_keys_cover_the_runtime_per_slot_read_surface(tmp_path):
     读这只宠的 slot 文件）。两处的键都必须分流到 slot 文件，否则子宠页改它等于没改
     （写进主配置既改不动这只宠，又会顺手改掉别的宠的继承值）。
     """
-    from pet import overlay_shell, overlay_spawn_state as spawn_state_mod
+    from petwisp import overlay_shell, overlay_spawn_state as spawn_state_mod
 
     assert overlay_shell.PER_SLOT_SETTING_KEYS is spawn_state_mod.PER_SLOT_SETTING_KEYS, (
         "PER_SLOT_SETTING_KEYS 必须全仓单一来源（设置在轻模块、壳侧引用）"
@@ -568,7 +568,7 @@ def test_parent_overlay_topology_routes_child_page_despite_disk_capture_mode(
 
     正解：设置进程按**拉起它的那个主进程的运行中拓扑**分流。
     """
-    from pet import overlay_settings_command as cmd_mod
+    from petwisp import overlay_settings_command as cmd_mod
 
     main = Config(base=tmp_path)
     main.set("stream_capture_mode", True)
@@ -599,7 +599,7 @@ def test_parent_legacy_topology_does_not_route_even_when_disk_says_overlay(
     父进程的陈述与磁盘互相矛盾时以**父进程运行中拓扑**为准：那才是这个设置页正在
     编辑的那个进程。
     """
-    from pet import overlay_settings_command as cmd_mod
+    from petwisp import overlay_settings_command as cmd_mod
 
     main = Config(base=tmp_path)
     assert main.save() is True
@@ -618,7 +618,7 @@ def test_parent_legacy_topology_does_not_route_even_when_disk_says_overlay(
 def test_missing_parent_topology_env_falls_back_to_existing_verdict(
         tmp_path, monkeypatch):
     """父进程没发话（手工单开设置页/旧主进程）→ 判定逐位回到原有链路。"""
-    from pet import overlay_settings_command as cmd_mod
+    from petwisp import overlay_settings_command as cmd_mod
 
     main = Config(base=tmp_path)
     main.set("stream_capture_mode", True)
@@ -679,7 +679,7 @@ def test_form_edit_generation_is_pinned_against_an_external_reset(tmp_path, app)
     ``settings.lock`` 拦住第二个设置窗。所以这是一条**契约/防回归**测试，不是线上缺陷
     复现：契约是"表单的编辑代次在打开时就钉住，reload 洗不掉它"。
     """
-    from pet import pet_profiles
+    from petwisp import pet_profiles
 
     main = Config(base=tmp_path)
     assert main.save() is True
@@ -710,7 +710,7 @@ def test_form_edit_generation_is_pinned_against_an_external_reset(tmp_path, app)
 
 def test_form_edit_generation_still_allows_the_normal_save_path(tmp_path, app):
     """对照：没有外部代次推进时，同一条保存路径照常成功（钉住的是代次，不是"总拒绝"）。"""
-    from pet import pet_profiles
+    from petwisp import pet_profiles
 
     main = Config(base=tmp_path)
     assert main.save() is True

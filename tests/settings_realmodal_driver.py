@@ -51,9 +51,9 @@ def main() -> None:
     except Exception:
         pass
 
-    from pet import pet_profiles, settings_slot_config
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp import pet_profiles, settings_slot_config
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     app = QApplication([])
     result = {"mode": mode, "boxes": [], "clicked": [], "finished": None}

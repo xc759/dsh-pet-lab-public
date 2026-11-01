@@ -13,7 +13,7 @@ import json
 
 import pytest
 
-from pet.growth.service import GrowthService
+from petwisp.growth.service import GrowthService
 
 
 class _Cfg:

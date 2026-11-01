@@ -26,14 +26,14 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from pet.festival.settings import FestivalSettingsPage  # noqa: E402
-from pet.festival.settings_panel import (  # noqa: E402
+from petwisp.festival.settings import FestivalSettingsPage  # noqa: E402
+from petwisp.festival.settings_panel import (  # noqa: E402
     COLLAPSE_TEXT,
     EXPAND_TEXT,
     FOLD_KEY,
     FestivalFoldPanel,
 )
-from pet.settings_widgets import SettingRow, SettingsCard  # noqa: E402
+from petwisp.settings_widgets import SettingRow, SettingsCard  # noqa: E402
 
 #: 设置页上不许出现的技术细节（与 2026-10-13 语音页同一口径）：那些只留在模块
 #: docstring/注释里，界面不讲课。
@@ -112,9 +112,9 @@ def _rows_by_name(widget) -> dict[str, SettingRow]:
 
 def _domain(tmp_path, monkeypatch):
     """真实设置对话框里「语音」域的节日提醒卡片（域构建后的真实形态）。"""
-    from pet import modern_settings_dialog as settings_mod
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp import modern_settings_dialog as settings_mod
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     _qapp()
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -133,7 +133,7 @@ def _section_card_keys(page) -> list[list[str]]:
     """域页里各分段卡片的行 key，按分段顺序（每个 ``SettingsSection`` 一张卡）。"""
     from PySide6.QtWidgets import QLabel
 
-    from pet.settings_widgets import SettingsSection
+    from petwisp.settings_widgets import SettingsSection
 
     ordered: list[list[str]] = []
     for section in page.findChildren(SettingsSection):
@@ -254,9 +254,9 @@ def test_domain_card_keeps_the_order_after_the_domain_reparent(tmp_path, monkeyp
 
 def test_search_reveals_a_row_inside_the_fold(tmp_path, monkeypatch):
     """搜索命中折叠里的行：必须自动展开，否则「搜到了却看不见」。"""
-    from pet import modern_settings_dialog as settings_mod
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp import modern_settings_dialog as settings_mod
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     app = _qapp()
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -285,7 +285,7 @@ def test_search_reveals_a_row_inside_the_fold(tmp_path, monkeypatch):
 
 def test_every_row_copy_is_one_short_sentence(tmp_path):
     """每个文案行都是一句话：标题说人话、提示 ≤20 字（机主口径）。"""
-    from pet.config import Config
+    from petwisp.config import Config
 
     _qapp()
     page = FestivalSettingsPage(Config(base=tmp_path))
@@ -308,7 +308,7 @@ def test_every_row_copy_is_one_short_sentence(tmp_path):
 
 def test_page_never_teaches_technical_details(tmp_path):
     """接口地址 / 配置键名 / 实现库名这类细节一个字都不许出现在界面上。"""
-    from pet.config import Config
+    from petwisp.config import Config
 
     _qapp()
     page = FestivalSettingsPage(Config(base=tmp_path))
@@ -322,7 +322,7 @@ def test_page_never_teaches_technical_details(tmp_path):
 
 def test_settings_module_keeps_the_technical_details():
     """从界面删掉的技术细节必须还在模块 docstring 里（换地方存档，不是丢掉）。"""
-    from pet.festival import settings as festival_settings
+    from petwisp.festival import settings as festival_settings
 
     doc = festival_settings.__doc__ or ""
     assert "festival_reminder_speak" in doc, "配置键清单要留在模块文档里"
@@ -335,7 +335,7 @@ def test_settings_module_keeps_the_technical_details():
 
 def test_controls_and_round_trip_are_unchanged(tmp_path):
     """折叠只改呈现：控件仍在、写回与刷新仍按原语义（生日用合成值）。"""
-    from pet.config import Config
+    from petwisp.config import Config
 
     _qapp()
     page = FestivalSettingsPage(Config(base=tmp_path))
@@ -360,7 +360,7 @@ def test_controls_and_round_trip_are_unchanged(tmp_path):
 
 def test_fold_members_stay_reachable_when_expanded(tmp_path):
     """折叠成员行展开后仍是可用控件（收起不是禁用）。"""
-    from pet.config import Config
+    from petwisp.config import Config
 
     _qapp()
     page = FestivalSettingsPage(Config(base=tmp_path))
@@ -414,7 +414,7 @@ def test_apply_writes_exactly_the_same_thirteen_keys():
 
 def test_fold_header_is_a_presentation_row_only(tmp_path):
     """折叠头是纯展示行：不是配置键，控件就是那颗展开/收起按钮。"""
-    from pet.config import Config
+    from petwisp.config import Config
 
     _qapp()
     page = FestivalSettingsPage(Config(base=tmp_path))
@@ -425,7 +425,7 @@ def test_fold_header_is_a_presentation_row_only(tmp_path):
 
 def test_mode_switch_keeps_enabling_the_right_time_control(tmp_path):
     """提醒方式的启停逻辑原样保留：次数与自定义时间互斥生效。"""
-    from pet.config import Config
+    from petwisp.config import Config
 
     _qapp()
     page = FestivalSettingsPage(Config(base=tmp_path))

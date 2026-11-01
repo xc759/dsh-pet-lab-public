@@ -27,12 +27,12 @@ from PySide6.QtWidgets import QApplication, QLabel, QPushButton, QScrollArea, QV
 
 import pytest
 
-import pet.modern_settings_dialog as settings_mod
-from pet import settings_page_guide
-from pet.music import settings as settings_music
-from pet.config import Config
-from pet.modern_settings_dialog import ModernSettingsDialog, SettingRow, SettingsSection
-from pet.settings_widgets import CollapsibleGroup, SettingsTabContainer
+import petwisp.modern_settings_dialog as settings_mod
+from petwisp import settings_page_guide
+from petwisp.music import settings as settings_music
+from petwisp.config import Config
+from petwisp.modern_settings_dialog import ModernSettingsDialog, SettingRow, SettingsSection
+from petwisp.settings_widgets import CollapsibleGroup, SettingsTabContainer
 
 app = QApplication.instance() or QApplication([])
 
@@ -1178,7 +1178,7 @@ def test_anchor_bar_rebuilds_when_the_in_page_tab_changes(tmp_path, monkeypatch)
         app.processEvents()
         assert bar.isHidden() is False
         assert [chip.text() for chip in _chips(bar)] == [
-            "动画与移动", "拖拽与弹射", "边缘探头", "生小肥鱼", "多开碰撞", "碰撞参数（高级）"]
+            "动画与移动", "拖拽与弹射", "边缘探头", "生小宠", "多开碰撞", "碰撞参数（高级）"]
 
         tabs.setCurrentKey("display_music")
         app.processEvents()

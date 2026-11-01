@@ -15,9 +15,9 @@ from PySide6.QtCore import QPoint, Qt  # noqa: E402
 from PySide6.QtGui import QColor, QPalette  # noqa: E402
 from PySide6.QtWidgets import QApplication, QScrollArea, QWidget  # noqa: E402
 
-from pet import modern_settings_dialog as settings_mod  # noqa: E402
-from pet.config import Config  # noqa: E402
-from pet.modern_settings_dialog import (  # noqa: E402
+from petwisp import modern_settings_dialog as settings_mod  # noqa: E402
+from petwisp.config import Config  # noqa: E402
+from petwisp.modern_settings_dialog import (  # noqa: E402
     ModernSettingsDialog,
     SettingRow,
     SettingsDisclosureHeader,

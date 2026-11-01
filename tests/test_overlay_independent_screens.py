@@ -50,11 +50,11 @@ from PySide6.QtGui import QGuiApplication
 from PySide6.QtWidgets import QApplication
 
 import tests.test_sprite_menu_facade as fac
-from pet.config import Config
-from pet.frameseq_clip import FrameSeqClip
-from pet.overlay_shell import OverlayShell
-from pet.pet_sprite import PetSprite
-from pet.tick_driver import TIER_ACTIVE
+from petwisp.config import Config
+from petwisp.frameseq_clip import FrameSeqClip
+from petwisp.overlay_shell import OverlayShell
+from petwisp.pet_sprite import PetSprite
+from petwisp.tick_driver import TIER_ACTIVE
 from tests.test_frameseq_clip import _make_frames
 from tests.test_overlay_geometry_parity import _place_center, _ratio_of
 from tests.test_overlay_screen_migration import FakeScreen

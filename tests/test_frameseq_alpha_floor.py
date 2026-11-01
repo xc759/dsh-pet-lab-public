@@ -29,8 +29,8 @@ from pathlib import Path
 import pytest
 from PIL import Image, ImageChops
 
-from pet import frameseq_provision as fp
-from pet.webm_clip import set_session_ending
+from petwisp import frameseq_provision as fp
+from petwisp.webm_clip import set_session_ending
 
 ROOT = Path(__file__).resolve().parents[1]
 # 每个动作一帧的真实素材（源 webm 入库；帧序列产物刻意不入库）

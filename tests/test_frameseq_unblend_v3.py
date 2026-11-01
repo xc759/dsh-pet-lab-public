@@ -25,7 +25,7 @@ import time
 import pytest
 from PIL import Image
 
-from pet import frameseq_provision as fp
+from petwisp import frameseq_provision as fp
 
 # 夹具几何：居中正方核（切比雪夫距离 0）+ 三圈污染（距离 1/2/3）
 SIZE = 40

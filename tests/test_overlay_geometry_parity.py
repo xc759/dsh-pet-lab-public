@@ -2,7 +2,7 @@
 """G2：同屏几何/可用区变化——全部 sprite 按同一 old/new bounds 比例迁移 + 气泡全局原点同步。
 
 覆盖（真实 OverlayWindow + 真实 PetSprite，假屏只包装显式方法）：
-- 主 + 2 子肥鱼在 ``geometryChanged`` / ``availableGeometryChanged`` 后**每只**都按
+- 主 + 2 子宠在 ``geometryChanged`` / ``availableGeometryChanged`` 后**每只**都按
   同一份 old_bounds → new_bounds 比例迁移（三组几何：常规缩放、原点右移、负坐标迁回）；
   迁移的比例取自换域**之前**——先钳到新边界会把旧位置比例抹掉；
 - 新可用区比身体还小时钳制退化与既有语义一致（``PetSprite._clamp_axis`` 上界<下界 → 贴左下）；
@@ -27,10 +27,10 @@ from PySide6.QtWidgets import QApplication
 
 import tests.test_overlay_window_capabilities as cap
 import tests.test_sprite_menu_facade as fac
-from pet import collision as collision_mod
-from pet.overlay_shell import OverlayShell
-from pet.pet_sprite import PetSprite
-from pet.sprite_bubble import sprite_anchor_rect_global
+from petwisp import collision as collision_mod
+from petwisp.overlay_shell import OverlayShell
+from petwisp.pet_sprite import PetSprite
+from petwisp.sprite_bubble import sprite_anchor_rect_global
 
 app = QApplication.instance() or QApplication([])
 
@@ -174,7 +174,7 @@ GEOMETRY_GROUPS = [
 @pytest.mark.parametrize("old_geo,old_avail,new_geo,new_avail", GEOMETRY_GROUPS)
 def test_all_pets_migrate_on_same_bounds_ratio(tmp_path, old_geo, old_avail,
                                                new_geo, new_avail):
-    """主 + 2 子共用同一 old/new bounds 比例迁移：子肥鱼不再留在原地被钳。"""
+    """主 + 2 子共用同一 old/new bounds 比例迁移：子宠不再留在原地被钳。"""
     screen = FakeScreen(old_geo, old_avail)
     shell = _make_shell(tmp_path, screen)
     try:
@@ -209,7 +209,7 @@ def test_all_pets_migrate_on_same_bounds_ratio(tmp_path, old_geo, old_avail,
 
 
 def test_migration_precedes_bounds_apply_so_ratio_is_not_lost(tmp_path):
-    """子肥鱼贴在旧可用区右侧：先应用新边界再迁移会把比例钳掉。
+    """子宠贴在旧可用区右侧：先应用新边界再迁移会把比例钳掉。
 
     先换域时 ``PetSprite.set_bounds`` 会就地钳一次（把 0.85 的比例钳成 ~0.71），
     随后迁移按被改过的位置算——本用例锁死"比例在换域之前取"。
@@ -282,7 +282,7 @@ def test_bubble_origin_follows_moved_screen_geometry(tmp_path):
         # 不重建：跟随器与气泡都是同一个对象（重建会丢在显气泡）
         assert shell._bubble_follower is follower
         assert follower.bubble is not None
-        # 子肥鱼走同一锚点口径（body_rect + 新原点）
+        # 子宠走同一锚点口径（body_rect + 新原点）
         for child in shell._spawned:
             child_body = child.body_rect()
             assert sprite_anchor_rect_global(child, new_origin) == QRect(
@@ -454,8 +454,8 @@ def _island_in_origin_frame(island, origin: QPoint) -> tuple[int, int, int, int]
 
 def test_island_wall_geometry_tracks_origin_change(tmp_path):
     """开态岛墙：同屏原点变化后墙的局部几何必须按新原点重算（岛本体不动）。"""
-    from pet.config import Config
-    from pet.island.dynamic_island import DynamicIsland
+    from petwisp.config import Config
+    from petwisp.island.dynamic_island import DynamicIsland
 
     screen = FakeScreen((0, 0, 1024, 768), (0, 0, 1024, 728))
     shell = _make_shell(tmp_path, screen)

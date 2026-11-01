@@ -28,12 +28,12 @@ from PySide6.QtCore import QEvent, QObject, QPointF, Qt, Signal
 from PySide6.QtGui import QFocusEvent, QImage, QKeyEvent, QMouseEvent, QPixmap
 from PySide6.QtWidgets import QApplication
 
-from pet import catalog
-from pet.agent_link import AgentLinkManager
-from pet.config import Config
-from pet.modern_settings_dialog import ModernSettingsDialog
-from pet.webm_clip import WebMClip
-from pet.window import IDLE_LOW_FPS_DIVISOR, PetWindow
+from petwisp import catalog
+from petwisp.agent_link import AgentLinkManager
+from petwisp.config import Config
+from petwisp.modern_settings_dialog import ModernSettingsDialog
+from petwisp.webm_clip import WebMClip
+from petwisp.window import IDLE_LOW_FPS_DIVISOR, PetWindow
 
 NAMES = [
     catalog.IDLE,

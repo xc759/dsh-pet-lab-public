@@ -30,9 +30,9 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QImage, QPixmap
 from PySide6.QtWidgets import QApplication
 
-from pet import frameseq_provision
-from pet.frameseq_clip import FrameSeqClip
-from pet.library import MovieLibrary
+from petwisp import frameseq_provision
+from petwisp.frameseq_clip import FrameSeqClip
+from petwisp.library import MovieLibrary
 
 app = QApplication.instance() or QApplication([])
 
@@ -278,7 +278,7 @@ def test_library_ignores_unstamped_legacy_frames_dir(tmp_path):
                        prewarm_enabled=False)
     try:
         assert lib._frameseq_dirs == {}
-        from pet.webm_clip import WebMClip
+        from petwisp.webm_clip import WebMClip
         assert isinstance(lib.movie("x"), WebMClip)   # 回退，不冻结
         assert legacy.is_dir()                        # 旧产物不删也不补戳
     finally:
@@ -296,14 +296,14 @@ def test_library_without_frameseq_keeps_webm_path(tmp_path):
                        prewarm_enabled=False)
     assert lib._frameseq_dirs == {}
     clip = lib.movie("x")
-    from pet.webm_clip import WebMClip
+    from petwisp.webm_clip import WebMClip
     assert isinstance(clip, WebMClip)       # 现路径逐行不变
 
 
 def test_shared_prefetch_thread_shutdown_and_recreate(tmp_path):
     """退出收口：aboutToQuit 停共享预取线程（防解释器退出 0xC0000409），
     且收口后可懒重建（测试/会话内 QApplication 反复生灭）。"""
-    from pet import frameseq_clip
+    from petwisp import frameseq_clip
 
     _make_frames(tmp_path, count=2)
     clip = FrameSeqClip(tmp_path)
@@ -371,7 +371,7 @@ class _DecodeProbe:
 
 @pytest.fixture
 def pixmap_probe(monkeypatch):
-    from pet import frameseq_clip
+    from petwisp import frameseq_clip
     _PixmapProbe.calls = []
     monkeypatch.setattr(frameseq_clip, "QPixmap", _PixmapProbe)
     return _PixmapProbe
@@ -379,7 +379,7 @@ def pixmap_probe(monkeypatch):
 
 @pytest.fixture
 def decode_probe(monkeypatch, tmp_path):
-    from pet import frameseq_clip
+    from petwisp import frameseq_clip
     import os as _os
     probe = _DecodeProbe()
     probe.scope = _os.path.normcase(str(tmp_path))
@@ -857,7 +857,7 @@ def test_close_releases_display_cache_and_unpins_after_drain(tmp_path):
     塞进 ``_retired_workers``：每个收口的 clip 连同显示 QImage（~0.88MB）与 worker
     永久钉住；切角色时旧库每次新建的那批全部命中这条路径。
     """
-    import pet.frameseq_clip as fs
+    import petwisp.frameseq_clip as fs
 
     d = tmp_path / "clip"
     _make_frames(d, count=4)
@@ -904,7 +904,7 @@ def _create_and_close_clips(d, count: int = 5):
     返回值只带弱引用与 worker 包装对象：clip 的强引用随本函数退出释放（"包装对象
     可回收"就是靠这一点）。断言写在调用方。
     """
-    import pet.frameseq_clip as fs
+    import petwisp.frameseq_clip as fs
 
     clips = [FrameSeqClip(d) for _ in range(count)]
     refs = [weakref.ref(c) for c in clips]
@@ -929,7 +929,7 @@ def test_closed_clips_keep_pin_tables_bounded_and_wrappers_collectable(tmp_path)
     侧等 C++ 侧真销毁后由 ``reap_retired_objects`` 摘除（每次 close / 每次排空确认
     落地后顺手清一次）。
     """
-    import pet.frameseq_clip as fs
+    import petwisp.frameseq_clip as fs
 
     d = tmp_path / "clip"
     _make_frames(d, count=4)
@@ -951,7 +951,7 @@ def _drop_library_without_shutdown(videos):
 
     返回 clip 的弱引用；函数退出时释放对 clip 的强引用，调用方据此断言可回收。
     """
-    import pet.frameseq_clip as fs
+    import petwisp.frameseq_clip as fs
 
     before_clips = len(fs._LIVE_CLIPS)
     before_workers = len(fs._LIVE_WORKERS)
@@ -985,7 +985,7 @@ def test_library_dropped_without_shutdown_releases_dead_pins(tmp_path):
     任何路径退役。库销毁后由一次机会式 reap 摘掉（含给仍活着的 worker 补排退役）。
     连丢三次库 = 连切三次角色的形状：钉表不得随切换次数线性增长。
     """
-    import pet.frameseq_clip as fs
+    import petwisp.frameseq_clip as fs
 
     videos = _make_pack(tmp_path)
     baseline_clips = len(fs._LIVE_CLIPS)
@@ -1028,7 +1028,7 @@ def test_background_warm_never_overwrites_newer_displayed_frame(
     _apply(img, 0)"三步无原子性：期间 GUI 起播/跳帧提交的新帧会被倒写成帧 0
     （图与帧号不一致），release_idle_frames 刚清空的槽也会被重新填回。
     """
-    from pet import frameseq_clip
+    from petwisp import frameseq_clip
 
     d = tmp_path / "clip"
     _make_frames(d, count=4)
@@ -1069,7 +1069,7 @@ def test_close_barrier_waits_for_inflight_prefetch(tmp_path, monkeypatch):
     可能出现，因此"确认已到"就等于"此后不再有更早投递的交付在飞"——钉表注销
     就是靠这条不变量才安全。
     """
-    from pet import frameseq_clip as fs
+    from petwisp import frameseq_clip as fs
 
     d = tmp_path / "clip"
     _make_frames(d, count=4)
@@ -1171,7 +1171,7 @@ def test_dropped_without_close_stays_pinned_for_inflight_delivery(tmp_path):
     （QThread::exec → sendPostedEvents → qtPythonMetacall，KERN_INVALID_ADDRESS
     at 0x8）。钉表让"丢弃未收口"路径的对象存活到进程退出，交付安全落地。
     """
-    import pet.frameseq_clip as fs
+    import petwisp.frameseq_clip as fs
 
     d = tmp_path / "clip"
     _make_frames(d, count=4)

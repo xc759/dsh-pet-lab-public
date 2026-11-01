@@ -29,12 +29,12 @@ from pathlib import Path
 
 import pytest
 
-from pet import config_write_lock as cwl
-from pet import overlay_settings_command as cmd_mod
-from pet import pet_profiles
-from pet import settings_slot_config
-from pet.config import Config
-from pet.settings_slot_config import SlotRoutedConfig
+from petwisp import config_write_lock as cwl
+from petwisp import overlay_settings_command as cmd_mod
+from petwisp import pet_profiles
+from petwisp import settings_slot_config
+from petwisp.config import Config
+from petwisp.settings_slot_config import SlotRoutedConfig
 
 REPO = str(Path(__file__).resolve().parent.parent)
 WAIT = 60.0  # 子进程同步宽预算（CI 慢机不赌）
@@ -51,7 +51,7 @@ mode = os.environ["SPI_MODE"]
 config_dir = os.environ["SPI_DIR"]
 
 if mode == "hold":
-    from pet import config_write_lock as cwl
+    from petwisp import config_write_lock as cwl
     with cwl.config_write_lock(config_dir, timeout=10.0):
         print("LOCKED", flush=True)
         release = os.environ["SPI_RELEASE"]
@@ -61,10 +61,10 @@ if mode == "hold":
         print("RELEASING", flush=True)
 elif mode == "routed":
     os.environ["PET_RENDER_TOPOLOGY"] = "overlay"
-    os.environ.pop("DSH_PET_PARENT_TOPOLOGY", None)
-    os.environ.pop("DSH_PET_INSTANCE", None)
-    from pet.config import Config
-    from pet import settings_slot_config as ssc
+    os.environ.pop("PETWISP_PARENT_TOPOLOGY", None)
+    os.environ.pop("PETWISP_INSTANCE", None)
+    from petwisp.config import Config
+    from petwisp import settings_slot_config as ssc
     base = os.path.dirname(config_dir)
     cfg = Config(base=base, instance_id="slot-" + os.environ["SPI_SLOT"])
     routed = ssc.route_settings_config(cfg)
@@ -171,7 +171,7 @@ def _overlay_topology_env(monkeypatch):
     """本文件测的是 overlay 拓扑下的 slot 身份路由（判定与磁盘/父进程陈述无关）。"""
     monkeypatch.delenv(cmd_mod.ENV_TOPOLOGY, raising=False)
     monkeypatch.delenv(cmd_mod.ENV_PARENT_TOPOLOGY, raising=False)
-    monkeypatch.delenv("DSH_PET_INSTANCE", raising=False)
+    monkeypatch.delenv("PETWISP_INSTANCE", raising=False)
     cmd_mod.reset_topology_snapshot()
     yield
     cmd_mod.reset_topology_snapshot()
@@ -253,7 +253,7 @@ def test_routed_save_batches_all_pending_keys_into_one_profile_write(
     def _legacy_write(*_args, **_kwargs):
         raise AssertionError("路由的落盘不得再逐键调用 write_slot_setting")
 
-    from pet import overlay_spawn_state
+    from petwisp import overlay_spawn_state
 
     monkeypatch.setattr(overlay_spawn_state, "write_slot_setting", _legacy_write)
     writes: list[Path] = []

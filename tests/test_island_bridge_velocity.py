@@ -43,9 +43,9 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 import pytest
 
-from pet import collision as collision_mod
-from pet.island.bridge import IslandCollisionBridge
-from pet.sprite_collision import (
+from petwisp import collision as collision_mod
+from petwisp.island.bridge import IslandCollisionBridge
+from petwisp.sprite_collision import (
     STATIC_HIT_MIN_DV,
     SpriteCollisionWorld,
     capsule_circles,
@@ -564,9 +564,9 @@ def test_real_island_drag_into_pet_throws_with_paired_reports(tmp_path):
     from PySide6.QtCore import QEvent, QPoint, Qt
     from PySide6.QtWidgets import QApplication
 
-    from pet.config import Config
-    from pet.island.dynamic_island import DynamicIsland
-    from pet.island.bridge import IslandWindowBridge
+    from petwisp.config import Config
+    from petwisp.island.dynamic_island import DynamicIsland
+    from petwisp.island.bridge import IslandWindowBridge
 
     clock = FakeClock()
     world = SpriteCollisionWorld(clock=clock)
@@ -662,10 +662,10 @@ def test_real_island_drag_slows_overlay_pixel_polling(tmp_path):
     from PySide6.QtCore import QEvent, QPoint, Qt
     from PySide6.QtWidgets import QApplication
 
-    from pet.config import Config
-    from pet.island.dynamic_island import DynamicIsland
-    from pet.island.bridge import IslandWindowBridge
-    from pet.overlay_window import OverlayWindow
+    from petwisp.config import Config
+    from petwisp.island.dynamic_island import DynamicIsland
+    from petwisp.island.bridge import IslandWindowBridge
+    from petwisp.overlay_window import OverlayWindow
     from tests.test_island_bridge import FakeInputController
 
     clock = FakeClock()

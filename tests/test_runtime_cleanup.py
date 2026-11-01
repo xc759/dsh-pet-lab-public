@@ -12,7 +12,7 @@ import os
 import time
 from pathlib import Path
 
-from pet.runtime_cleanup import (
+from petwisp.runtime_cleanup import (
     OWNER_MARKER_NAME,
     cleanup_stale_runtime_dirs,
     find_stale_runtime_dirs,

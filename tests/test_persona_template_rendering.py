@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from pet.persona_phrases import render_template
+from petwisp.persona_phrases import render_template
 
 
 def test_render_template_exposes_future_upstream_fields_and_nested_payload():

@@ -6,7 +6,7 @@ import random
 
 import pytest
 
-from pet.movement import body_reach, choose_move_direction, inward_facing
+from petwisp.movement import body_reach, choose_move_direction, inward_facing
 
 
 class _Rng:

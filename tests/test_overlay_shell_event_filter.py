@@ -31,8 +31,8 @@ from PySide6.QtCore import QEvent, QObject, QPoint, QPointF, Qt, Signal
 from PySide6.QtGui import QImage, QKeyEvent, QMouseEvent
 from PySide6.QtWidgets import QApplication
 
-from pet.overlay_shell import OverlayShell
-from pet.pet_sprite import INTERACTION_NORMAL, PetSprite
+from petwisp.overlay_shell import OverlayShell
+from petwisp.pet_sprite import INTERACTION_NORMAL, PetSprite
 from tests.test_overlay_shell import FakeInstance, FakeLibrary, FakeScreen
 
 app = QApplication.instance() or QApplication([])

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from pet.config import Config
+from petwisp.config import Config
 
 
 def test_dialogue_modes_and_custom_phrases_persist(tmp_path):
@@ -142,7 +142,7 @@ def test_placeholder_migration_idempotent_and_noop_on_fresh(tmp_path):
 
 def test_phrase_lookup_prefers_agent_delta_over_global():
     """agents[agent_key][key] 优先于 global[key]；缺省回退 global；global 缺失返回 None。"""
-    from pet.persona_phrases import phrase_for_agent
+    from petwisp.persona_phrases import phrase_for_agent
 
     preset = {
         "global": {
@@ -161,7 +161,7 @@ def test_phrase_lookup_prefers_agent_delta_over_global():
 
 def test_phrase_lookup_accepts_flat_legacy_phrases():
     """旧单层 {key: [...]} 视为 global（preset 无 global 键时整包即 global）。"""
-    from pet.persona_phrases import phrase_for_agent
+    from petwisp.persona_phrases import phrase_for_agent
 
     flat = {"start": ["旧 start"], "thinking": ["旧 thinking"]}
     assert phrase_for_agent(flat, "dsh", "start") == ["旧 start"]
@@ -175,7 +175,7 @@ def test_phrase_lookup_non_agent_only_reads_global():
     agent_key="" 的调用点渲染，天然绕过 agents 层。agents 层误存非 Agent 事件
     由 UI/导入层约束（ticket 04），不在渲染层维护事件分类。
     """
-    from pet.persona_phrases import phrase_for_agent
+    from petwisp.persona_phrases import phrase_for_agent
 
     preset = {
         "global": {"self_talk": ["只有 global"]},
@@ -189,7 +189,7 @@ def test_phrase_lookup_non_agent_only_reads_global():
 def test_picker_custom_for_agent_renders_delta_then_global():
     """custom_for_agent：agents[agent_key][key] → global[key] → fallback；
     渲染占位符注入 values。"""
-    from pet.persona_phrases import PhrasePicker
+    from petwisp.persona_phrases import PhrasePicker
 
     picker = PhrasePicker()
     preset = {
@@ -209,7 +209,7 @@ def test_picker_custom_for_agent_renders_delta_then_global():
 
 def test_picker_custom_for_agent_non_agent_ignores_agents():
     """agent_key=""（非 Agent 场景）只渲染 global，忽略 agents 层。"""
-    from pet.persona_phrases import PhrasePicker
+    from petwisp.persona_phrases import PhrasePicker
 
     picker = PhrasePicker()
     preset = {

@@ -4,8 +4,8 @@
 两条都是**发布阻断级**的缺陷，共同点是「产品界面看不出来」：
 
 1. **keyring 被 no-chat 变体排除**（``build_onedir.ps1`` 与两个 shell 脚本原本把
-   ``keyring`` 和 ``pet.chat`` 一起排除）。可语音报时设置页在 chat / no-chat 两条链路上
-   都注册（它刻意不依赖 ``pet.chat``），MiMo / 豆包这两个收费后端照旧出现、照旧收
+   ``keyring`` 和 ``petwisp.chat`` 一起排除）。可语音报时设置页在 chat / no-chat 两条链路上
+   都注册（它刻意不依赖 ``petwisp.chat``），MiMo / 豆包这两个收费后端照旧出现、照旧收
    API Key——只是那个 Key 永远只能落进**写它的进程**的内存里。设置页默认跑在独立
    进程（``settings_process_isolation``），真正合成的 ``VoiceChimeService`` 在主宠
    进程，于是用户填完 Key、界面报「已保存」，而收费后端永远自报「没配 Key」。
@@ -69,7 +69,7 @@ def test_every_variant_offers_paid_backends_that_need_the_keyring():
     这条断言是上面那两条构建断言的**理由**：一旦收费后端变成 chat-only，本文件
     第 1 节就该跟着改；反过来只要它们还在产品里，keyring 就一个变体都不能少。
     """
-    from pet import tts
+    from petwisp import tts
 
     for provider_id in PAID_PROVIDERS:
         provider = tts.get(provider_id)
@@ -78,11 +78,11 @@ def test_every_variant_offers_paid_backends_that_need_the_keyring():
         assert secrets, f"{provider_id} 必须仍然带 API Key 字段（keyring 的用武之地）"
         assert all(spec.secret_ref for spec in secrets), f"{provider_id} 的凭据缺少 secret_ref"
 
-    page = (REPO / "pet" / "voice" / "chime_settings.py").read_text(encoding="utf-8")
-    assert "pet.chat" not in page and "from .chat" not in page, (
-        "语音报时设置页刻意不依赖 pet.chat（no-chat 变体也要能打开），别把它接回 chat 链"
+    page = (REPO / "petwisp" / "voice" / "chime_settings.py").read_text(encoding="utf-8")
+    assert "petwisp.chat" not in page and "from .chat" not in page, (
+        "语音报时设置页刻意不依赖 petwisp.chat（no-chat 变体也要能打开），别把它接回 chat 链"
     )
-    dialog = (REPO / "pet" / "modern_settings_dialog.py").read_text(encoding="utf-8")
+    dialog = (REPO / "petwisp" / "modern_settings_dialog.py").read_text(encoding="utf-8")
     assert "self.voice_chime_page = VoiceChimeSettingsPage(self.config, self)" in dialog, (
         "语音报时页必须在设置对话框里无条件构造（不是 chat 分支里）"
     )
@@ -105,7 +105,7 @@ def test_windows_build_excludes_only_the_chat_subsystem():
     """no-chat 变体该排的是 chat 子系统本体，不是它的存储依赖。"""
     text = PS1.read_text(encoding="utf-8")
 
-    assert "'--exclude-module', 'pet.chat'" in text
+    assert "'--exclude-module', 'petwisp.chat'" in text
 
 
 def _load_tts_gate():
@@ -148,7 +148,7 @@ def test_shell_builds_collect_keyring_for_every_variant(name):
     assert "--exclude-module keyring" not in text, (
         "keyring 一旦被排除，no-chat 变体的收费后端凭据就只能留在设置进程内存里"
     )
-    assert "pet.chat,keyring" not in text, "no-chat 变体只该排除 pet.chat"
+    assert "petwisp.chat,keyring" not in text, "no-chat 变体只该排除 petwisp.chat"
     assert "--collect-all keyring" not in text[text.index('if [[ "$name" == *-chat ]]') :], (
         "keyring 不许再挂在 *-chat 条件分支里"
     )

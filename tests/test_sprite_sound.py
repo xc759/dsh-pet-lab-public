@@ -18,8 +18,8 @@ from types import SimpleNamespace
 import pytest
 from PySide6.QtWidgets import QApplication
 
-from pet import click_sound
-from pet.sprite_sound import SpriteSoundPlayer
+from petwisp import click_sound
+from petwisp.sprite_sound import SpriteSoundPlayer
 
 app = QApplication.instance() or QApplication([])
 
@@ -529,7 +529,7 @@ def test_light_pet_island_hit_below_raw_dv_floor_still_sounds():
     """轻量小鱼（mass 0.5）岛击：dv=65 过世界门，j=32.5 < 60，音效不该被吞。"""
     from types import SimpleNamespace
 
-    from pet import sprite_sound
+    from petwisp import sprite_sound
 
     world = SimpleNamespace(hit_min_dv=300.0, static_hit_min_dv=60.0,
                             _static_members={"island": object()})

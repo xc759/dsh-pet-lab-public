@@ -13,9 +13,9 @@ from PySide6.QtCore import QPoint, QRect, Qt
 from PySide6.QtGui import QColor, QPainter, QPixmap
 from PySide6.QtWidgets import QApplication, QWidget
 
-from pet.config import Config
-from pet.speech_bubble import PetSpeechBubble
-from pet.window import STREAM_CAPTURE_TITLE, PetWindow
+from petwisp.config import Config
+from petwisp.speech_bubble import PetSpeechBubble
+from petwisp.window import STREAM_CAPTURE_TITLE, PetWindow
 from tests.test_window_pause import FakeLibrary
 
 
@@ -194,7 +194,7 @@ def test_try_open_quick_chat_from_bubble_works_in_child_mode():
 def test_quick_chat_capture_compat_becomes_child_and_restores(tmp_path):
     """快速对话气泡在直播捕获模式下也作为主窗子内容渲染。"""
     app = _qapp()
-    from pet.quick_chat import QuickChatBubble
+    from petwisp.quick_chat import QuickChatBubble
 
     host = QWidget()
     host.setGeometry(0, 0, 640, 390)
@@ -221,7 +221,7 @@ def test_quick_chat_capture_compat_becomes_child_and_restores(tmp_path):
 def test_quick_chat_capture_requests_headroom_and_stays_above(tmp_path):
     """直播捕获子模式下快速对话应申请透明头顶空间，保持“向上生成”。"""
     app = _qapp()
-    from pet.quick_chat import QuickChatBubble
+    from petwisp.quick_chat import QuickChatBubble
 
     win = _make_pet(tmp_path, capture_on=True)
     # 给主窗一帧可定位的角色内容，并放到屏幕底部附近。

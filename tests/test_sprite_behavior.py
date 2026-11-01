@@ -21,13 +21,13 @@ from PySide6.QtCore import QObject, QPointF, QRect, Qt, Signal
 from PySide6.QtGui import QImage
 from PySide6.QtWidgets import QApplication
 
-from pet.pet_sprite import (
+from petwisp.pet_sprite import (
     INTERACTION_DRAG,
     INTERACTION_NORMAL,
     INTERACTION_THROWN,
     PetSprite,
 )
-from pet.sprite_behavior import (
+from petwisp.sprite_behavior import (
     STATE_ACTS,
     STATE_CLICK,
     STATE_DRAG,
@@ -909,7 +909,7 @@ def test_clamp_into_bounds_respects_body_box(monkeypatch):
     一个透明边距（可见瞬移）。body_box=(100,60,400,330) × scale 0.5
     → 局部身体框 QRect(50,30,150,135)，画布 320×180。
     """
-    from pet import catalog
+    from petwisp import catalog
 
     monkeypatch.setattr(catalog, "character_body_box", lambda _cid, *a, **k: (100, 60, 400, 330))
     lib = _make_library()
@@ -925,7 +925,7 @@ def test_clamp_into_bounds_respects_body_box(monkeypatch):
 
 def test_clamp_into_bounds_body_box_pulls_back_only_overflow(monkeypatch):
     """V-2：身体框真出界时按身体框口径钳回（不多拉）。"""
-    from pet import catalog
+    from petwisp import catalog
 
     monkeypatch.setattr(catalog, "character_body_box", lambda _cid, *a, **k: (100, 60, 400, 330))
     lib = _make_library()
@@ -1062,7 +1062,7 @@ def _real_clip_sprite(tmp_path, name="idle1", count=12):
     假 clip（``FakeClip``）没有 ``playback_speed`` 字段，覆盖不到这条路径，
     故本段用真帧序列素材（Qt 现场生成 webp，不碰 ffmpeg）。
     """
-    from pet.frameseq_clip import FrameSeqClip
+    from petwisp.frameseq_clip import FrameSeqClip
     from tests.test_frameseq_clip import _make_frames
 
     frames_dir = tmp_path / name
@@ -1170,7 +1170,7 @@ class _RecordingExecutor:
 
 def test_predict_warm_respects_library_gate(tmp_path, monkeypatch):
     """预测预热必须过库级闸门：关闭预热 / 隐藏暂停后零提交，开闸恢复提交。"""
-    import pet.sprite_behavior as sprite_behavior_mod
+    import petwisp.sprite_behavior as sprite_behavior_mod
 
     executor = _RecordingExecutor()
     monkeypatch.setattr(sprite_behavior_mod, "_WARM_EXECUTOR", executor)
@@ -1196,7 +1196,7 @@ def test_predict_warm_respects_library_gate(tmp_path, monkeypatch):
 
 def test_predict_warm_without_gate_api_still_submits(tmp_path, monkeypatch):
     """鸭式库没有 ``warm_allowed()``（测试假对象/轻量替身）：按放行。"""
-    import pet.sprite_behavior as sprite_behavior_mod
+    import petwisp.sprite_behavior as sprite_behavior_mod
 
     executor = _RecordingExecutor()
     monkeypatch.setattr(sprite_behavior_mod, "_WARM_EXECUTOR", executor)

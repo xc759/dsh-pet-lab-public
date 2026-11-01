@@ -16,8 +16,8 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 import pytest
 from PySide6.QtWidgets import QApplication
 
-from pet import network_info as ni
-from pet.network_info_dialog import NetworkInfoDialog
+from petwisp import network_info as ni
+from petwisp.network_info_dialog import NetworkInfoDialog
 
 app = QApplication.instance() or QApplication([])
 

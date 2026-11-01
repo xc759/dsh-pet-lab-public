@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from pet import catalog
+from petwisp import catalog
 
 
 def test_version_key_is_type_stable_across_segments():
@@ -34,8 +34,8 @@ def test_extra_only_version_never_becomes_active(tmp_path, monkeypatch):
     """
     import json as _json
 
-    from pet import catalog as _catalog
-    from pet import pack_download as _pd
+    from petwisp import catalog as _catalog
+    from petwisp import pack_download as _pd
 
     chars = tmp_path / "chars"
 
@@ -46,7 +46,7 @@ def test_extra_only_version_never_becomes_active(tmp_path, monkeypatch):
             d.mkdir(parents=True, exist_ok=True)
             (d / "f_0001.webp").write_bytes(b"x")
             meta = {"fps": 24.0, "frames": c["frames"],
-                    "encoder": __import__("pet.frameseq_provision", fromlist=["x"]).ENCODER_DESC}
+                    "encoder": __import__("petwisp.frameseq_provision", fromlist=["x"]).ENCODER_DESC}
             if c.get("content_sha"):
                 meta["content_sha"] = c["content_sha"]
             (d / "meta.json").write_text(_json.dumps(meta), encoding="utf-8")
@@ -76,7 +76,7 @@ def test_extra_only_version_never_becomes_active(tmp_path, monkeypatch):
     # 新语义：**装了什么不等于用哪个** —— 没有指针就不激活任何包
     assert _catalog.resolve_character_video_dir("demo") != complete,         "没有 active.json 时不许按版本号自动激活"
     # 指针也不许指到 core 不闭环的版本
-    from pet import character_pack as _cp
+    from petwisp import character_pack as _cp
     assert _cp.set_active(extra_only) is False
     assert _catalog.resolve_character_video_dir("demo") != extra_only
     # 显式激活完整的那套 → 才生效
@@ -92,7 +92,7 @@ def test_body_box_scales_hd_pack_to_logical_canvas(tmp_path):
     """
     import json as _json
 
-    from pet import catalog as _catalog
+    from petwisp import catalog as _catalog
 
     root = tmp_path / "hd-pack"
     root.mkdir()
@@ -127,7 +127,7 @@ def test_geometry_is_bound_to_pack_root_not_active_pointer(tmp_path):
     """
     import json as _json
 
-    from pet import catalog as _catalog
+    from petwisp import catalog as _catalog
 
     _catalog.clear_geometry_caches()
     root_a = tmp_path / "pack-a"

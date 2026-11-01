@@ -5,7 +5,7 @@ import test from "node:test";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const bridgeDir = path.resolve(here, "../integrations/dsh-pet-bridge");
+const bridgeDir = path.resolve(here, "../integrations/petwisp-bridge");
 
 test("bridge loads standalone (zero external dependencies)", async () => {
   const bridge = await import(pathToFileURL(path.join(bridgeDir, "index.js")).href);

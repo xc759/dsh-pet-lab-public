@@ -18,9 +18,9 @@ import time
 
 import pytest
 
-from pet import config as config_mod
-from pet import quiet_mode
-from pet import window_alerts
+from petwisp import config as config_mod
+from petwisp import quiet_mode
+from petwisp import window_alerts
 
 pytest.importorskip("PySide6")
 
@@ -343,7 +343,7 @@ def test_agent_link_hard_failure_alert_passes_through_quiet(win):
     普通提醒压进暂存队列，用户在最需要看到报错的时刻什么都看不到，与「审批、报错
     照常提醒」的规格相矛盾。
     """
-    from pet.agent_link import AgentLinkManager
+    from petwisp.agent_link import AgentLinkManager
 
     quiet_mode.shared_quiet_state().start(15)
     mgr = AgentLinkManager(win, win.cfg, min_interval=0.0)
@@ -421,7 +421,7 @@ def test_report_quiet_summary_uses_one_bubble(win):
 
 
 def test_end_quiet_mode_reports_and_clears(win):
-    from pet.context_menus.shared import end_quiet_mode
+    from petwisp.context_menus.shared import end_quiet_mode
 
     quiet_mode.shared_quiet_state().start(15)
     win.show_alert("卡住了", duration_ms=6000, sticky=False, alert_type="watchdog")
@@ -434,7 +434,7 @@ def test_end_quiet_mode_reports_and_clears(win):
 
 def test_end_quiet_mode_keeps_queue_when_report_cannot_be_delivered(win, monkeypatch):
     """宿主交不出去时不得排空：暂存留着，轮询表稍后重试（先排空再丢弃禁止）。"""
-    from pet.context_menus.shared import end_quiet_mode
+    from petwisp.context_menus.shared import end_quiet_mode
 
     quiet_mode.shared_quiet_state().start(15)
     quiet_mode.shared_quiet_state().remember("卡住了")
@@ -453,8 +453,8 @@ def test_overlay_host_dropped_summary_is_not_acked(tmp_path):
     这个假的"成功"去 ``ack_report``，暂存被排空而用户什么都没看到（违反本批
     自己立的交付确认制）。
     """
-    from pet.context_menus.shared import end_quiet_mode
-    from pet.sprite_menu_facade import SpriteMenuFacade
+    from petwisp.context_menus.shared import end_quiet_mode
+    from petwisp.sprite_menu_facade import SpriteMenuFacade
     from tests.test_sprite_menu_facade import _make_shell
 
     shell, _lib = _make_shell(tmp_path)
@@ -478,8 +478,8 @@ def test_overlay_host_dropped_summary_is_not_acked(tmp_path):
 
 def test_overlay_host_delivered_summary_is_acked(tmp_path):
     """反面：气泡真的上屏时照常确认交付（不许因这次修复变成永远重试）。"""
-    from pet.context_menus.shared import end_quiet_mode
-    from pet.sprite_menu_facade import SpriteMenuFacade
+    from petwisp.context_menus.shared import end_quiet_mode
+    from petwisp.sprite_menu_facade import SpriteMenuFacade
     from tests.test_sprite_bubble import FakeBubble
     from tests.test_sprite_menu_facade import _make_shell
 
@@ -514,8 +514,8 @@ def _fake_pet(cfg):
 def test_quiet_menu_lists_durations_and_shows_remaining(qapp, tmp_path):
     from PySide6.QtWidgets import QMenu
 
-    from pet.config import Config
-    from pet.context_menus.shared import add_quiet_mode_menu
+    from petwisp.config import Config
+    from petwisp.context_menus.shared import add_quiet_mode_menu
 
     pet = _fake_pet(Config(base=tmp_path))
     root_menu = QMenu()
@@ -544,8 +544,8 @@ def test_quiet_menu_lists_durations_and_shows_remaining(qapp, tmp_path):
 def test_quiet_menu_end_action_reports(qapp, tmp_path, monkeypatch):
     from PySide6.QtWidgets import QMenu
 
-    from pet.config import Config
-    from pet.context_menus.shared import add_quiet_mode_menu
+    from petwisp.config import Config
+    from petwisp.context_menus.shared import add_quiet_mode_menu
 
     pet = _fake_pet(Config(base=tmp_path))
     quiet_mode.shared_quiet_state().start(15)
@@ -567,8 +567,8 @@ def test_quiet_menu_end_action_reports(qapp, tmp_path, monkeypatch):
 def test_default_duration_setting_moves_the_menu_marker(qapp, tmp_path):
     from PySide6.QtWidgets import QMenu
 
-    from pet.config import Config
-    from pet.context_menus.shared import add_quiet_mode_menu
+    from petwisp.config import Config
+    from petwisp.context_menus.shared import add_quiet_mode_menu
 
     cfg = Config(base=tmp_path)
     cfg.set("quiet_minutes_default", 120)
@@ -588,7 +588,7 @@ def test_window_menu_path_exposes_quiet_entry(qapp, tmp_path):
     """
     from PySide6.QtWidgets import QMenu
 
-    from pet.context_menu import populate_context_menu
+    from petwisp.context_menu import populate_context_menu
     from tests.pet_window_fakes import make_pet_window
 
     window = make_pet_window(tmp_path, runtime_id="slot-quiet")
@@ -611,9 +611,9 @@ def test_overlay_facade_host_can_build_quiet_menu(qapp, tmp_path):
     """
     from PySide6.QtWidgets import QMenu
 
-    from pet.config import Config
-    from pet.context_menus.shared import add_quiet_mode_menu
-    from pet.sprite_menu_facade import SpriteMenuFacade
+    from petwisp.config import Config
+    from petwisp.context_menus.shared import add_quiet_mode_menu
+    from petwisp.sprite_menu_facade import SpriteMenuFacade
 
     shell = type("Shell", (), {"_config": Config(base=tmp_path), "sprite": object()})()
     root_menu = QMenu()
@@ -627,7 +627,7 @@ def test_overlay_facade_host_can_build_quiet_menu(qapp, tmp_path):
 def test_menu_entry_is_a_submenu_with_durations(qapp, tmp_path):
     from PySide6.QtWidgets import QMenu
 
-    from pet.context_menu import populate_context_menu
+    from petwisp.context_menu import populate_context_menu
     from tests.pet_window_fakes import make_pet_window
 
     window = make_pet_window(tmp_path, runtime_id="slot-quiet-sub")
@@ -646,7 +646,7 @@ def test_menu_entry_is_a_submenu_with_durations(qapp, tmp_path):
 
 def test_appshell_fullscreen_broadcast_flips_quiet(qapp):
     """既有全屏避让广播（AppShell._on_shared_fullscreen）是等效免打扰的唯一来源。"""
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     shell = type("Shell", (), {"_shared": object(), "_instances": []})()
     assert quiet_mode.shared_quiet_state().fullscreen() is False
@@ -693,7 +693,7 @@ class _HiddenHost:
 
 
 def _make_proxy(win):
-    from pet.multi_window_shared import MultiWindowProxy
+    from petwisp.multi_window_shared import MultiWindowProxy
 
     return MultiWindowProxy(_ProxyShell(win.cfg, win))
 
@@ -704,7 +704,7 @@ def _wire_quiet_pipeline(tmp_path, *, qapp):
     只装配，不替产品写逻辑：汇报链完全走 ``SharedSubsystems._on_quiet_ended``
     与 ``MultiWindowProxy``。
     """
-    from pet.multi_window_shared import SharedSubsystems
+    from petwisp.multi_window_shared import SharedSubsystems
     from tests.pet_window_fakes import make_pet_window
 
     win = make_pet_window(tmp_path, runtime_id="slot-quiet-chain")
@@ -718,7 +718,7 @@ def _wire_quiet_pipeline(tmp_path, *, qapp):
 
 def test_fullscreen_round_trip_delivers_report_after_window_restored(qapp, tmp_path):
     """全屏进 → 隐藏+暂存 → 全屏出 → 恢复显示 → 收到汇报（真实扇出顺序）。"""
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     win, proxy, ticker = _wire_quiet_pipeline(tmp_path, qapp=qapp)
     shell = _AppShellStub(win)
@@ -795,7 +795,7 @@ def test_hidden_proxy_queues_ordinary_alert_during_quiet(qapp, tmp_path):
 
 def test_proxy_reports_no_delivery_when_no_visible_window(qapp, tmp_path):
     """没有可见目标时 ``show_alert`` 明说没交付（汇报据此保留重试）。"""
-    from pet.config import Config
+    from petwisp.config import Config
 
     proxy = _make_proxy(_HiddenHost(Config(base=tmp_path), visible=False))
     assert proxy.has_presentation_target() is False
@@ -804,8 +804,8 @@ def test_proxy_reports_no_delivery_when_no_visible_window(qapp, tmp_path):
 
 def test_festival_reminder_on_hidden_host_is_queued_not_notified(qapp, tmp_path):
     """M3：隐藏宿主 + 免打扰 → 节日提醒进暂存队列，不再落到系统通知。"""
-    from pet.config import Config
-    from pet.festival.service import FestivalReminderService
+    from petwisp.config import Config
+    from petwisp.festival.service import FestivalReminderService
 
     notified: list[tuple] = []
     win = _HiddenHost(Config(base=tmp_path), visible=False)
@@ -827,8 +827,8 @@ def test_festival_reminder_on_hidden_host_is_queued_not_notified(qapp, tmp_path)
 
 def test_voice_chime_bubble_on_hidden_host_is_queued_not_notified(qapp, tmp_path):
     """M3：报时气泡同规（隐藏宿主 + 免打扰 → 暂存、不发通知；语音通道不受影响）。"""
-    from pet.config import Config
-    from pet.voice.chime_service import VoiceChimeService
+    from petwisp.config import Config
+    from petwisp.voice.chime_service import VoiceChimeService
 
     notified: list[tuple] = []
     win = _HiddenHost(Config(base=tmp_path), visible=False)
@@ -857,7 +857,7 @@ def test_overlay_fullscreen_exit_settles_after_overlay_is_shown(qapp):
     """
     from PySide6.QtWidgets import QWidget
 
-    from pet.overlay_shell import OverlayShell
+    from petwisp.overlay_shell import OverlayShell
 
     overlay = QWidget()
     overlay.resize(80, 80)
@@ -996,9 +996,9 @@ def _spin(qapp, done, *, timeout: float = 5.0) -> None:
 
 
 def test_settings_rows_live_in_automation_domain_and_round_trip(qapp, tmp_path):
-    from pet import settings_quiet
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog, SettingRow
+    from petwisp import settings_quiet
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog, SettingRow
 
     dialog = ModernSettingsDialog(Config(tmp_path), include_ai=False)
     try:
@@ -1026,7 +1026,7 @@ def test_settings_rows_live_in_automation_domain_and_round_trip(qapp, tmp_path):
 
 def test_config_normalizes_dirty_quiet_values(tmp_path):
     """手改 config.json：档位归一到合法档、字符串布尔不得误开（#129 同规）。"""
-    from pet.config import Config
+    from petwisp.config import Config
 
     cfg = Config(base=tmp_path)
     cfg.set("quiet_minutes_default", "abc")
@@ -1039,7 +1039,7 @@ def test_config_normalizes_dirty_quiet_values(tmp_path):
 
 def test_config_defaults_match_quiet_mode_constants(tmp_path):
     """默认值 dict 的免打扰两键与 feature 常量必须一致（防止两处漂移）。"""
-    from pet.config import Config
+    from petwisp.config import Config
 
     cfg = Config(base=tmp_path)
     assert cfg.get("quiet_minutes_default") == config_mod.DEFAULT_QUIET_MINUTES
@@ -1055,8 +1055,8 @@ def test_quiet_controls_are_editable_on_the_child_page(qapp, tmp_path):
     """
     import json
 
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     master = ModernSettingsDialog(Config(tmp_path), include_ai=False)
     child = ModernSettingsDialog(Config(base=tmp_path, instance_id="slot-1"),

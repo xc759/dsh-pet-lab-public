@@ -4,11 +4,11 @@
 覆盖验收口径：
 
 - **托盘聚合**（对齐 legacy 单托盘 + 每窗子菜单的聚合语义）：**≥1 只**就有逐只
-  子菜单（主肥鱼 / 小肥鱼 [slot-N]）各含「回到右下角」「退出这只」，动作路由到
+  子菜单（主桌宠 / 小宠 [slot-N]）各含「回到右下角」「退出这只」，动作路由到
   被点的那一只而不是主宠；0 只时不建（没有"这只"可指）；spawn/退出后菜单自动
   重建（旧条目不得残留）；单宠的关闭入口闭环见
   `tests/test_single_pet_close_entry.py`；托盘不可用时壳照常活；
-- **D12 指令消费**：主进程按 config 目录 watcher + QTimer 轮询消费「退出子肥鱼」
+- **D12 指令消费**：主进程按 config 目录 watcher + QTimer 轮询消费「退出子宠」
   指令（含 target slot 只退一只、未知 slot 空操作、消费即删、无 config 目录不装
   watcher、stop/退出收口）；
 - **D13 路由**：右键命中的 sprite 透传给菜单建造器；菜单「桌宠设置」按被点
@@ -30,17 +30,17 @@ from PySide6.QtWidgets import QApplication, QMenu
 
 import tests.test_overlay_window_capabilities as cap
 import tests.test_sprite_menu_facade as fac
-from pet import overlay_settings_command as cmd
-from pet import overlay_spawn_state as ovs
-from pet.config import APP_DIR_NAME
-from pet.overlay_shell import OverlayShell
-from pet.pet_sprite import PetSprite
-from pet.sprite_menu_facade import build_sprite_full_menu
+from petwisp import overlay_settings_command as cmd
+from petwisp import overlay_spawn_state as ovs
+from petwisp.config import APP_DIR_NAME
+from petwisp.overlay_shell import OverlayShell
+from petwisp.pet_sprite import PetSprite
+from petwisp.sprite_menu_facade import build_sprite_full_menu
 from tests.test_overlay_spawn import _make_persistent_shell
 
 app = QApplication.instance() or QApplication([])
 
-MAIN_LABEL = "主肥鱼 [slot-0]"
+MAIN_LABEL = "主桌宠 [slot-0]"
 
 
 # ---------------------------------------------------------------- 探测工具
@@ -88,7 +88,7 @@ def _action(menu, label: str):
 
 
 def _child_label(shell, sprite) -> str:
-    return f"小肥鱼 [slot-{shell._spawned_slots[sprite]}]"
+    return f"小宠 [slot-{shell._spawned_slots[sprite]}]"
 
 
 def _spawn_two(shell):
@@ -140,7 +140,7 @@ class _FakeContextEvent:
 
 # ================================================================ 托盘聚合
 def test_tray_single_pet_has_per_pet_close_entry(tmp_path):
-    """单宠（无子肥鱼）也必须有逐只子菜单，且顶层「退出」保持独立。
+    """单宠（无子宠）也必须有逐只子菜单，且顶层「退出」保持独立。
 
     旧口径是"单宠不挂逐只子菜单"（当时的理由是 legacy 单窗没有「退出这只」的
     parity）。实测发现那等于让单宠用户没有"关闭这只"入口：宠物右键菜单与托盘都
@@ -153,7 +153,7 @@ def test_tray_single_pet_has_per_pet_close_entry(tmp_path):
     try:
         menu = _tray_menu(shell)
         labels = _labels(menu)
-        for expected in ("显示 / 隐藏", "回到右下角", "生小肥鱼", "退出子肥鱼",
+        for expected in ("显示 / 隐藏", "回到右下角", "生小宠", "退出子宠",
                          "桌宠设置", "退出"):
             assert expected in labels, f"托盘缺项 {expected}；实际: {labels}"
         sub = _submenus(menu).get(MAIN_LABEL)
@@ -337,9 +337,9 @@ def test_tray_aggregate_entries_and_quit(tmp_path):
     try:
         _spawn_two(shell)
         shell.overlay.show()
-        _action(_tray_menu(shell), "退出子肥鱼").trigger()
-        assert shell._spawned != [], "菜单还开着，退出子肥鱼不许内联执行"
-        assert _wait_until(lambda: shell._spawned == []), "菜单关闭后必须清空子肥鱼"
+        _action(_tray_menu(shell), "退出子宠").trigger()
+        assert shell._spawned != [], "菜单还开着，退出子宠不许内联执行"
+        assert _wait_until(lambda: shell._spawned == []), "菜单关闭后必须清空子宠"
 
         toggle = _action(_tray_menu(shell), "显示 / 隐藏")
         toggle.trigger()
@@ -362,7 +362,7 @@ def test_tray_aggregate_entries_and_quit(tmp_path):
 
 def test_tray_unavailable_keeps_shell_alive(tmp_path, monkeypatch):
     """托盘构造失败（无托盘环境）：壳照常建，刷新/收口全走空转不抛。"""
-    from pet import overlay_shell as overlay_shell_mod
+    from petwisp import overlay_shell as overlay_shell_mod
 
     def boom(*_args, **_kwargs):
         raise RuntimeError("no tray here")
@@ -386,7 +386,7 @@ def test_tray_survives_menu_build_failure(tmp_path, monkeypatch):
     ``self.tray = None``，而 ``start()`` 判 None 永不 show → 用户看到的是
     「托盘里完全没有桌宠条目」，只留一行 log（正是用户报的现象）。
     """
-    from pet import overlay_shell as overlay_shell_mod
+    from petwisp import overlay_shell as overlay_shell_mod
 
     class _BoomMenu:
         def __init__(self, *_args, **_kwargs):
@@ -615,7 +615,7 @@ def test_menu_exit_this_absent_for_single_pet(tmp_path):
 
 
 def test_menu_settings_routes_child_identity(tmp_path):
-    """D13：被点子肥鱼的「桌宠设置」必须带该 sprite 的 slot 身份。"""
+    """D13：被点子宠的「桌宠设置」必须带该 sprite 的 slot 身份。"""
     shell, _ = _make_persistent_shell(tmp_path)
     opened: list = []
     try:

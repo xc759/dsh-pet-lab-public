@@ -34,7 +34,7 @@ sys.path.insert(0, {root!r})
 """
 
 _CATALOG_PROBE = """
-import pet.catalog as catalog
+import petwisp.catalog as catalog
 try:
     catalog.ANIM_FILES['__probe__'] = '__probe__.webm'
     catalog._verify_animation_pools()
@@ -45,7 +45,7 @@ else:
 """
 
 _FESTIVAL_PROBE = """
-import pet.festival.data as fd
+import petwisp.festival.data as fd
 try:
     fd._index_festivals(fd.FESTIVALS + (fd.FESTIVALS[0],))
 except ValueError as exc:
@@ -86,7 +86,7 @@ def test_festival_id_guard_survives_optimize():
 
 def test_festival_index_keeps_every_entry_when_ids_are_unique():
     """正例：全量节日表建索引后条数不变（校验不得把正常数据判成重复）。"""
-    import pet.festival.data as fd
+    import petwisp.festival.data as fd
 
     index = fd._index_festivals(fd.FESTIVALS)
     assert len(index) == len(fd.FESTIVALS)
@@ -95,7 +95,7 @@ def test_festival_index_keeps_every_entry_when_ids_are_unique():
 
 
 # ------------------------------------------------------------------ 静态门
-@pytest.mark.parametrize("rel_path", ["pet/catalog.py", "pet/festival/data.py"])
+@pytest.mark.parametrize("rel_path", ["petwisp/catalog.py", "petwisp/festival/data.py"])
 def test_no_module_level_assert_remains(rel_path):
     """这两个模块不得再出现模块级 assert——`-O` 会把它整句删除。"""
     tree = ast.parse((ROOT / rel_path).read_text(encoding="utf-8"))

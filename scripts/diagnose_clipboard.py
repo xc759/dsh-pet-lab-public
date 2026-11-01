@@ -57,7 +57,7 @@ u32.GetWindowTextW.argtypes = [wintypes.HWND, ctypes.c_wchar_p, ctypes.c_int]
 u32.GetClassNameW.argtypes = [wintypes.HWND, ctypes.c_wchar_p, ctypes.c_int]
 
 PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
-PET_EXE_HINTS = ('dsh-pet', 'python', 'pythonw')
+PET_EXE_HINTS = ('petwisp', 'python', 'pythonw')
 
 _proc_cache: dict[int, str] = {}
 

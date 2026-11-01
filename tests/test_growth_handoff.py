@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""半自动转交外部助手（``pet.growth.handoff``）。
+"""半自动转交外部助手（``petwisp.growth.handoff``）。
 
 验收口径：
 
@@ -16,7 +16,7 @@ import pytest
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
-from pet.growth import handoff as ho
+from petwisp.growth import handoff as ho
 
 NOW = datetime(2026, 10, 30, 15, 0, 0)
 

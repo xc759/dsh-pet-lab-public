@@ -22,8 +22,8 @@ from PySide6.QtCore import QEvent, QObject, QPointF, QRect, Qt, Signal
 from PySide6.QtGui import QGuiApplication, QMouseEvent
 from PySide6.QtWidgets import QApplication
 
-from pet.overlay_peripherals import FullscreenCursorWatcher
-from pet.overlay_shell import OverlayShell
+from petwisp.overlay_peripherals import FullscreenCursorWatcher
+from petwisp.overlay_shell import OverlayShell
 
 app = QApplication.instance() or QApplication([])
 
@@ -145,7 +145,7 @@ class CapConfig:
         self._write_slot_values(self._values)
 
     def _write_slot_values(self, values) -> None:
-        from pet import pet_profiles
+        from petwisp import pet_profiles
 
         per_pet = {key: value for key, value in values.items()
                    if key in pet_profiles.PER_PET_KEYS}

@@ -8,15 +8,15 @@ from types import SimpleNamespace
 
 import pytest
 
-from pet import vision, window
-from pet.window import PetWindow
+from petwisp import vision, window
+from petwisp.window import PetWindow
 
 
 def _ns_shim(real, **overrides):
     """模块命名空间垫片：显式给出的成员覆盖，其余全部转发给真模块。
 
     用法是 ``monkeypatch.setattr(<被测模块>, 'os'/'sys', _ns_shim(os, name='nt'))``
-    ——只换**被测模块里那个名字的绑定**。若写成 ``setattr('pet.window.os.name', …)``
+    ——只换**被测模块里那个名字的绑定**。若写成 ``setattr('petwisp.window.os.name', …)``
     或 ``setattr(vision.sys, 'platform', …)``，改的其实是**全局** os/sys 模块：
     pathlib 的平台分派只看全局 ``os.name``，窗口期里 pytest 生成失败报告时会抛
     ``NotImplementedError: cannot instantiate …Path`` ⇒ 整场 INTERNALERROR。
@@ -106,7 +106,7 @@ def _state_window(monkeypatch):
 def test_cursor_hidden_requires_200ms_and_showing_restores(monkeypatch):
     win = _state_window(monkeypatch)
     times = iter((10.0, 10.1, 10.2, 10.21, 10.22))
-    monkeypatch.setattr('pet.window.time.monotonic', lambda: next(times))
+    monkeypatch.setattr('petwisp.window.time.monotonic', lambda: next(times))
 
     win._on_cursor_visibility_changed('HIDDEN')
     win._on_cursor_visibility_changed('HIDDEN')
@@ -150,7 +150,7 @@ def test_cursor_transition_is_deferred_until_release(monkeypatch):
 def test_fs_watch_loop_survives_transient_runtime_error(monkeypatch):
     """回归测试：全屏/光标监视线程遇到瞬时异常不应退出，应继续循环。"""
     import threading
-    from pet import vision
+    from petwisp import vision
 
     win = PetWindow.__new__(PetWindow)
     win._fs_stop = threading.Event()
@@ -175,7 +175,7 @@ def test_fs_watch_loop_survives_transient_runtime_error(monkeypatch):
         win._fs_stop.set()
 
     win.cursor_visibility_changed = SimpleNamespace(emit=fake_emit)
-    monkeypatch.setattr("pet.vision.get_cursor_visibility", flaky_get_cursor_visibility)
+    monkeypatch.setattr("petwisp.vision.get_cursor_visibility", flaky_get_cursor_visibility)
     monkeypatch.setattr("shiboken6.isValid", lambda obj: True)
 
     # 运行 watcher loop
@@ -193,7 +193,7 @@ def test_apply_mouse_through_windows_uses_native_style(monkeypatch):
     win.mouse_through = False
     native_calls = []
     monkeypatch.setattr(window, 'os', _ns_shim(os, name='nt'))
-    monkeypatch.setattr('pet.window._set_windows_click_through',
+    monkeypatch.setattr('petwisp.window._set_windows_click_through',
                         lambda hwnd, enabled: native_calls.append((hwnd, enabled)) or True)
     monkeypatch.setattr(PetWindow, 'winId', lambda self: 43210)
 

@@ -8,9 +8,9 @@ from __future__ import annotations
 import json
 from datetime import datetime, timedelta, timezone
 
-from pet.chat.models import ChatMessage, ChatSettings
-from pet.chat.prompt import PromptBuilder, format_elapsed
-from pet.chat.session_store import SessionStore
+from petwisp.chat.models import ChatMessage, ChatSettings
+from petwisp.chat.prompt import PromptBuilder, format_elapsed
+from petwisp.chat.session_store import SessionStore
 
 TZ8 = timezone(timedelta(hours=8))
 

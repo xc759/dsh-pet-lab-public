@@ -13,7 +13,7 @@ from pathlib import Path
 
 import pytest
 
-from pet.tts import doubao
+from petwisp.tts import doubao
 
 
 def test_pitch_shift_hides_console_window(monkeypatch, tmp_path) -> None:

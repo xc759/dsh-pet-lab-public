@@ -19,9 +19,9 @@ from PySide6.QtCore import QDate, QEvent
 from PySide6.QtGui import QCloseEvent
 from PySide6.QtWidgets import QApplication
 
-from pet.config import APP_DIR_NAME, Config
-from pet.growth import GrowthService
-from pet.onboarding import state as onboarding_state
+from petwisp.config import APP_DIR_NAME, Config
+from petwisp.growth import GrowthService
+from petwisp.onboarding import state as onboarding_state
 
 app = QApplication.instance() or QApplication([])
 
@@ -83,7 +83,7 @@ def config(tmp_path):
 
 
 def _wizard(monkeypatch, config, characters=("demo",), chat=True):
-    from pet.onboarding import wizard as wizard_mod
+    from petwisp.onboarding import wizard as wizard_mod
 
     monkeypatch.setattr(wizard_mod, "_character_ids", lambda _cfg: list(characters))
     monkeypatch.setattr(wizard_mod, "chat_available", lambda: chat)
@@ -153,7 +153,7 @@ def test_close_event_marks_done_so_it_never_nags_twice(monkeypatch, config):
 
 
 def test_maybe_start_returns_none_when_already_done(monkeypatch, config):
-    from pet.onboarding import wizard as wizard_mod
+    from petwisp.onboarding import wizard as wizard_mod
 
     assert wizard_mod.maybe_start_first_run(None, config, needed=False) is None
 
@@ -182,11 +182,11 @@ def test_apply_tolerates_broken_shell(monkeypatch, config):
 
 
 def test_wizard_module_does_not_import_chat_at_top_level():
-    """no-chat 打包变体里没有 pet.chat：向导模块顶层的 import 列表不能碰它。"""
+    """no-chat 打包变体里没有 petwisp.chat：向导模块顶层的 import 列表不能碰它。"""
     import ast
     import inspect
 
-    from pet.onboarding import wizard as wizard_mod
+    from petwisp.onboarding import wizard as wizard_mod
 
     tree = ast.parse(inspect.getsource(wizard_mod))
     for node in tree.body:  # 只看模块级，函数内部（延迟 import）不算
@@ -194,4 +194,4 @@ def test_wizard_module_does_not_import_chat_at_top_level():
             assert not (node.module or "").startswith("chat"), node.module
         if isinstance(node, ast.Import):
             for alias in node.names:
-                assert not alias.name.startswith("pet.chat"), alias.name
+                assert not alias.name.startswith("petwisp.chat"), alias.name

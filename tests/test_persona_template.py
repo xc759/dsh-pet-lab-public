@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import json
 import re
-from pet.persona_phrases import phrase_keys
-from pet.persona_template import build_persona_template
+from petwisp.persona_phrases import phrase_keys
+from petwisp.persona_template import build_persona_template
 
 
 def test_template_is_complete_and_safe():
@@ -38,7 +38,7 @@ def test_all_advertised_fields_reach_presentation_layer():
     import ast
     from pathlib import Path
 
-    from pet.persona_template import (
+    from petwisp.persona_template import (
         CONDITIONAL_PARAMETERS, DISPLAY_HINTS, EVENT_SOURCES, LEGACY_HIDDEN_PARAMETERS,
         PARAMETERS, UPSTREAM_FIELDS, VARIABLES,
     )
@@ -48,7 +48,7 @@ def test_all_advertised_fields_reach_presentation_layer():
     expansion_keys = set()
     dynamic = []
     for fname in ("agent_link/__init__.py", "app.py"):
-        tree = ast.parse((root / "pet" / fname).read_text(encoding="utf-8"))
+        tree = ast.parse((root / "petwisp" / fname).read_text(encoding="utf-8"))
         for node in ast.walk(tree):
             if not isinstance(node, ast.Call):
                 continue
@@ -169,8 +169,8 @@ def test_all_advertised_fields_reach_presentation_layer():
     assert "balance.query" not in entries
 
     # ── 上下文字段层：桥接插件确实写出这些字段（或 Pet 侧注入）──
-    bridge_src = (root / "integrations" / "dsh-pet-bridge" / "index.js").read_text(encoding="utf-8")
-    agent_link_src = (root / "pet" / "agent_link" / "__init__.py").read_text(encoding="utf-8")
+    bridge_src = (root / "integrations" / "petwisp-bridge" / "index.js").read_text(encoding="utf-8")
+    agent_link_src = (root / "petwisp" / "agent_link" / "__init__.py").read_text(encoding="utf-8")
     pet_side_fields = {"agent_key"}
     for group, fields in UPSTREAM_FIELDS.items():
         for field in fields:

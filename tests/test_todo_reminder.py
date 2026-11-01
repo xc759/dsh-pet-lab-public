@@ -10,8 +10,8 @@ import logging
 from datetime import date, datetime
 from pathlib import Path
 
-from pet.config import Config
-from pet.todo.reminder import (
+from petwisp.config import Config
+from petwisp.todo.reminder import (
     DEFAULT_GRACE_MINUTES,
     TODO_ITEMS_LIMIT,
     TODO_ITEMS_VERSION,
@@ -555,7 +555,7 @@ def test_service_warns_when_bubble_blocked_and_notify_off(tmp_path, caplog):
     service = TodoReminderService(app)
     service.apply_config()
 
-    with caplog.at_level(logging.WARNING, logger="pet.todo.reminder"):
+    with caplog.at_level(logging.WARNING, logger="petwisp.todo.reminder"):
         service._on_tick(now=datetime(2026, 9, 4, 10, 6))
 
     assert app.win.bubbles == [] and app.notifies == []
@@ -601,7 +601,7 @@ def test_service_once_archive_persists(tmp_path):
 # ------------------------------------------------------------ PetApp 接线
 
 def test_petapp_creates_service_and_wires_callback(tmp_path):
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     qapp = _qapp()
     shell = AppShell(qapp, Config(tmp_path))
@@ -617,8 +617,8 @@ def test_petapp_creates_service_and_wires_callback(tmp_path):
 
 
 def test_petapp_settings_finish_applies_todo_prefs(tmp_path, monkeypatch):
-    import pet.app as app_mod
-    from pet.app import AppShell, PetInstance
+    import petwisp.app as app_mod
+    from petwisp.app import AppShell, PetInstance
 
     qapp = _qapp()
     monkeypatch.setattr(app_mod, "_mac_set_dock_icon_visible", lambda *a, **k: None)
@@ -644,7 +644,7 @@ def test_petapp_settings_finish_applies_todo_prefs(tmp_path, monkeypatch):
 # ------------------------------------------------------------ 管理面板
 
 def _make_panel(tmp_path):
-    from pet.todo.panel import TodoPanelDialog
+    from petwisp.todo.panel import TodoPanelDialog
 
     _qapp()
     app = _FakeApp(tmp_path)
@@ -798,7 +798,7 @@ def test_settings_roundtrip_todo_prefs(tmp_path):
     """设置对话框读写 todo_reminder 两键，且两行归入「待办提醒」section。"""
     from PySide6.QtWidgets import QLabel
 
-    from pet.modern_settings_dialog import ModernSettingsDialog, SettingRow, SettingsSection
+    from petwisp.modern_settings_dialog import ModernSettingsDialog, SettingRow, SettingsSection
 
     _qapp()
     cfg_root = tmp_path / "appdata"
@@ -881,7 +881,7 @@ def test_tick_speaks_exactly_the_bubble_text(tmp_path):
 
 def test_quiet_mode_neither_speaks_nor_catches_up(tmp_path):
     """免打扰拦下的提醒不出声、也不在结束后补播（过期提醒不该突然出声）。"""
-    from pet import quiet_mode
+    from petwisp import quiet_mode
 
     _qapp()
     app, service = _speaking_service(tmp_path, speak=True)
@@ -909,8 +909,8 @@ def test_todo_speak_pref_default_off_and_string_false_stays_off(tmp_path):
 
 def test_settings_save_keeps_the_audio_channel_wanted(tmp_path):
     """设置页保存写回 → 壳仍需要音频通道；漏接 ``_chime_wanted`` 就是死开关。"""
-    from pet.app import AppShell
-    from pet.modern_settings_dialog import ModernSettingsDialog, SettingRow
+    from petwisp.app import AppShell
+    from petwisp.modern_settings_dialog import ModernSettingsDialog, SettingRow
 
     qapp = _qapp()
     cfg_root = tmp_path / "appdata"

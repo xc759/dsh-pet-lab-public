@@ -6,7 +6,7 @@ import pytest
 
 imageio_ffmpeg = pytest.importorskip("imageio_ffmpeg")
 
-from pet import ffmpeg_hide  # noqa: E402
+from petwisp import ffmpeg_hide  # noqa: E402
 
 
 @pytest.mark.skipif(not sys.platform.startswith("win"), reason="Windows only")
@@ -26,7 +26,7 @@ def test_popen_kwargs_carry_create_no_window_in_both_modules():
 
 
 def test_importing_media_modules_installs_hide_patch():
-    import pet.webm_clip  # noqa: F401
+    import petwisp.webm_clip  # noqa: F401
 
     if sys.platform.startswith("win"):
         assert ffmpeg_hide._INSTALLED is True

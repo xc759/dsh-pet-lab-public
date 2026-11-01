@@ -22,8 +22,8 @@ from PySide6.QtCore import QPointF
 from PySide6.QtWidgets import QApplication
 
 import tests.test_sprite_menu_facade as fac
-from pet import collision as collision_mod
-from pet.sprite_collision import SpriteCollisionWorld
+from petwisp import collision as collision_mod
+from petwisp.sprite_collision import SpriteCollisionWorld
 
 app = QApplication.instance() or QApplication([])
 
@@ -180,9 +180,9 @@ def _make_slot_shell(tmp_path, **config_values):
     配置落种成 ``config-slot-N.json``，这正是旧架构"每个桌宠各自 config"的物质
     基础。所有写盘都在 tmp_path 内。
     """
-    from pet.config import Config
-    from pet.overlay_shell import OverlayShell
-    from pet.pet_sprite import PetSprite
+    from petwisp.config import Config
+    from petwisp.overlay_shell import OverlayShell
+    from petwisp.pet_sprite import PetSprite
     from tests.test_overlay_window_capabilities import FakeScreen
 
     cfg = Config(base=tmp_path)
@@ -201,9 +201,9 @@ def _make_slot_shell(tmp_path, **config_values):
 
 def _write_slot(parent, slot, **values):
     """按设置进程的写法改 ``config-slot-N.json``（真 Config + 真落盘）。"""
-    from pet.config import Config
+    from petwisp.config import Config
 
-    from pet.settings_slot_config import route_settings_config
+    from petwisp.settings_slot_config import route_settings_config
 
     cfg = route_settings_config(Config(base=parent, instance_id=f"slot-{slot}"))
     for key, value in values.items():
@@ -218,9 +218,9 @@ def _notify_slot_saved(shell):
 
 def _save_main(parent, shell, **values):
     """模拟主配置被外部（设置进程/主进程保存）改写：落盘 → reload → 应用。"""
-    from pet.config import Config
+    from petwisp.config import Config
 
-    from pet.settings_slot_config import route_settings_config
+    from petwisp.settings_slot_config import route_settings_config
 
     other = route_settings_config(Config(base=parent, instance_id="slot-0"))
     for key, value in values.items():

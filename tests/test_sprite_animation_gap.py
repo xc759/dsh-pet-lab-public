@@ -18,7 +18,7 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from PySide6.QtWidgets import QApplication
 
-from pet.sprite_behavior import STATE_ACTS, STATE_IDLE, STATE_TURN, BehaviorController
+from petwisp.sprite_behavior import STATE_ACTS, STATE_IDLE, STATE_TURN, BehaviorController
 from tests.test_overlay_dead_switches import _make_shell
 from tests.test_sprite_behavior import (
     BOUNDS,

@@ -18,13 +18,13 @@ import pytest
 from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QApplication
 
-import pet.app as app_mod
-import pet.slot_manager as slot_manager_mod
-from pet import catalog
-from pet.agent_link import AgentLinkManager
-from pet.app import AppShell, PetInstance
-from pet.config import Config
-from pet.multi_window_shared import MultiWindowProxy, SharedProactiveWatcher
+import petwisp.app as app_mod
+import petwisp.slot_manager as slot_manager_mod
+from petwisp import catalog
+from petwisp.agent_link import AgentLinkManager
+from petwisp.app import AppShell, PetInstance
+from petwisp.config import Config
+from petwisp.multi_window_shared import MultiWindowProxy, SharedProactiveWatcher
 
 
 @pytest.fixture
@@ -596,7 +596,7 @@ def test_shared_watcher_tick_survives_idle_windows(tmp_path, app, monkeypatch):
     proxy = MultiWindowProxy(_ProxyShell(config, [w1, w2]))
     watcher = SharedProactiveWatcher(proxy, config)
     try:
-        from pet import vision
+        from petwisp import vision
 
         probed: list[int] = []
         # 返回 None：守卫之后的第一步（前台窗口信息），且不会触发截图/网络，
@@ -645,7 +645,7 @@ def test_shared_production_watcher_reads_proxy_sentinel(tmp_path, app, monkeypat
         assert proxy._physics_mode is None
 
         # 并且真实 tick 能越过 G1（前台窗口查询被调用即证明）
-        from pet import vision
+        from petwisp import vision
 
         # _on_tick 只读 effective config（与平台守卫无关），无需 apply_config 起表
         config.set("proactive_screen", {"enabled": True, "whitelist": ["*"]})

@@ -31,22 +31,22 @@ from PySide6.QtCore import QObject, QPointF, QRect, QRectF, Qt, Signal
 from PySide6.QtGui import QImage, QPainter, QRegion
 from PySide6.QtWidgets import QApplication
 
-from pet.overlay_window import OverlayWindow
-from pet.pet_sprite import (
+from petwisp.overlay_window import OverlayWindow
+from petwisp.pet_sprite import (
     INTERACTION_DRAG,
     INTERACTION_NORMAL,
     INTERACTION_THROWN,
     PetSprite,
 )
-from pet.sprite_edge_probe import PEEKING, SpriteEdgeProbeWorld
-from pet.sprite_physics import ThrowPhysicsController
-from pet.sprite_throw_egg import (
+from petwisp.sprite_edge_probe import PEEKING, SpriteEdgeProbeWorld
+from petwisp.sprite_physics import ThrowPhysicsController
+from petwisp.sprite_throw_egg import (
     SpriteThrowEggWorld,
     create_throw_egg_world,
     touching_boundary,
 )
-from pet.throw_egg import THROW_EGG_AIR_FOLLOW_SPEED, THROW_EGG_RECOVER_SPEED
-from pet.window_effects import rotated_region_bounds
+from petwisp.throw_egg import THROW_EGG_AIR_FOLLOW_SPEED, THROW_EGG_RECOVER_SPEED
+from petwisp.window_effects import rotated_region_bounds
 
 app = QApplication.instance() or QApplication([])
 
@@ -222,8 +222,8 @@ def _forward_rotate(point: QPointF, rect: QRect, angle_deg: float) -> QPointF:
 
 # ---------------------------------------------------------------- 阈值单一来源
 def test_thresholds_come_from_the_old_controller_not_copied():
-    """阈值常量必须是 pet.throw_egg 的同一对象（禁止复制数值）。"""
-    from pet import sprite_throw_egg, throw_egg
+    """阈值常量必须是 petwisp.throw_egg 的同一对象（禁止复制数值）。"""
+    from petwisp import sprite_throw_egg, throw_egg
 
     assert sprite_throw_egg.THROW_EGG_RECOVER_SPEED is throw_egg.THROW_EGG_RECOVER_SPEED
     assert sprite_throw_egg.THROW_EGG_AIR_FOLLOW_SPEED is throw_egg.THROW_EGG_AIR_FOLLOW_SPEED

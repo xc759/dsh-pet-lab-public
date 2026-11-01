@@ -29,10 +29,10 @@ from PySide6.QtCore import QRect
 from PySide6.QtGui import QPainter, qAlpha
 from PySide6.QtWidgets import QApplication
 
-import pet.island.dynamic_island as island_mod
-from pet.island import layout
-from pet.config import Config
-from pet.island.dynamic_island import _CAPSULE_INSET, DynamicIsland
+import petwisp.island.dynamic_island as island_mod
+from petwisp.island import layout
+from petwisp.config import Config
+from petwisp.island.dynamic_island import _CAPSULE_INSET, DynamicIsland
 
 app = QApplication.instance() or QApplication([])
 
@@ -351,7 +351,7 @@ def test_all_text_layers_share_one_baseline(monkeypatch, tmp_path):
     """
     import time as _time
 
-    from pet import sys_monitor as sm
+    from petwisp import sys_monitor as sm
 
     island, _screen = _make_island(monkeypatch, metrics=["cpu", "mem"])
     try:

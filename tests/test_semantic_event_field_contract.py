@@ -14,8 +14,8 @@ model_access 记录未带 consecutiveRetryCount 时兜底计数恒为 0，语义
 """
 from __future__ import annotations
 
-from pet.agent_event_normalizer import normalize_event
-from pet.model_access_tracker import ModelAccessTracker
+from petwisp.agent_event_normalizer import normalize_event
+from petwisp.model_access_tracker import ModelAccessTracker
 
 
 def _norm(event: str, **data):

@@ -13,7 +13,7 @@ from pathlib import Path
 
 import pytest
 
-from pet.chat_reply_voice import (
+from petwisp.chat_reply_voice import (
     MAX_SENTENCE_CHARS,
     ChatReplyReader,
     clean_for_speech,
@@ -149,7 +149,7 @@ def test_disabled_reader_speaks_nothing():
 
 
 def test_start_stop_are_idempotent():
-    from pet.chat.service import ChatService
+    from petwisp.chat.service import ChatService
 
     channel = FakeChannel(idle=True)
     clock = FakeClock()
@@ -168,7 +168,7 @@ def test_start_stop_are_idempotent():
 
 
 def test_channel_idle_is_public_and_truthful():
-    from pet.voice.chime_service import VoiceChimeService
+    from petwisp.voice.chime_service import VoiceChimeService
 
     assert isinstance(VoiceChimeService.channel_idle, property), (
         "朗读要靠公开的 channel_idle 判据，而不是去摸私有 _channel_idle"
@@ -177,5 +177,5 @@ def test_channel_idle_is_public_and_truthful():
 
 def test_lyric_chain_never_wires_reply_voice():
     for name in ("lyric_controller.py", "lyric.py", "now_playing.py"):
-        source = (REPO_ROOT / "pet" / "music" / name).read_text(encoding="utf-8")
+        source = (REPO_ROOT / "petwisp" / "music" / name).read_text(encoding="utf-8")
         assert "chat_reply_voice" not in source, f"{name} 不该接助手回复朗读（只念对话，不念歌词）"

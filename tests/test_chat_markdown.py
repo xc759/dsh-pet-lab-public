@@ -5,7 +5,7 @@ import re
 
 from PySide6.QtWidgets import QApplication
 
-from pet.chat.markdown_view import markdown_to_html, preserve_line_breaks
+from petwisp.chat.markdown_view import markdown_to_html, preserve_line_breaks
 
 
 def _app():
@@ -87,7 +87,7 @@ def test_markdown_renders_formatting_and_escapes_raw_html():
 
 
 def test_assistant_bubble_renders_markdown_but_keeps_raw_text_for_copy():
-    from pet.chat.widgets import MessageBubble
+    from petwisp.chat.widgets import MessageBubble
 
     app = _app()
     src = "**重点**\n- 一\n- 二"
@@ -103,7 +103,7 @@ def test_assistant_bubble_renders_markdown_but_keeps_raw_text_for_copy():
 
 
 def test_slow_markdown_render_is_throttled_while_streaming_and_flushed_on_finish():
-    from pet.chat.widgets import MessageBubble
+    from petwisp.chat.widgets import MessageBubble
 
     _app()
     bubble = MessageBubble("assistant", "")
@@ -122,7 +122,7 @@ def test_legacy_bubble_renders_markdown_for_assistant():
     """经典聊天窗口（chat_ui_style=classic）的助手气泡同样走 Markdown；
     用户气泡保持纯文本（模型输出才可能含 markdown 标记）。"""
     _app()
-    from pet.chat.legacy_widgets import MessageBubble
+    from petwisp.chat.legacy_widgets import MessageBubble
 
     assistant = MessageBubble("assistant", "重点**加粗**收尾")
     assert 'font-weight:700' in assistant.body.text() and "加粗" in assistant.body.text()  # Qt 写 span 而非 <strong>

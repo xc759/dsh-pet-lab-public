@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""主动提醒（``pet.growth.nudge``）与 service 接线。
+"""主动提醒（``petwisp.growth.nudge``）与 service 接线。
 
 全是纯逻辑断言：时间由用例传入，不 sleep、不依赖本机时钟，也不需要 Qt。
 """
@@ -13,10 +13,10 @@ import pytest
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
-from pet import quiet_mode
-from pet.app import AppShell
-from pet.growth import nudge
-from pet.growth.service import GrowthService
+from petwisp import quiet_mode
+from petwisp.app import AppShell
+from petwisp.growth import nudge
+from petwisp.growth.service import GrowthService
 
 
 def _moment(text: str) -> datetime:

@@ -37,7 +37,7 @@ from pathlib import Path
 import pytest
 from PIL import Image
 
-from pet import frameseq_provision as fp
+from petwisp import frameseq_provision as fp
 
 # 仓库内真实素材（git 跟踪）：真素材断言从它现场解一帧，不依赖 .scratch 临时产物
 REAL_WEBM = (Path(__file__).resolve().parent.parent

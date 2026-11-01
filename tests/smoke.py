@@ -19,10 +19,10 @@ if ROOT not in sys.path:
 
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
-from pet import catalog  # noqa: E402
-from pet.config import Config  # noqa: E402
-from pet.library import MovieLibrary  # noqa: E402
-from pet.window import PetWindow  # noqa: E402
+from petwisp import catalog  # noqa: E402
+from petwisp.config import Config  # noqa: E402
+from petwisp.library import MovieLibrary  # noqa: E402
+from petwisp.window import PetWindow  # noqa: E402
 
 
 def _wait_until(app: QApplication, predicate, timeout: float = 5.0) -> None:

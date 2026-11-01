@@ -28,7 +28,7 @@ import pytest
 from ctypes import wintypes
 from PySide6.QtCore import QObject, Signal
 
-from pet import session_watcher as sw_mod
+from petwisp import session_watcher as sw_mod
 
 
 def _msg_pointer(message: int, wparam: int = 0):
@@ -216,7 +216,7 @@ def test_register_failure_degrades_without_raising(monkeypatch, caplog):
     monkeypatch.setattr(sw_mod, "_wts_register_session_notification", _register)
     watcher = sw_mod.SessionWatcher(app=None, on_session_end=lambda: None,
                                     install_native_filter=False)
-    with caplog.at_level(logging.INFO, logger="pet.session_watcher"):
+    with caplog.at_level(logging.INFO, logger="petwisp.session_watcher"):
         assert watcher.register_session_notifications(12345) is False
     assert any("降级为不支持" in r.getMessage() for r in caplog.records), "失败必须留痕"
     # 未注册成功 ⇒ 反注册不得调用（绝不误摘别人的注册）
@@ -262,7 +262,7 @@ def _stub_sprite(shell):
 def test_shell_installs_watcher_with_suspend_callback_and_registers_hwnd(
         tmp_path, monkeypatch):
     """壳装配：探测器接上挂起回调，并对 overlay 句柄注册锁屏通知。"""
-    from pet import overlay_shell as shell_mod
+    from petwisp import overlay_shell as shell_mod
 
     installed: list = []
     registered: list = []
@@ -316,7 +316,7 @@ def test_shell_quit_unregisters_session_notifications(tmp_path):
 
 def test_shell_suspend_downgrades_without_hiding_and_resumes_clips(tmp_path):
     """锁屏/挂起只降档：clips 停/续 + 档位 T3→T0，overlay 可见性一动不动。"""
-    from pet.tick_governor import TIER_ACTIVE, TIER_OCCLUDED
+    from petwisp.tick_governor import TIER_ACTIVE, TIER_OCCLUDED
 
     shell, _lib = _make_shell(tmp_path)
     try:
@@ -433,7 +433,7 @@ def test_install_failure_is_loud_and_never_reports_success(caplog):
     fake_app = _RejectingApp()
     watcher = sw_mod.SessionWatcher(app=fake_app, on_session_end=lambda: None)
     try:
-        with caplog.at_level(logging.WARNING, logger="pet.session_watcher"):
+        with caplog.at_level(logging.WARNING, logger="petwisp.session_watcher"):
             assert watcher.install() is False
         assert watcher._installed is False, "装失败不得置成功位（否则再没人重试/排查）"
         assert any(r.levelno >= logging.WARNING for r in caplog.records), \
@@ -450,7 +450,7 @@ def test_install_degrades_on_app_without_native_filter_api(caplog):
     fake_app = _FakeApp()
     watcher = sw_mod.SessionWatcher(app=fake_app, on_session_end=lambda: None)
     try:
-        with caplog.at_level(logging.WARNING, logger="pet.session_watcher"):
+        with caplog.at_level(logging.WARNING, logger="petwisp.session_watcher"):
             assert watcher.install() is False
         assert watcher._installed is False
         assert any(r.levelno >= logging.WARNING for r in caplog.records)

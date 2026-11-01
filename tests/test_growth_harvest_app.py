@@ -12,8 +12,8 @@ import pytest
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
-from pet.app import AppShell
-from pet.chat.memory import ChatMemory, memory_path
+from petwisp.app import AppShell
+from petwisp.chat.memory import ChatMemory, memory_path
 
 
 class _Cfg:

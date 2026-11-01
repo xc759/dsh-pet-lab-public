@@ -28,8 +28,8 @@ from PySide6.QtCore import QPoint, Qt
 from PySide6.QtGui import QMouseEvent
 from PySide6.QtWidgets import QApplication, QMenu
 
-from pet import catalog
-from pet.context_menu import populate_context_menu
+from petwisp import catalog
+from petwisp.context_menu import populate_context_menu
 
 app = QApplication.instance() or QApplication([])
 

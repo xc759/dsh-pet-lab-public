@@ -29,8 +29,8 @@ pytest.importorskip("PySide6")
 from PySide6.QtGui import QImage, QPixmap  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
-from pet.screen_capture import hdr_capture, pixels  # noqa: E402
-from pet.screen_capture.hdr_capture import (  # noqa: E402
+from petwisp.screen_capture import hdr_capture, pixels  # noqa: E402
+from petwisp.screen_capture.hdr_capture import (  # noqa: E402
     DISABLE_ENV,
     fp16_scrgb_to_srgb8,
     grab_hdr_sdr,
@@ -736,7 +736,7 @@ def test_grab_screen_image_fake_screen_without_geometry_still_works(monkeypatch)
 def test_cached_sessions_are_released_after_idle(qapp, monkeypatch):
     """最后一次抓帧 30s 后，缓存的 D3D11 设备/会话整组还回系统（闲置回收器）。"""
     import time as _time
-    import pet.screen_capture.hdr_capture as hdr
+    import petwisp.screen_capture.hdr_capture as hdr
 
     released = []
 

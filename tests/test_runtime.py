@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """目录/常量完整性测试（无需 GUI）。"""
 
-from pet import catalog
+from petwisp import catalog
 
 
 def test_catalog_integrity():

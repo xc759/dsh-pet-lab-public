@@ -15,7 +15,7 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 import pytest
 
-from pet.sprite_collision import SpriteCollisionWorld
+from petwisp.sprite_collision import SpriteCollisionWorld
 from tests.test_island_bridge import FakePoint, FakeSprite
 from tests.test_island_bridge_velocity import FakeClock
 
@@ -90,7 +90,7 @@ def test_drag_velocity_cleared_on_release():
 
 def test_drag_velocity_capped_against_teleport():
     """光标瞬移型跳变：估计速度按 DRAG_VELOCITY_CAP 封顶，不放大成荒诞值。"""
-    from pet.sprite_collision import DRAG_VELOCITY_CAP
+    from petwisp.sprite_collision import DRAG_VELOCITY_CAP
 
     clock = FakeClock()
     world = _world(clock)

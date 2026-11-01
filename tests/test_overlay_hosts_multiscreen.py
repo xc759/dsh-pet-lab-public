@@ -40,8 +40,8 @@ from PySide6.QtWidgets import QApplication
 
 import tests.test_overlay_window_capabilities as cap
 import tests.test_sprite_menu_facade as fac
-from pet.overlay_shell import OverlayShell
-from pet.pet_sprite import PetSprite
+from petwisp.overlay_shell import OverlayShell
+from petwisp.pet_sprite import PetSprite
 
 app = QApplication.instance() or QApplication([])
 
@@ -53,7 +53,7 @@ pytestmark = pytest.mark.usefixtures("non_macos_overlay_topology")
 ])
 def test_macos_unit_dpr_screens_use_separate_windows(
         tmp_path, monkeypatch, cross_screen, count, expected):
-    import pet.overlay_shell as overlay_mod
+    import petwisp.overlay_shell as overlay_mod
 
     monkeypatch.setattr(overlay_mod, "_IS_MACOS", True, raising=False)
     main = FakeScreen((0, 0, 1920, 1080), (0, 30, 1920, 1010), name="MAIN")
@@ -185,7 +185,7 @@ def _make_shell(tmp_path, screen, values=None):
     # （默认关 = 单显示器口径）。显式值优先，便于单条用例反向覆盖。
     values = {"allow_cross_screen": True, **(values or {})}
     config = cap.CapConfig(tmp_path, values)
-    from pet import pet_profiles
+    from petwisp import pet_profiles
 
     values_pet = {key: value for key, value in (values or {}).items()
                   if key in pet_profiles.PER_PET_KEYS}
@@ -730,7 +730,7 @@ def test_profile_records_the_pets_own_screen(tmp_path, monkeypatch):
 
         shell.save_spawned_positions()
 
-        from pet import pet_profiles
+        from petwisp import pet_profiles
         geometry = dict(pet_profiles.read_slot_snapshot(tmp_path, slot).profile.data)
         assert geometry["screen_name"] == "B"
         rx, ry = _ratio_in(shell, child, b)
@@ -744,7 +744,7 @@ def test_restore_puts_each_pet_back_on_its_own_screen(tmp_path, monkeypatch):
     """重启复活：按各宠档案里的 ``screen_name`` 回到各自那块屏。"""
     a, b = _two_screens()
     _install_screens(monkeypatch, a, b)
-    from pet import pet_profiles
+    from petwisp import pet_profiles
 
     # 复活路径同样只在"允许跨屏"下按各宠记忆的屏落位
     config = cap.CapConfig(tmp_path, {"allow_cross_screen": True})
@@ -776,7 +776,7 @@ def test_main_pet_restored_to_its_saved_screen_re_sites_the_home_screen(
     """主宠记着副屏：家（关闭跨屏时唯一活动区、拔屏兜底）就落在副屏。"""
     a, b = _two_screens()
     _install_screens(monkeypatch, a, b)
-    from pet import pet_profiles
+    from petwisp import pet_profiles
 
     config = cap.CapConfig(tmp_path, {"allow_cross_screen": True})
     pet_profiles.write_profile_settings(tmp_path, 0, {"scale": 0.5})
@@ -809,7 +809,7 @@ def _awaiting_shell(tmp_path, monkeypatch, *screens):
     档案准备与 ``test_restore_puts_each_pet_back_on_its_own_screen`` 完全一致，只
     少一块 B——这正是重启后回不到副屏的现场：启动恢复解析不到归属屏就落家那块。
     """
-    from pet import pet_profiles
+    from petwisp import pet_profiles
 
     _install_screens(monkeypatch, *screens)
     config = cap.CapConfig(tmp_path, {"allow_cross_screen": True})
@@ -854,7 +854,7 @@ def test_missing_assigned_screen_restores_when_it_arrives(tmp_path, monkeypatch)
             rect.top() + 0.75 * rect.height(), abs=2.0), "按档案 ry 落位"
         assert not getattr(child, "_awaiting_screen", None), "落位后清掉待恢复标记"
 
-        from pet import pet_profiles
+        from petwisp import pet_profiles
         stored = dict(pet_profiles.read_slot_snapshot(tmp_path, 1).profile.data)
         assert stored["screen_name"] == "B"
         assert (stored["rx"], stored["ry"]) == pytest.approx((0.25, 0.75), abs=0.01), (
@@ -893,7 +893,7 @@ def test_dragging_while_waiting_keeps_the_saved_assignment(tmp_path, monkeypatch
         assert QPointF(child.pos) != before, "前提：这一下真的拖动了"
         assert _screen_of(shell, child) is a, "前提：拖动没跨屏"
 
-        from pet import pet_profiles
+        from petwisp import pet_profiles
         stored = dict(pet_profiles.read_slot_snapshot(tmp_path, 1).profile.data)
         assert stored["screen_name"] == "B", "等屏期间的拖动不得改写屏归属"
         assert (stored["rx"], stored["ry"]) == pytest.approx((0.25, 0.75), abs=0.01), (
@@ -924,7 +924,7 @@ def test_rejected_geometry_write_says_why(tmp_path, monkeypatch, caplog):
 
 def test_main_pet_goes_back_when_its_screen_reappears(tmp_path, monkeypatch):
     """主宠同一套：归属屏晚到时先落家，它上线后搬回去，家也跟着搬（同恢复口径）。"""
-    from pet import pet_profiles
+    from petwisp import pet_profiles
 
     a, b = _two_screens()
     _install_screens(monkeypatch, a)
@@ -959,7 +959,7 @@ def test_main_pet_goes_back_when_its_screen_reappears(tmp_path, monkeypatch):
 # ---------------------------------------------------------------- 关机落盘
 def test_session_end_persists_positions(tmp_path, monkeypatch):
     """关机/注销也是最后一次落盘机会：不写的话关机前摆好的位置退回上一次保存。"""
-    from pet import pet_profiles
+    from petwisp import pet_profiles
 
     a, b = _two_screens()
     _install_screens(monkeypatch, a, b)
@@ -1345,7 +1345,7 @@ def test_main_pet_position_listener_tracks_it_across_screens(tmp_path, monkeypat
     监听挂在唯一合成窗上，而这正是不再需要"逐屏重挂注册"的原因：宠在哪块屏上，
     窗口都是同一张。
     """
-    from pet import slot_manager
+    from petwisp import slot_manager
 
     a, b = _two_screens()
     _install_screens(monkeypatch, a, b)
@@ -2224,7 +2224,7 @@ def test_degraded_state_survives_the_window_own_geometry_callback(
 
 def test_degraded_state_saves_the_home_screen_ratio(tmp_path, monkeypatch):
     """降级态落盘要用**单窗**的屏矩形：家屏正中不许被写成 1.5 这种越界比例。"""
-    from pet import pet_profiles
+    from petwisp import pet_profiles
     from tests.test_overlay_hosts_multiscreen import FakeScreen
 
     right = FakeScreen((0, 0, 1920, 1080), (0, 0, 1920, 1040), name="RIGHT")
@@ -2265,7 +2265,7 @@ def test_save_is_refused_while_the_topology_transaction_is_running(
     这段时间 `_active_multi()` 已经翻成多窗、精灵坐标还是旧单窗的，量出来的比例是
     越界值（实测 1.5）。落盘后补窗成功或重启就会把宠推到屏边。
     """
-    from pet import pet_profiles
+    from petwisp import pet_profiles
 
     a, b = _two_screens()
     _install_screens(monkeypatch, a, b)
@@ -2341,7 +2341,7 @@ def test_interrupted_drag_is_saved_after_the_topology_transaction(
     原先的取舍是"这次不写"——安全但不完整：拓扑切换打断拖拽后用户重启/被强杀，
     位置就丢了。收口后拓扑已对齐，这时再存一次才是正确的口径。
     """
-    from pet import pet_profiles
+    from petwisp import pet_profiles
 
     a, b = _two_screens()
     _install_screens(monkeypatch, a, b)
@@ -2371,7 +2371,7 @@ def test_deferred_drag_save_survives_a_multi_pass_transaction(tmp_path, monkeypa
     每轮开始都清记录的话：第一轮记下被拖那只 → 第二轮 `_drag_relaxed_sprite` 已被
     几何事务清空 → 记不上 → 收敛成功也补不了存。这条路径是"最终成功却漏存"。
     """
-    from pet import pet_profiles
+    from petwisp import pet_profiles
 
     a, b = _two_screens()
     _install_screens(monkeypatch, a, b)
@@ -2436,7 +2436,7 @@ def test_deferred_drag_save_is_kept_when_the_topology_is_still_broken(
 
         # 恢复后下一次信号应当把这次位置补存掉
         state["fail"] = False
-        from pet import pet_profiles
+        from petwisp import pet_profiles
         before = dict(pet_profiles.read_slot_profile(tmp_path, 0).data)
         shell._feed_screen_dpr()
         after = dict(pet_profiles.read_slot_profile(tmp_path, 0).data)

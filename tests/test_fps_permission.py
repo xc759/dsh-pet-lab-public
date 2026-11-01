@@ -9,7 +9,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from pet import fps_permission as fp
+from petwisp import fps_permission as fp
 
 SID = "S-1-5-21-111-222-333-1001"
 PS = r"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"

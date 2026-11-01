@@ -28,7 +28,7 @@ def slim():
 
 
 FULL_BUNDLE = [
-    "dsh-pet-standalone-webm-chat.exe",
+    "petwisp-webm-chat.exe",
     "_internal/PySide6/Qt6Core.dll",
     "_internal/PySide6/Qt6Gui.dll",
     "_internal/PySide6/Qt6Widgets.dll",

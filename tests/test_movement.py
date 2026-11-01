@@ -7,10 +7,10 @@ import pytest
 from PySide6.QtCore import QPoint, QRect
 from PySide6.QtWidgets import QApplication
 
-from pet import catalog
-from pet.config import Config
-from pet.movement import wander_target_y
-from pet.window import PetWindow
+from petwisp import catalog
+from petwisp.config import Config
+from petwisp.movement import wander_target_y
+from petwisp.window import PetWindow
 
 TOP, BOTTOM, H, MARGIN = 0.0, 1440.0, 300.0, 20.0
 
@@ -44,7 +44,7 @@ def test_clamped_near_edges():
 
 def test_inplace_move_clips_do_not_displace():
     """文件名含「原地」的移动素材不进 moves（位移池），降级到 acts。"""
-    from pet.catalog import build_categories
+    from petwisp.catalog import build_categories
 
     folder_files = {
         'move': ['原地小憩沉眠', '螃蟹走路'],
@@ -61,7 +61,7 @@ def test_inplace_move_clips_do_not_displace():
 
 def test_renamed_move_pair_stays_in_moves():
     """原「原地漂浮踏步/原地左转奔跑」去掉“原地”后进入移动池，不再出现在随机动作里。"""
-    from pet.catalog import build_categories
+    from petwisp.catalog import build_categories
 
     folder_files = {
         'move': ['螃蟹走路', '漂浮踏步', '左转奔跑'],
@@ -79,7 +79,7 @@ def test_renamed_move_pair_stays_in_moves():
 
 def test_balance_animations_also_enter_random_acts():
     """余额动画既要能按档位触发，也要允许在随机动作池/菜单里播放。"""
-    from pet.catalog import build_categories
+    from petwisp.catalog import build_categories
 
     folder_files = {
         'idle': ['待机呼吸休闲'],
@@ -99,7 +99,7 @@ def test_balance_animations_also_enter_random_acts():
 
 def test_text_clips_no_mirror_loaded():
     """text_clips.json 的 no_mirror 清单被素材库加载。"""
-    from pet.library import MovieLibrary
+    from petwisp.library import MovieLibrary
 
     lib = MovieLibrary(character_id='demo')
     assert '是啊，吃什么' in lib.no_mirror

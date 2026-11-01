@@ -5,10 +5,10 @@ import json
 import pytest
 from PySide6.QtCore import QPointF
 
-from pet import catalog, overlay_settings_command as commands, pet_profiles as profiles
-from pet import settings_reset_defaults
-from pet.config import Config
-from pet.settings_slot_config import SlotRoutedConfig
+from petwisp import catalog, overlay_settings_command as commands, pet_profiles as profiles
+from petwisp import settings_reset_defaults
+from petwisp.config import Config
+from petwisp.settings_slot_config import SlotRoutedConfig
 from tests import test_overlay_collision_toggle as toggle
 from tests import test_sprite_menu_facade as fac
 

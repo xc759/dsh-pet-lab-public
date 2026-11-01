@@ -19,7 +19,7 @@ pytest.importorskip("PySide6")
 
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
-from pet import weather as W  # noqa: E402
+from petwisp import weather as W  # noqa: E402
 
 app = QApplication.instance() or QApplication([])
 
@@ -28,8 +28,8 @@ WEATHER_KEYS = ("weather_enabled", "weather_city", "weather_city_list")
 
 @pytest.fixture
 def dialog(tmp_path, monkeypatch):
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
     dlg = settings_mod.ModernSettingsDialog(Config(tmp_path), include_ai=True)
@@ -39,7 +39,7 @@ def dialog(tmp_path, monkeypatch):
 
 
 def _row(dialog, key: str):
-    from pet.modern_settings_dialog import SettingRow
+    from petwisp.modern_settings_dialog import SettingRow
 
     row = dialog.findChild(SettingRow, f"settingRow_{key}")
     assert row is not None, f"缺少设置行 {key}"
@@ -47,7 +47,7 @@ def _row(dialog, key: str):
 
 
 def _weather_tab(dialog):
-    from pet.settings_widgets import SettingsTabContainer
+    from petwisp.settings_widgets import SettingsTabContainer
 
     index = next(i for i in range(dialog.sidebar.count())
                  if dialog.sidebar.item(i).text() == "互动")
@@ -77,8 +77,8 @@ def test_default_values_are_the_documented_ones(dialog):
 
 
 def test_controls_round_trip_from_config(tmp_path, monkeypatch):
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
     config = Config(tmp_path)
@@ -122,8 +122,8 @@ def test_saving_other_rows_never_erodes_the_stored_city_name(dialog):
 
 def test_save_drops_area_codes_of_cities_that_are_no_longer_listed(tmp_path, monkeypatch):
     """地区码表跟着城市列表收敛：删掉的城市不能留着身份（否则重加会串号）。"""
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
     config = Config(tmp_path)
@@ -190,8 +190,8 @@ def test_search_finds_the_weather_rows_and_switches_to_the_tab(dialog):
 # ---------------------------------------------------------------- 子宠页作用域
 def _main_and_sub_dialogs(tmp_path, monkeypatch):
     """主宠页 + 子宠页（``instance_id=slot-1``）两个设置对话框。"""
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
     master = settings_mod.ModernSettingsDialog(Config(tmp_path), include_ai=True)

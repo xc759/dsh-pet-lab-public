@@ -12,7 +12,7 @@ import threading
 
 import pytest
 
-from pet import pack_download as pd
+from petwisp import pack_download as pd
 
 SHA_OK = "c" * 64
 
@@ -663,7 +663,7 @@ def test_registry_allows_same_version_in_two_resolutions():
     """同版本号的 640 与 720 是两条产品线，不是重复包（去重键含分辨率）。"""
     base = {"schema": 1, "id": "demo", "variant": "base", "version": "1.0.0",
             "pipeline": "unblend-white-v6", "format": "lossless-frame-v1",
-            "parts": [{"name": "core", "urls": ["https://github.com/MerZlin/dsh-pet-indesktop/releases/download/x/y.zip"],
+            "parts": [{"name": "core", "urls": ["https://github.com/MerZlin/petwisp-indesktop/releases/download/x/y.zip"],
                        "bytes": 10, "sha256": "a" * 64}]}
     r640 = dict(base, name="640", canvas=[640, 360])
     r720 = dict(base, name="720", canvas=[1280, 720])
@@ -858,7 +858,7 @@ def test_part_doc_missing_schema_and_name_still_merges_valid_index(tmp_path):
                 "content_sha": digest, "bytes": 1}]}, ensure_ascii=False))
     target = tmp_path / "char"
     pd.install_part(zpath, target)
-    from pet import character_pack as cp
+    from petwisp import character_pack as cp
     index = cp.load_index(target)
     assert index is not None and index.schema == 1 and index.name == "demo"
 

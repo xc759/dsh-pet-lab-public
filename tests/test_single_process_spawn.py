@@ -3,7 +3,7 @@
 
 覆盖批5.2 修复轮（DISPATCH_batch52_fix1）处置清单与验收（4.4b 已删去
 feature flag / 碰撞 IPC 相关项）：
-- P0-1：spawn 偏移链（env DSH_PET_SPAWN_OFFSET_INDEX → 主窗 spawn_offset）接线；
+- P0-1：spawn 偏移链（env PETWISP_SPAWN_OFFSET_INDEX → 主窗 spawn_offset）接线；
 - P0-2：右键退出恒注入窗级「退出这只」；
 - P1-2/P2-6：runtime 标记恒用 versioned 名；
 - P1-3：「退出这只」退主窗后实例提升，托盘/灵动岛动作仍指向存活实例；
@@ -24,14 +24,14 @@ from PySide6.QtCore import QEventLoop, QObject, QTimer, Signal
 from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QApplication
 
-import pet.app as app_mod
-import pet.slot_manager as slot_manager_mod
-from pet import catalog
-from pet.app import AppShell, PetInstance, _read_spawn_offset_env
-from pet.chat import session_store as session_store_mod
-from pet.chat.session_store import SessionStore
-from pet.config import APP_DIR_NAME, Config
-from pet.window import PetWindow
+import petwisp.app as app_mod
+import petwisp.slot_manager as slot_manager_mod
+from petwisp import catalog
+from petwisp.app import AppShell, PetInstance, _read_spawn_offset_env
+from petwisp.chat import session_store as session_store_mod
+from petwisp.chat.session_store import SessionStore
+from petwisp.config import APP_DIR_NAME, Config
+from petwisp.window import PetWindow
 
 
 @pytest.fixture
@@ -174,7 +174,7 @@ def test_spawn_in_process_creates_isolated_second_window(tmp_path, app, monkeypa
 
 
 def test_spawn_refreshes_island_wall_hooks(tmp_path, app, monkeypatch):
-    """生小肥鱼后必须刷新灵动岛硬墙钩子——否则新鱼直接穿过岛（回归）。
+    """生小宠后必须刷新灵动岛硬墙钩子——否则新鱼直接穿过岛（回归）。
 
     硬墙 hook 只在碰撞体 start() 挂过一轮（那一刻已存在的窗口），本进程新窗
     不在列表里；spawn 路径必须补挂（island_collision.refresh_hooks）。
@@ -369,13 +369,13 @@ def test_runtime_marker_versioned_name_avoids_legacy_glob(tmp_path, app):
 
 def test_spawn_offset_env_wired_to_primary_instance(tmp_path, app, monkeypatch):
     """P0-1：spawn 偏移链接线（env → 主窗 spawn_offset）——兼容解析保留（T5）。"""
-    monkeypatch.setenv("DSH_PET_SPAWN_OFFSET_INDEX", "3")
+    monkeypatch.setenv("PETWISP_SPAWN_OFFSET_INDEX", "3")
     assert _read_spawn_offset_env() == 3
-    monkeypatch.setenv("DSH_PET_SPAWN_OFFSET_INDEX", "-2")
+    monkeypatch.setenv("PETWISP_SPAWN_OFFSET_INDEX", "-2")
     assert _read_spawn_offset_env() == 0
-    monkeypatch.setenv("DSH_PET_SPAWN_OFFSET_INDEX", "")  # 空串
+    monkeypatch.setenv("PETWISP_SPAWN_OFFSET_INDEX", "")  # 空串
     assert _read_spawn_offset_env() == 0
-    monkeypatch.delenv("DSH_PET_SPAWN_OFFSET_INDEX", raising=False)
+    monkeypatch.delenv("PETWISP_SPAWN_OFFSET_INDEX", raising=False)
     assert _read_spawn_offset_env() == 0
 
     # env → AppShell(spawn_offset=...) → PetInstance._spawn_offset
@@ -524,7 +524,7 @@ def _make_session_store_pairs(tmp_path):
 
 
 def _create_sessions(store):
-    from pet.chat.models import ChatSession
+    from petwisp.chat.models import ChatSession
     session = store.create("char", "provider", "prompt")
     return session
 
@@ -606,7 +606,7 @@ def test_spawn_in_process_slot_scan_cap_raises(tmp_path, app, monkeypatch):
     B01 起「目录里全是历史配置」不再等于耗尽（改为复用最小退役身份）；真耗尽
     只剩「128 个身份同时活跃」这一条，本用例以活跃窗集合模拟该极限。
     """
-    from pet import overlay_spawn_state
+    from petwisp import overlay_spawn_state
 
     shell, _config, _handle = _make_primary_with_slot(tmp_path)
     monkeypatch.setattr(
@@ -751,7 +751,7 @@ class _FakeAnimLib:
 def test_real_window_construction_writes_versioned_marker(tmp_path, app):
     """N-1（红→绿回归）：真实 PetWindow 构造期就写 v2 名标记，绝不写旧名
     （4.4b：多窗常开化 → 恒版本化，旧名无法区分同进程多窗）。"""
-    from pet.window import PetWindow
+    from petwisp.window import PetWindow
 
     config = Config(tmp_path)
     config.save()  # 确保 config.dir 已建（生产路径由启动流程建，测试需显式）
@@ -841,7 +841,7 @@ def test_seed_slot_config_applies_spawn_inherit_logic(tmp_path):
     assert slot_manager_mod.seed_slot_config_from_main(config_dir, 7) is True
     seeded = json.loads(
         (config_dir / "config-slot-7.json").read_text(encoding="utf-8"))
-    # 关闭继承大小 → 用主配置为小肥鱼选定的 spawn_scale；继承灵动岛 → enabled=True
+    # 关闭继承大小 → 用主配置为小宠选定的 spawn_scale；继承灵动岛 → enabled=True
     assert seeded["scale"] == 0.5
     assert seeded["spawn_inherit_size"] is False
     assert seeded["spawn_scale"] == 0.5
@@ -967,16 +967,16 @@ def test_spawn_in_process_window_routes_through_shared_seed(tmp_path, app, monke
 # --------------------------------------------------------------------------
 def test_clear_spawned_pets_closes_in_process_children_no_residue(
         tmp_path, app, monkeypatch):
-    """批 B：单进程模式下 clear_spawned_pets 先关闭进程内「非主窗」子肥鱼窗口、
+    """批 B：单进程模式下 clear_spawned_pets 先关闭进程内「非主窗」子宠窗口、
     删除其 runtime 标记，主窗保留；重复调用幂等无残留。
 
-    子肥鱼在单进程模式是进程内窗口（PID=主进程），会被文件级清理的
+    子宠在单进程模式是进程内窗口（PID=主进程），会被文件级清理的
     pid==os.getpid() 自我保护跳过而永远不会被关；修复后先按进程内子窗登记表
     （self._instances）枚举并关闭，再走文件级清理杀多进程子进程。
     """
     shell, config, primary_handle = _make_primary_with_slot(tmp_path)
 
-    # 主窗窗身 + 主窗 runtime 标记（主肥鱼不清，须保留）
+    # 主窗窗身 + 主窗 runtime 标记（主桌宠不清，须保留）
     primary = shell.instance
     primary_win = _FakeWindow()
     primary_win.cfg = config
@@ -1018,7 +1018,7 @@ def test_clear_spawned_pets_closes_in_process_children_no_residue(
     assert shell.instance is primary
     assert sec not in shell.instances
     assert sec_win.calls == ["save", "marker_del", "close"]
-    # 子窗 v2 标记被删；主窗标记保留（主肥鱼仍在跑）
+    # 子窗 v2 标记被删；主窗标记保留（主桌宠仍在跑）
     assert not sec_marker.exists()
     assert primary_marker.exists()
 
@@ -1059,7 +1059,7 @@ def test_clear_spawned_pets_without_in_process_children_is_noop(
 
 
 # --------------------------------------------------------------------------
-# 批 E：清除子肥鱼——进程内子窗 QTimer.singleShot(0) 链式关闭（不冻 UI）
+# 批 E：清除子宠——进程内子窗 QTimer.singleShot(0) 链式关闭（不冻 UI）
 # --------------------------------------------------------------------------
 def _add_child_instance(shell, tmp_path, config, preferred_slot, monkeypatch):
     """建一个进程内子窗实例（fake window + broker 打桩），返回 (inst, win)。"""
@@ -1167,7 +1167,7 @@ def test_clear_spawned_pets_chain_skips_removed_or_destroyed_child(
 
 def test_clear_spawned_pets_defers_heavy_teardown_to_reaper_thread(
         tmp_path, app, monkeypatch):
-    """批 G：链式「退出子肥鱼」把每窗的重资源回收（writer 关闭 / agent
+    """批 G：链式「退出子宠」把每窗的重资源回收（writer 关闭 / agent
     shutdown——各有界阻塞秒级）挪到进程级 reaper 线程执行；UI 线程只保留
     关窗/摘标记等毫秒级步骤，主桌宠不再冻结。4.4a 起碰撞会话已退役。"""
     import threading
@@ -1208,11 +1208,11 @@ def test_clear_spawned_pets_defers_heavy_teardown_to_reaper_thread(
 def test_settings_dialog_clear_button_routes_through_shell_chain(
         tmp_path, app, monkeypatch):
     """批 E：设置界面「一键退出」经 win.on_clear_spawned_pets（真实接线 =
-    shell.clear_spawned_pets）走到进程内子窗链式关闭——单进程模式子肥鱼清得掉。
+    shell.clear_spawned_pets）走到进程内子窗链式关闭——单进程模式子宠清得掉。
     批 I：全程无确认框无结果框。"""
     from PySide6.QtWidgets import QMessageBox, QWidget
 
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     shell, config, primary_handle = _make_primary_with_slot(tmp_path)
     child, child_win = _add_child_instance(shell, tmp_path, config, 1, monkeypatch)
@@ -1245,28 +1245,28 @@ def test_settings_dialog_clear_button_routes_through_shell_chain(
 
 
 def test_clear_spawned_entry_wired_only_on_primary(tmp_path, app, monkeypatch):
-    """批 G：「退出子肥鱼」入口只挂给主肥鱼（instance_id 为空）；子肥鱼窗
+    """批 G：「退出子宠」入口只挂给主桌宠（instance_id 为空）；子宠窗
     该回调为 None——否则子鱼进程里 pid==os.getpid() 只跳过自己，会把主鱼
     当子鱼 taskkill 掉（实机事故）。"""
     shell, config, primary_handle = _make_primary_with_slot(tmp_path)
     main_win = _FakeWindow()
     main_win.cfg = config
     shell.instance._wire_window(main_win)
-    assert callable(main_win.on_clear_spawned_pets), "主肥鱼必须有入口"
+    assert callable(main_win.on_clear_spawned_pets), "主桌宠必须有入口"
 
     inst, _win = _add_child_instance(shell, tmp_path, config, 1, monkeypatch)
     child_win = _FakeWindow()
     child_win.cfg = inst.config
     inst._wire_window(child_win)
-    assert child_win.on_clear_spawned_pets is None, "子肥鱼不得有入口"
+    assert child_win.on_clear_spawned_pets is None, "子宠不得有入口"
 
 
 def test_runtime_marker_written_on_first_show(tmp_path, app):
-    """批 G：窗口首次显示即登记 runtime 标记——没被拖动过的新生小肥鱼也有
-    标记，「退出子肥鱼」按标记枚举时不会漏掉它。"""
+    """批 G：窗口首次显示即登记 runtime 标记——没被拖动过的新生小宠也有
+    标记，「退出子宠」按标记枚举时不会漏掉它。"""
     from tests.pet_window_fakes import FakeLibrary
 
-    from pet.window import PetWindow
+    from petwisp.window import PetWindow
 
     config = Config(tmp_path)
     config.set("collision_enabled", False)

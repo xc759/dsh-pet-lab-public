@@ -19,7 +19,7 @@ pytestmark = pytest.mark.skipif(
 
 
 def test_macos_dock_visibility_policy_can_be_applied():
-    from pet.app import _mac_set_dock_icon_visible
+    from petwisp.app import _mac_set_dock_icon_visible
 
     _mac_set_dock_icon_visible(True)
 

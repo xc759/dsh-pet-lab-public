@@ -17,8 +17,8 @@ import time
 
 import pytest
 
-from pet.chat.models import ChatMessage, ChatSettings
-from pet.chat.prompt import PromptBuilder
+from petwisp.chat.models import ChatMessage, ChatSettings
+from petwisp.chat.prompt import PromptBuilder
 
 # spec v2「扮演引导」定稿文案（逐字，不得改写语义）。v2 的重点是场景发散：
 # 环境细节 + 在场其他人主动参与 + 每轮都要有推进，而不是两个人轮流对台词。
@@ -58,7 +58,7 @@ def _system(**kwargs) -> str:
 
 
 def _write_config(tmp_path, payload: dict) -> None:
-    from pet import config as config_mod
+    from petwisp import config as config_mod
 
     cfg_dir = tmp_path / config_mod.APP_DIR_NAME
     cfg_dir.mkdir(parents=True, exist_ok=True)
@@ -188,7 +188,7 @@ def test_scene_and_cast_are_only_sent_when_enabled():
 
 # ---------------------------------------------------------------- 配置键纪律
 def test_roleplay_defaults_are_off_and_empty(tmp_path):
-    from pet.config import Config
+    from petwisp.config import Config
 
     cfg = Config(base=tmp_path)
     assert cfg.data["roleplay_enabled"] is False
@@ -198,8 +198,8 @@ def test_roleplay_defaults_are_off_and_empty(tmp_path):
 
 def test_roleplay_keys_are_per_pet(tmp_path):
     """三个键必须在每宠键集里（读错层 = 前科回归）。"""
-    from pet import pet_profiles
-    from pet.config import Config
+    from petwisp import pet_profiles
+    from petwisp.config import Config
 
     assert {"roleplay_enabled", "roleplay_scene", "roleplay_cast"} <= set(
         pet_profiles.PER_PET_KEYS
@@ -209,7 +209,7 @@ def test_roleplay_keys_are_per_pet(tmp_path):
 
 
 def test_roleplay_values_are_normalized_on_load(tmp_path):
-    from pet.config import Config
+    from petwisp.config import Config
 
     _write_config(
         tmp_path,
@@ -240,8 +240,8 @@ def test_roleplay_values_are_normalized_on_load(tmp_path):
 
 def test_roleplay_keys_live_in_each_slot_profile(tmp_path):
     """不同角色/槽位各存各的场景卡，互不覆盖。"""
-    from pet import pet_profiles
-    from pet.config import Config
+    from petwisp import pet_profiles
+    from petwisp.config import Config
 
     cfg_dir = Config(base=tmp_path).dir
     first = pet_profiles.write_profile_settings(
@@ -275,9 +275,9 @@ def test_roleplay_keys_live_in_each_slot_profile(tmp_path):
 
 def _slot_routed_config(tmp_path):
     """构造一只宠的 SlotRoutedConfig 视图（每宠键从 slot 档案读）。"""
-    from pet import pet_profiles
-    from pet.config import Config
-    from pet.settings_slot_config import SlotRoutedConfig
+    from petwisp import pet_profiles
+    from petwisp.config import Config
+    from petwisp.settings_slot_config import SlotRoutedConfig
 
     main = Config(base=tmp_path)
     main.dir.mkdir(parents=True, exist_ok=True)
@@ -298,8 +298,8 @@ def _slot_routed_config(tmp_path):
 @pytest.mark.parametrize("surface", ["legacy", "quick"])
 def test_legacy_and_quick_read_roleplay_from_slot_profile(surface, tmp_path, qapp):
     """R3：classic 聊天窗与快速对话都按每宠键传 roleplay_*，且走 config.get。"""
-    from pet.chat.legacy_widgets import ChatWindow
-    from pet.quick_chat import QuickChatBubble
+    from petwisp.chat.legacy_widgets import ChatWindow
+    from petwisp.quick_chat import QuickChatBubble
 
     route = _slot_routed_config(tmp_path)
     sent: list[list[dict]] = []
@@ -375,7 +375,7 @@ def _hrefs(html: str) -> list[str]:
 # ---------------------------------------------------------------- 动作段预处理边界
 def test_prewrapped_autolink_is_not_double_wrapped():
     """F1：已经写在 <...> 里的 URL 不再被二次包裹成 ``<<...>>``。"""
-    from pet.chat.markdown_view import markdown_to_html
+    from petwisp.chat.markdown_view import markdown_to_html
 
     html = markdown_to_html("<https://x.org/a_(b)>")
     assert _hrefs(html) == ["https://x.org/a_(b)"]
@@ -393,7 +393,7 @@ def test_prewrapped_autolink_is_not_double_wrapped():
 )
 def test_bare_url_trims_unbalanced_closing_paren(text, expected):
     """F2：右括号按 URL 内的括号配平决定去留，不能焊进 href。"""
-    from pet.chat.markdown_view import markdown_to_html
+    from petwisp.chat.markdown_view import markdown_to_html
 
     assert _hrefs(markdown_to_html(text)) == [expected]
 
@@ -404,7 +404,7 @@ def test_bare_url_trims_unbalanced_closing_paren(text, expected):
 )
 def test_bare_url_trims_trailing_sentence_punctuation(punct):
     """F2：尾随句末标点不属于链接。"""
-    from pet.chat.markdown_view import markdown_to_html
+    from petwisp.chat.markdown_view import markdown_to_html
 
     html = markdown_to_html(f"见 https://example.com/x_(y){punct} 后面")
     assert _hrefs(html) == ["https://example.com/x_(y)"]
@@ -419,7 +419,7 @@ def test_crossing_parentheses_never_duplicate_text(text):
     from PySide6.QtGui import QTextDocument
     from PySide6.QtWidgets import QApplication
 
-    from pet.chat.markdown_view import markdown_to_html
+    from petwisp.chat.markdown_view import markdown_to_html
 
     QApplication.instance() or QApplication([])
     doc = QTextDocument()
@@ -430,7 +430,7 @@ def test_crossing_parentheses_never_duplicate_text(text):
 
 def test_action_pairing_latency_budget(qapp):
     """F4：括号配对与 token 还原来回都是线性量级，整段渲染不超过预算。"""
-    from pet.chat.markdown_view import markdown_to_html
+    from petwisp.chat.markdown_view import markdown_to_html
 
     cases = [
         ("paren-dense 10KB", "(a)" * 2500, 0.150),
@@ -446,7 +446,7 @@ def test_action_pairing_latency_budget(qapp):
 
 def test_link_target_parentheses_stay_in_href():
     """R1：markdown 链接目标里的半角括号不能被动作段 token 吞掉。"""
-    from pet.chat.markdown_view import markdown_to_html
+    from petwisp.chat.markdown_view import markdown_to_html
 
     html = markdown_to_html("看 [维基](https://x.org/a_(b)) 这篇")
     href = html.split('href="', 1)[1].split('"', 1)[0]
@@ -457,7 +457,7 @@ def test_link_target_parentheses_stay_in_href():
 
 def test_bare_url_with_parentheses_is_autolinked_whole():
     """R1：裸 URL 里的括号整段留在链接里，不渲染成动作段。"""
-    from pet.chat.markdown_view import markdown_to_html
+    from petwisp.chat.markdown_view import markdown_to_html
 
     html = markdown_to_html("见 https://example.com/x_(y) 这篇")
     assert 'href="https://example.com/x_(y)"' in html
@@ -480,14 +480,14 @@ def test_bare_url_with_parentheses_is_autolinked_whole():
 )
 def test_bare_urls_are_always_autolinked(text, expected):
     """v2e R1：紧跟中文/全角标点、带 query、带端口、裸域名都必须点得动。"""
-    from pet.chat.markdown_view import markdown_to_html
+    from petwisp.chat.markdown_view import markdown_to_html
 
     assert _hrefs(markdown_to_html(text)) == [expected]
 
 
 def test_link_target_and_bold_wrapped_url_keep_their_href():
     """v2e R1：链接目标与 ``**...**`` 里的 URL 不重复包裹，href 保持原样。"""
-    from pet.chat.markdown_view import markdown_to_html
+    from petwisp.chat.markdown_view import markdown_to_html
 
     wiki = markdown_to_html("[维基](https://x.org/a_(b))")
     assert _hrefs(wiki) == ["https://x.org/a_(b)"]
@@ -511,7 +511,7 @@ def test_url_stops_before_emphasis_markers(text, emphasis):
     from PySide6.QtGui import QTextDocument
     from PySide6.QtWidgets import QApplication
 
-    from pet.chat.markdown_view import markdown_to_html
+    from petwisp.chat.markdown_view import markdown_to_html
 
     QApplication.instance() or QApplication([])
     html = markdown_to_html(text)
@@ -524,7 +524,7 @@ def test_url_stops_before_emphasis_markers(text, emphasis):
 
 def test_bare_url_inside_link_label_does_not_split_the_anchor():
     """v2e R5：标签里的 URL 不插尖括号；一个链接仍是一个 ``<a>``。"""
-    from pet.chat.markdown_view import markdown_to_html
+    from petwisp.chat.markdown_view import markdown_to_html
 
     text = "看 [说明 https://x.org/a_(b) 页](https://y.org/)"
     html = markdown_to_html(text)
@@ -536,7 +536,7 @@ def test_bare_url_inside_link_label_does_not_split_the_anchor():
 
 def test_unclosed_parenthesis_is_not_an_action():
     """既有正例：未闭合括号不上色。"""
-    from pet.chat.markdown_view import markdown_to_html
+    from petwisp.chat.markdown_view import markdown_to_html
 
     html = markdown_to_html("（她抬手说了一半")
     assert not _action_fragments(html)
@@ -552,7 +552,7 @@ def test_unclosed_parenthesis_is_not_an_action():
 )
 def test_outer_action_with_url_falls_back_to_inner(text, inner):
     """v2e R7：外层动作段含 URL 被丢弃时，内层干净子段仍要渲染成斜体。"""
-    from pet.chat.markdown_view import markdown_to_html
+    from petwisp.chat.markdown_view import markdown_to_html
 
     html = markdown_to_html(text)
     assert _hrefs(html) == ["https://x.org/a"]
@@ -563,7 +563,7 @@ def test_outer_action_with_url_falls_back_to_inner(text, inner):
 
 def test_action_ranges_latency_with_half_inline_code(qapp):
     """v2e R2：一半括号一半行内代码的 20KB 输入不再走 O(k·m) 相交判断。"""
-    from pet.chat.markdown_view import markdown_to_html
+    from petwisp.chat.markdown_view import markdown_to_html
 
     started = time.perf_counter()
     markdown_to_html("（动作）`x`" * 2000)
@@ -573,7 +573,7 @@ def test_action_ranges_latency_with_half_inline_code(qapp):
 
 def test_link_target_scan_latency_budget(qapp):
     """v2e R3：``](`` 密集输入用单遍扫描，两条预算都要过。"""
-    from pet.chat.markdown_view import markdown_to_html
+    from petwisp.chat.markdown_view import markdown_to_html
 
     cases = [
         ("many ]( 10KB", "](" * 5000, 0.150),
@@ -588,7 +588,7 @@ def test_link_target_scan_latency_budget(qapp):
 
 def test_parentheses_inside_inline_code_are_not_actions():
     """R1：行内代码里的括号原样留在代码里。"""
-    from pet.chat.markdown_view import markdown_to_html
+    from petwisp.chat.markdown_view import markdown_to_html
 
     html = markdown_to_html("`(x)`")
     assert not _action_fragments(html)
@@ -598,7 +598,7 @@ def test_parentheses_inside_inline_code_are_not_actions():
 
 def test_action_cannot_cross_code_fence_boundary():
     """R2：动作段起于围栏外、止于围栏内时必须跳过，围栏与后续正文都完好。"""
-    from pet.chat.markdown_view import markdown_to_html
+    from petwisp.chat.markdown_view import markdown_to_html
 
     html = markdown_to_html("（看这段：\n\n```\ncode）\n```\n完了")
     assert "font-style:italic" not in html
@@ -617,7 +617,7 @@ def test_action_cannot_cross_code_fence_boundary():
 )
 def test_one_level_nested_parentheses_render_outer_as_action(text, outer):
     """R4：一层嵌套时外层整体作为动作段。"""
-    from pet.chat.markdown_view import markdown_to_html
+    from petwisp.chat.markdown_view import markdown_to_html
 
     actions = _action_fragments(markdown_to_html(text))
     assert any(outer in fragment_text for fragment_text, _italic, _alpha in actions)
@@ -625,7 +625,7 @@ def test_one_level_nested_parentheses_render_outer_as_action(text, outer):
 
 def test_two_levels_of_nesting_still_only_take_the_innermost():
     """R4：两层以上只取最内层，不无限递归。"""
-    from pet.chat.markdown_view import markdown_to_html
+    from petwisp.chat.markdown_view import markdown_to_html
 
     actions = _action_fragments(markdown_to_html("（最外（中间（最内）中间）最外）"))
     assert any("（最内）" in fragment_text for fragment_text, _italic, _alpha in actions)
@@ -634,7 +634,7 @@ def test_two_levels_of_nesting_still_only_take_the_innermost():
 
 def test_action_inline_code_and_bold_are_parsed():
     """R5：动作段内的 `x` 与 **x** 渲染成等宽/加粗，不残留字面标记。"""
-    from pet.chat.markdown_view import markdown_to_html
+    from petwisp.chat.markdown_view import markdown_to_html
 
     html = markdown_to_html("（指着 `设置` 图标）\n（**重点**动作）")
     assert "font-style:italic" in html
@@ -651,7 +651,7 @@ def test_action_inline_code_and_bold_are_parsed():
     ],
 )
 def test_parenthesized_action_is_italic_and_weak(text, action_text):
-    from pet.chat.markdown_view import markdown_to_html
+    from petwisp.chat.markdown_view import markdown_to_html
 
     html = markdown_to_html(text)
     actions = _action_fragments(html)
@@ -663,7 +663,7 @@ def test_parenthesized_action_is_italic_and_weak(text, action_text):
 
 
 def test_multiline_action_is_rendered_as_one_italic_weak_segment():
-    from pet.chat.markdown_view import markdown_to_html
+    from petwisp.chat.markdown_view import markdown_to_html
 
     html = markdown_to_html("第一句\n（动作一\n动作二）\n第二句")
     actions = _action_fragments(html)
@@ -677,7 +677,7 @@ def test_multiline_action_is_rendered_as_one_italic_weak_segment():
 
 
 def test_code_fence_parentheses_are_not_treated_as_actions():
-    from pet.chat.markdown_view import markdown_to_html
+    from petwisp.chat.markdown_view import markdown_to_html
 
     html = markdown_to_html("```\nfunc(x)\n```")
     assert not _action_fragments(html)
@@ -685,8 +685,8 @@ def test_code_fence_parentheses_are_not_treated_as_actions():
 
 def test_rendering_never_mutates_the_original_text(tmp_path):
     """纯展示层：渲染不写回原文，会话落盘也逐字保持。"""
-    from pet.chat.markdown_view import markdown_to_html
-    from pet.chat.session_store import SessionStore
+    from petwisp.chat.markdown_view import markdown_to_html
+    from petwisp.chat.session_store import SessionStore
 
     raw = "（动作）台词\n（第二段动作）"
     before = str(raw)
@@ -707,10 +707,10 @@ def test_rendering_never_mutates_the_original_text(tmp_path):
 
 def test_all_chat_surfaces_share_one_action_renderer(tmp_path, qapp):
     """R6：modern / classic / 快速对话三个入口统一渲染，输出逐字一致。"""
-    from pet.chat.legacy_widgets import MessageBubble as LegacyBubble
-    from pet.chat.widgets import MessageBubble as ModernBubble
-    from pet.config import Config
-    from pet.quick_chat import QuickChatBubble
+    from petwisp.chat.legacy_widgets import MessageBubble as LegacyBubble
+    from petwisp.chat.widgets import MessageBubble as ModernBubble
+    from petwisp.config import Config
+    from petwisp.quick_chat import QuickChatBubble
 
     src = "（她抬眼看你）台词 `设置` **重点**"
     modern = ModernBubble("assistant", src)
@@ -739,8 +739,8 @@ def qapp():
 
 
 def _settings_dialog(tmp_path, monkeypatch, slot: int):
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
     return settings_mod.ModernSettingsDialog(
@@ -751,8 +751,8 @@ def _settings_dialog(tmp_path, monkeypatch, slot: int):
 
 
 def test_settings_group_is_mounted_with_its_guide(tmp_path, monkeypatch, qapp):
-    from pet.modern_settings_dialog import SettingRow
-    from pet.settings_page_guide import SECTION_GUIDE
+    from petwisp.modern_settings_dialog import SettingRow
+    from petwisp.settings_page_guide import SECTION_GUIDE
 
     dialog = _settings_dialog(tmp_path, monkeypatch, 1)
     try:
@@ -774,7 +774,7 @@ def test_settings_group_is_mounted_with_its_guide(tmp_path, monkeypatch, qapp):
 
 
 def test_scene_dialog_has_example_placeholders(qapp):
-    from pet.chat.ai_settings_page import RoleplaySceneDialog
+    from petwisp.chat.ai_settings_page import RoleplaySceneDialog
 
     dialog = RoleplaySceneDialog("", "")
     try:
@@ -786,8 +786,8 @@ def test_scene_dialog_has_example_placeholders(qapp):
 
 def test_scene_dialog_counters_follow_input_and_turn_red(qapp):
     """R7：两个编辑框实时字数计数，超限变红并给出可见提示。"""
-    from pet.chat.ai_settings_page import RoleplaySceneDialog
-    from pet.config import ROLEPLAY_SCENE_MAX_CHARS
+    from petwisp.chat.ai_settings_page import RoleplaySceneDialog
+    from petwisp.config import ROLEPLAY_SCENE_MAX_CHARS
 
     dialog = RoleplaySceneDialog("", "")
     dialog.show()
@@ -811,8 +811,8 @@ def test_scene_dialog_counters_follow_input_and_turn_red(qapp):
 
 def test_scene_dialog_counts_stripped_text_and_allows_save(qapp):
     """F7：计数与禁用都用 strip 后的长度，与 values() 的落盘口径一致。"""
-    from pet.chat.ai_settings_page import RoleplaySceneDialog
-    from pet.config import ROLEPLAY_SCENE_MAX_CHARS
+    from petwisp.chat.ai_settings_page import RoleplaySceneDialog
+    from petwisp.config import ROLEPLAY_SCENE_MAX_CHARS
 
     dialog = RoleplaySceneDialog("", "")
     dialog.show()
@@ -830,8 +830,8 @@ def test_scene_dialog_counts_stripped_text_and_allows_save(qapp):
 
 def test_scene_dialog_truncates_scene_with_ellipsis_and_cast_on_line_boundary(qapp):
     """R7：场景补「…」；人物按整行截断，绝不出现半行；截断提示可见。"""
-    from pet.chat.ai_settings_page import RoleplaySceneDialog
-    from pet.config import ROLEPLAY_CAST_MAX_CHARS, ROLEPLAY_SCENE_MAX_CHARS
+    from petwisp.chat.ai_settings_page import RoleplaySceneDialog
+    from petwisp.config import ROLEPLAY_CAST_MAX_CHARS, ROLEPLAY_SCENE_MAX_CHARS
 
     dialog = RoleplaySceneDialog("", "")
     dialog.show()
@@ -857,8 +857,8 @@ def test_scene_dialog_truncates_scene_with_ellipsis_and_cast_on_line_boundary(qa
 
 def test_scene_dialog_blocks_save_while_over_limit(qapp):
     """R7：超限时保存按钮禁用（不许静默截断），删到范围内才能保存。"""
-    from pet.chat.ai_settings_page import RoleplaySceneDialog
-    from pet.config import ROLEPLAY_SCENE_MAX_CHARS
+    from petwisp.chat.ai_settings_page import RoleplaySceneDialog
+    from petwisp.config import ROLEPLAY_SCENE_MAX_CHARS
 
     dialog = RoleplaySceneDialog("", "")
     dialog.show()
@@ -879,7 +879,7 @@ def test_scene_dialog_blocks_save_while_over_limit(qapp):
 
 def test_settings_save_routes_roleplay_keys_to_each_slot(tmp_path, monkeypatch, qapp):
     """走公开设置窗 seam：两只宠各存各的场景卡，主配置里不留每宠真值。"""
-    from pet.config import Config
+    from petwisp.config import Config
 
     for slot, scene in ((1, "一号角色的场景。"), (2, "二号角色的场景。")):
         dialog = _settings_dialog(tmp_path, monkeypatch, slot)

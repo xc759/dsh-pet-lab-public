@@ -23,8 +23,8 @@ from types import SimpleNamespace
 import pytest
 from PIL import Image
 
-from pet.config import Config
-from pet.proactive import (
+from petwisp.config import Config
+from petwisp.proactive import (
     DEFAULT_PROACTIVE_CONFIG,
     PRESET_DEFAULTS,
     ProactiveLimiter,
@@ -386,7 +386,7 @@ class TestEffectiveConfig:
         assert cfg["min_idle_seconds"] == 3600
 
     def test_config_integration(self, tmp_path):
-        # 验证 pet.config.Config 能够正确存储与合并 proactive_screen
+        # 验证 petwisp.config.Config 能够正确存储与合并 proactive_screen
         cfg = Config(base=tmp_path)
         assert "proactive_screen" in cfg.data
         assert cfg.data["proactive_screen"]["enabled"] is False
@@ -494,7 +494,7 @@ def _foreground_window_has_visible_payload() -> bool:
 
 class TestVisionAndWatcherPhase2:
     def test_foreground_app_info_backward_compatibility(self, monkeypatch):
-        from pet import vision
+        from petwisp import vision
         # mock foreground_window_info
         fake_info = {
             "hwnd": 12345,
@@ -514,13 +514,13 @@ class TestVisionAndWatcherPhase2:
 
     def test_get_system_idle_seconds_non_windows(self, monkeypatch):
         import sys
-        from pet import vision
+        from petwisp import vision
         monkeypatch.setattr(sys, "platform", "linux")
         assert vision.get_system_idle_seconds() == 0.0
 
     def test_watcher_lifecycle_and_conditions(self, tmp_path, monkeypatch):
         from PySide6.QtWidgets import QApplication
-        from pet.proactive import ProactiveScreenWatcher
+        from petwisp.proactive import ProactiveScreenWatcher
 
         app = QApplication.instance() or QApplication([])
 
@@ -582,7 +582,7 @@ class TestVisionAndWatcherPhase2:
         if not _foreground_window_has_visible_payload():
             pytest.skip("当前前台窗口不满足真调用前置条件（不可见/最小化/cloaked/无尺寸）"
                         "——该输入下返回 None 是契约本身，判别不了 shadow bug")
-        from pet import vision
+        from petwisp import vision
         info = vision.foreground_window_info()
         assert info is not None
         assert set(info.keys()) == {"hwnd", "pid", "process", "title", "rect"}
@@ -595,7 +595,7 @@ class TestVisionAndWatcherPhase2:
         import sys
         monkeypatch.setattr(sys, "platform", "win32")
         from PySide6.QtWidgets import QApplication
-        from pet.proactive import ProactiveScreenWatcher
+        from petwisp.proactive import ProactiveScreenWatcher
 
         app = QApplication.instance() or QApplication([])
 
@@ -620,7 +620,7 @@ class TestVisionAndWatcherPhase2:
         Signal(int) 会触发 libshiboken Overflow 导致值截断/投递失败，
         必须用 object 传参保证原值到达槽函数。"""
         from PySide6.QtWidgets import QApplication
-        from pet.proactive import ProactiveScreenWatcher
+        from petwisp.proactive import ProactiveScreenWatcher
 
         app = QApplication.instance() or QApplication([])
 
@@ -652,7 +652,7 @@ class TestVisionAndWatcherPhase2:
         import ctypes
         import types
 
-        from pet import vision
+        from petwisp import vision
         from PIL import Image
 
         # 创建一个 1000x1000 的虚拟屏幕
@@ -686,8 +686,8 @@ class TestVisionAndWatcherPhase2:
 
     def test_log_mode_does_not_consume_daily_quota(self, tmp_path, monkeypatch):
         from PySide6.QtWidgets import QApplication
-        from pet.proactive import ProactiveScreenWatcher
-        from pet import vision
+        from petwisp.proactive import ProactiveScreenWatcher
+        from petwisp import vision
         from PIL import Image
 
         app = QApplication.instance() or QApplication([])
@@ -723,11 +723,11 @@ class TestVisionAndWatcherPhase2:
         watcher._on_frame_ready(fake_img, "code.exe | test", 12345, 0x12345678)
 
         # 真实状态文件应当不存在
-        real_state_file = tmp_path / "dsh-pet-standalone" / "proactive_screen_state.json"
+        real_state_file = tmp_path / "petwisp" / "proactive_screen_state.json"
         assert not real_state_file.exists()
 
         # dry_run 状态文件已创建
-        dry_state_file = tmp_path / "dsh-pet-standalone" / "proactive_screen_dryrun_state.json"
+        dry_state_file = tmp_path / "petwisp" / "proactive_screen_dryrun_state.json"
         assert dry_state_file.exists()
 
         # 检查 dry_run limiter 状态，count 保持为 0（dry_run 下只记 attempt，不记真实 success）
@@ -737,7 +737,7 @@ class TestVisionAndWatcherPhase2:
 
     def test_physics_mode_blocks_watcher_tick(self, tmp_path, monkeypatch):
         from PySide6.QtWidgets import QApplication
-        from pet.proactive import ProactiveScreenWatcher
+        from petwisp.proactive import ProactiveScreenWatcher
 
         app = QApplication.instance() or QApplication([])
 
@@ -773,7 +773,7 @@ class TestVisionAndWatcherPhase2:
 # ============================================================================
 class TestPhase3VisionLinkAndDryRun:
     def test_ask_about_screen_and_post_vision_request_equivalence(self, tmp_path, monkeypatch):
-        from pet import vision
+        from petwisp import vision
         import json
 
         fake_resp = {
@@ -793,7 +793,7 @@ class TestPhase3VisionLinkAndDryRun:
 
         monkeypatch.setattr("urllib.request.urlopen", lambda *a, **kw: FakeResponse())
 
-        from pet.chat.models import ProviderConfig
+        from petwisp.chat.models import ProviderConfig
         p = ProviderConfig.from_dict("test", {"model": "deepseek-v4-flash", "api_key": "sk-123"})
 
         # 生成一张真实临时图
@@ -842,8 +842,8 @@ class TestPhase3VisionLinkAndDryRun:
         assert reason == "min_request_interval_cooldown"
 
     def test_provider_resolution_strategy(self, tmp_path):
-        from pet.proactive import ProactiveScreenWatcher
-        from pet.chat.models import ChatSettings, ProviderConfig
+        from petwisp.proactive import ProactiveScreenWatcher
+        from petwisp.chat.models import ChatSettings, ProviderConfig
 
         cfg = Config(base=tmp_path)
         win = None
@@ -867,7 +867,7 @@ class TestPhase3VisionLinkAndDryRun:
 
     def test_watcher_real_mode_vision_pipeline(self, tmp_path, monkeypatch):
         from PySide6.QtWidgets import QApplication
-        from pet.proactive import ProactiveScreenWatcher
+        from petwisp.proactive import ProactiveScreenWatcher
         from PIL import Image
 
         app = QApplication.instance() or QApplication([])
@@ -888,7 +888,7 @@ class TestPhase3VisionLinkAndDryRun:
                 bubbles.append(text)
 
         # mock vision._post_vision_request（模拟真实请求消耗一次预算）
-        from pet import vision
+        from petwisp import vision
 
         def _fake_post(jpeg_bytes, app_str, prompt, p, memory_context="", consume_budget=None, pet_name=""):
             if consume_budget is not None:
@@ -945,8 +945,8 @@ class TestPhase3VisionLinkAndDryRun:
 class TestPhase4UIAndMenuIntegration:
     def test_window_menu_proactive_and_agent_toggles(self, tmp_path, monkeypatch):
         from PySide6.QtWidgets import QApplication, QMessageBox
-        from pet.window import PetWindow
-        from pet.library import MovieLibrary
+        from petwisp.window import PetWindow
+        from petwisp.library import MovieLibrary
 
         app = QApplication.instance() or QApplication([])
 
@@ -957,7 +957,7 @@ class TestPhase4UIAndMenuIntegration:
         # mock QMessageBox 避免弹窗阻塞
         monkeypatch.setattr(QMessageBox, "question", lambda *a, **kw: QMessageBox.StandardButton.Yes)
         # 禁止测试写入真实 ~/.claude/settings.json（旧版曾污染真实配置，见终审记录）
-        from pet.agent_link import ClaudeCodeMonitor
+        from petwisp.agent_link import ClaudeCodeMonitor
         monkeypatch.setattr(ClaudeCodeMonitor, "install_hooks", lambda f: True)
 
         # 触发菜单事件中的开关逻辑
@@ -977,9 +977,9 @@ class TestPhase4UIAndMenuIntegration:
     def test_context_menu_proactive_build_no_name_error(self, tmp_path):
         """右键菜单（上游模板系统）构建不抛错，且包含主动识屏与 Agent 联动。"""
         from PySide6.QtWidgets import QApplication, QMenu
-        from pet.window import PetWindow
-        from pet.library import MovieLibrary
-        from pet.context_menu import populate_context_menu
+        from petwisp.window import PetWindow
+        from petwisp.library import MovieLibrary
+        from petwisp.context_menu import populate_context_menu
 
         app = QApplication.instance() or QApplication([])
 
@@ -1006,8 +1006,8 @@ class TestPhase4UIAndMenuIntegration:
     def test_enable_with_empty_whitelist_bubble_hint(self, tmp_path, monkeypatch):
         """测试 4a：白名单为空时开启主动识屏，应提示「白名单还是空的」气泡。"""
         from PySide6.QtWidgets import QApplication
-        from pet.window import PetWindow
-        from pet.library import MovieLibrary
+        from petwisp.window import PetWindow
+        from petwisp.library import MovieLibrary
 
         app = QApplication.instance() or QApplication([])
 
@@ -1029,8 +1029,8 @@ class TestPhase4UIAndMenuIntegration:
     def test_agent_link_toggle_bubble_notice(self, tmp_path, monkeypatch):
         """测试 4c：开启 Agent 联动应气泡提示「后续版本实装」。"""
         from PySide6.QtWidgets import QApplication
-        from pet.window import PetWindow
-        from pet.library import MovieLibrary
+        from petwisp.window import PetWindow
+        from petwisp.library import MovieLibrary
 
         app = QApplication.instance() or QApplication([])
 
@@ -1043,7 +1043,7 @@ class TestPhase4UIAndMenuIntegration:
 
         # DSH 开启需授权确认 + 安装桥接插件：mock 掉弹窗与真实 dsh CLI 调用
         from PySide6.QtWidgets import QMessageBox
-        from pet.agent_link import DshMonitor
+        from petwisp.agent_link import DshMonitor
         monkeypatch.setattr(QMessageBox, "question", lambda *a, **kw: QMessageBox.StandardButton.Yes)
         monkeypatch.setattr(DshMonitor, "install_bridge", classmethod(lambda cls: (True, "ok")))
         monkeypatch.setattr(DshMonitor, "uninstall_bridge", classmethod(lambda cls: None))
@@ -1067,7 +1067,7 @@ class TestPhase4UIAndMenuIntegration:
     def test_apply_config_non_windows_no_timer(self, tmp_path, monkeypatch):
         """测试 4d：非 Windows 平台即使 enabled=True 且白名单非空也不起动定时器。"""
         from PySide6.QtWidgets import QApplication
-        from pet.proactive import ProactiveScreenWatcher
+        from petwisp.proactive import ProactiveScreenWatcher
 
         app = QApplication.instance() or QApplication([])
 
@@ -1083,7 +1083,7 @@ class TestPhase4UIAndMenuIntegration:
                 return True
 
         # 仅作用于本次调用：替换 proactive 模块内的 sys 引用（不改全局 sys.platform）
-        monkeypatch.setattr("pet.proactive.sys", SimpleNamespace(platform="darwin"))
+        monkeypatch.setattr("petwisp.proactive.sys", SimpleNamespace(platform="darwin"))
 
         cfg = Config(base=tmp_path)
         cfg.set("proactive_screen", {"enabled": True, "whitelist": ["code.exe"]})
@@ -1097,7 +1097,7 @@ class TestPhase4UIAndMenuIntegration:
 # ============================================================================
 class TestPhase5ShortTermMemory:
     def test_classify_activity_branches(self):
-        from pet.proactive import classify_activity
+        from petwisp.proactive import classify_activity
 
         assert classify_activity("Code.exe", "main.py - VSCode") == "写代码"
         assert classify_activity("pycharm64.exe", "my_project") == "写代码"
@@ -1112,7 +1112,7 @@ class TestPhase5ShortTermMemory:
         assert classify_activity("cmd.exe", "命令提示符") == "在电脑前"
 
     def test_proactive_memory_persist_and_prune(self, tmp_path):
-        from pet.proactive import ProactiveMemory
+        from petwisp.proactive import ProactiveMemory
 
         mem_file = tmp_path / "memory.json"
         cur_time = [1000.0]
@@ -1146,7 +1146,7 @@ class TestPhase5ShortTermMemory:
 
     def test_memory_never_persists_window_title(self, tmp_path):
         """#206：docstring 与实现矛盾的收口——title 参数只作签名兼容，绝不落盘。"""
-        from pet.proactive import ProactiveMemory
+        from petwisp.proactive import ProactiveMemory
 
         mem = ProactiveMemory(tmp_path / "memory.json")
         mem.record("Code.exe", "工作汇报机密.docx - Word", "办公或看文档")
@@ -1159,7 +1159,7 @@ class TestPhase5ShortTermMemory:
 
     def test_memory_write_goes_through_atomic_replace_with_unique_tmp(self, tmp_path, monkeypatch):
         """#196：落盘必须 temp（名带 PID，多实例不抢同一临时文件）+ 原子替换。"""
-        from pet.proactive import memory as pm
+        from petwisp.proactive import memory as pm
 
         mem_file = tmp_path / "memory.json"
         mem = pm.ProactiveMemory(mem_file)
@@ -1184,7 +1184,7 @@ class TestPhase5ShortTermMemory:
 
     def test_memory_write_fsyncs_before_replace(self, tmp_path, monkeypatch):
         """#204：替换前必须 fsync——否则掉电/崩溃后 rename 已生效而内容还在页缓存。"""
-        from pet.proactive import memory as pm
+        from petwisp.proactive import memory as pm
 
         synced: list[int] = []
         real_fsync = os.fsync
@@ -1200,7 +1200,7 @@ class TestPhase5ShortTermMemory:
 
     def test_memory_write_failure_is_logged_not_swallowed(self, tmp_path, monkeypatch, caplog):
         """#196：写盘失败不得静默吞——记 warning，且旧内容完整保留、不留 .tmp。"""
-        from pet.proactive import memory as pm
+        from petwisp.proactive import memory as pm
 
         mem_file = tmp_path / "memory.json"
         old = {"entries": [{"ts": 1.0, "process": "old.exe", "activity": "上网"}]}
@@ -1221,7 +1221,7 @@ class TestPhase5ShortTermMemory:
 
     def test_memory_lock_is_shared_per_path_inside_process(self, tmp_path):
         """#196：同进程内同一路径共用一把锁——设置页清理与主动记录是两个实例。"""
-        from pet.proactive import memory as pm
+        from petwisp.proactive import memory as pm
 
         path = tmp_path / "memory.json"
         first = pm.ProactiveMemory(path)
@@ -1244,7 +1244,7 @@ class TestPhase5ShortTermMemory:
         """
         import threading
 
-        from pet.proactive import memory as pm
+        from petwisp.proactive import memory as pm
 
         mem_file = tmp_path / "memory.json"
         writers = [pm.ProactiveMemory(mem_file, max_entries=200) for _ in range(4)]
@@ -1292,7 +1292,7 @@ class TestPhase5ShortTermMemory:
         assert len(entries) == 40, f"4 线程 × 10 条不得丢写，实得 {len(entries)}"
 
     def test_build_memory_context(self):
-        from pet.proactive import build_memory_context
+        from petwisp.proactive import build_memory_context
 
         # 上次为空
         assert build_memory_context(None, "写代码") is None
@@ -1308,13 +1308,13 @@ class TestPhase5ShortTermMemory:
 
     def test_watcher_real_mode_memory_injection(self, tmp_path, monkeypatch):
         from PySide6.QtWidgets import QApplication
-        from pet.proactive import ProactiveScreenWatcher
+        from petwisp.proactive import ProactiveScreenWatcher
         from PIL import Image
 
         app = QApplication.instance() or QApplication([])
 
         recorded_contexts = []
-        from pet import vision
+        from petwisp import vision
 
         def _fake_post(jpeg_bytes, app_str, prompt, p, memory_context="", consume_budget=None, pet_name=""):
             recorded_contexts.append(memory_context)
@@ -1361,8 +1361,8 @@ class TestPhase5ShortTermMemory:
     def test_worker_vision_uses_character_alias_as_pet_name(self, tmp_path, monkeypatch):
         """主动识屏请求的身份提示用用户重命名后的别名，而不是默认角色名。"""
         from PySide6.QtWidgets import QApplication
-        from pet.proactive import ProactiveScreenWatcher
-        from pet import vision
+        from petwisp.proactive import ProactiveScreenWatcher
+        from petwisp import vision
 
         QApplication.instance() or QApplication([])
 
@@ -1397,7 +1397,7 @@ class TestPhase5ShortTermMemory:
 class TestUXFixesRound3:
     def test_cooldown_allows_half_minute_granularity(self):
         """冷却间隔支持 0.5 分钟粒度（用户反馈整分钟太粗）。"""
-        from pet.proactive import effective_proactive_config
+        from petwisp.proactive import effective_proactive_config
         cfg = effective_proactive_config({"preset": "custom", "cooldown_minutes": 2.5})
         assert cfg["cooldown_minutes"] == 2.5
         # 下限 clamp 到 0.5
@@ -1405,7 +1405,7 @@ class TestUXFixesRound3:
         assert cfg2["cooldown_minutes"] == 0.5
 
     def test_min_request_interval_exposed_and_clamped(self):
-        from pet.proactive import effective_proactive_config
+        from petwisp.proactive import effective_proactive_config
         cfg = effective_proactive_config({"preset": "custom", "min_request_interval_seconds": 45})
         assert cfg["min_request_interval_seconds"] == 45
         cfg2 = effective_proactive_config({"preset": "custom", "min_request_interval_seconds": 1})
@@ -1414,8 +1414,8 @@ class TestUXFixesRound3:
     def test_self_talk_yields_to_important_bubble(self, tmp_path):
         """重要气泡占用期间，自言自语必须让路。"""
         from PySide6.QtWidgets import QApplication
-        from pet.window import PetWindow
-        from pet.library import MovieLibrary
+        from petwisp.window import PetWindow
+        from petwisp.library import MovieLibrary
         import time
 
         app = QApplication.instance() or QApplication([])
@@ -1447,7 +1447,7 @@ class TestUXFixesRound3:
 
     def test_daily_cap_upper_relaxed(self):
         """每日上限取消 100 硬顶：用户自定义可达 9999。"""
-        from pet.proactive import effective_proactive_config
+        from petwisp.proactive import effective_proactive_config
         cfg = effective_proactive_config({"preset": "custom", "daily_cap": 500})
         assert cfg["daily_cap"] == 500
         cfg2 = effective_proactive_config({"preset": "custom", "daily_cap": 99999})
@@ -1456,7 +1456,7 @@ class TestUXFixesRound3:
     def test_stale_generation_frame_dropped(self, tmp_path, monkeypatch):
         """代次翻转（pause/关闭）后到达的迟到帧必须丢弃，不得发请求。"""
         from PySide6.QtWidgets import QApplication
-        from pet.proactive import ProactiveScreenWatcher
+        from petwisp.proactive import ProactiveScreenWatcher
         from PIL import Image
 
         app = QApplication.instance() or QApplication([])
@@ -1494,7 +1494,7 @@ class TestUXFixesRound3:
     def test_in_flight_request_blocks_new_dispatch(self, tmp_path, monkeypatch):
         """视觉请求在飞期间，心跳不得再派发新 pipeline。"""
         from PySide6.QtWidgets import QApplication
-        from pet.proactive import ProactiveScreenWatcher
+        from petwisp.proactive import ProactiveScreenWatcher
 
         app = QApplication.instance() or QApplication([])
 
@@ -1523,8 +1523,8 @@ class TestUXFixesRound3:
         """截图成功但后续 emit/dHash 抛异常时，worker_busy 必须释放，
         否则主动识屏永久卡死（gpt-5.6-sol 终审 #10 回归）。"""
         from PySide6.QtWidgets import QApplication
-        from pet.proactive import ProactiveScreenWatcher
-        from pet import vision
+        from petwisp.proactive import ProactiveScreenWatcher
+        from petwisp import vision
         from PIL import Image
 
         app = QApplication.instance() or QApplication([])
@@ -1545,7 +1545,7 @@ class TestUXFixesRound3:
 
         monkeypatch.setattr(vision, "foreground_window_info", lambda: {"hwnd": 1, "process": "a.exe", "title": "t", "rect": (0, 0, 100, 100)})
         monkeypatch.setattr(vision, "capture_window_rect", lambda r: Image.new("RGB", (10, 10)))
-        monkeypatch.setattr("pet.proactive.image_dhash", lambda img: (_ for _ in ()).throw(RuntimeError("boom")))
+        monkeypatch.setattr("petwisp.proactive.image_dhash", lambda img: (_ for _ in ()).throw(RuntimeError("boom")))
 
         watcher._worker_capture((0, 0, 100, 100), {"hwnd": 1, "process": "a.exe", "title": "t"}, {}, 0)
         assert watcher._worker_busy is False
@@ -1576,8 +1576,8 @@ class TestProactiveBudgetPerRequest:
     def test_vision_consumes_budget_each_attempt_and_model_access_retries_once(self, monkeypatch):
         """497 回归：模型访问失败最多重试 1 次；每一次真实 HTTP 请求前都消耗预算。"""
         import urllib.error
-        from pet import vision
-        from pet.chat.models import ProviderConfig
+        from petwisp import vision
+        from petwisp.chat.models import ProviderConfig
 
         attempts = []
         consumed = []
@@ -1603,8 +1603,8 @@ class TestProactiveBudgetPerRequest:
 
     def test_vision_budget_exhausted_stops_before_request(self, monkeypatch):
         """预算耗尽时必须停止，绝不再发起任何 HTTP 请求。"""
-        from pet import vision
-        from pet.chat.models import ProviderConfig
+        from petwisp import vision
+        from petwisp.chat.models import ProviderConfig
 
         calls = []
 

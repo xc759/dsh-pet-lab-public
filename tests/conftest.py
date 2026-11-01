@@ -30,7 +30,7 @@ import pytest
 # pytest 每个进程首扫插件打一条"Windows fatal exception"噪声——在 import 任何
 # 被测代码之前清掉（conftest 的 pytest 加载时机早于测试模块）。
 try:
-    from pet.qt_plugin_sanitizer import sanitize_plugin_path as _spp
+    from petwisp.qt_plugin_sanitizer import sanitize_plugin_path as _spp
 
     _spp()
 except Exception:  # 消毒失败不挡测试
@@ -40,7 +40,7 @@ except Exception:  # 消毒失败不挡测试
 @pytest.fixture
 def non_macos_overlay_topology(monkeypatch):
     """同 DPR 单窗算法族显式选择非 macOS，平台分支由 macOS 专项覆盖。"""
-    import pet.overlay_shell as overlay_mod
+    import petwisp.overlay_shell as overlay_mod
 
     monkeypatch.setattr(overlay_mod, "_IS_MACOS", False, raising=False)
 
@@ -65,7 +65,7 @@ def _mute_qt_audio(monkeypatch):
         # 测试如需验证音效逻辑，应像 test_click_sound 一样局部替换
         # click_sound._pool.qt_multimedia_classes 为假类。
         try:
-            from pet import click_sound as _click_sound_mod
+            from petwisp import click_sound as _click_sound_mod
         except Exception:
             return
         monkeypatch.setattr(_click_sound_mod._pool, "qt_multimedia_classes", lambda: None)
@@ -82,7 +82,7 @@ def _mute_winmm_audio(monkeypatch):
     （tests/test_winmm_sound.py 用 _new_winmm_pool / WinmmSoundPool(api=...)）。
     """
     try:
-        from pet import sound_winmm
+        from petwisp import sound_winmm
     except Exception:
         return
     monkeypatch.setattr(sound_winmm, "default_api", lambda: None)
@@ -95,7 +95,7 @@ def _reset_feature_activation_snapshot():
     期 5 全量曾因此 88 红）。每个用例前后都恢复到「未冻结 = 全激活」默认态；
     门控用例在测试体内自行 freeze_snapshot_for_tests。
     """
-    from pet import feature_activation as fa
+    from petwisp import feature_activation as fa
 
     fa.reset_snapshot_for_tests()
     yield
@@ -134,7 +134,7 @@ def _no_modal_save_failure_choice(monkeypatch):
     取产品真实构造的框。
     """
     try:
-        from pet import settings_close_flow
+        from petwisp import settings_close_flow
     except Exception:
         return
     monkeypatch.setattr(settings_close_flow, "confirm_discard_unsaved",
@@ -152,7 +152,7 @@ def _no_real_dsh_profile_write(monkeypatch):
     自检逻辑本身仍可测（用例自行注入 spawn，或直接调 refresh_stale_bridge_links）。
     """
     try:
-        from pet.agent_link import DshMonitor
+        from petwisp.agent_link import DshMonitor
     except Exception:
         return
     monkeypatch.setattr(
@@ -170,13 +170,13 @@ def _isolate_topology_config(tmp_path, monkeypatch):
     的断言在这种机器上变红，而 CI 上永远绿——测试失去意义。故把目录解析这一层
     钉到 ``tmp_path``（空目录 ⇒ 配置缺失 ⇒ 默认 overlay），并清掉快照缓存。
 
-    钉的是 ``overlay_settings_command`` 复用的那个 seam（``pet.config._default_base``
+    钉的是 ``overlay_settings_command`` 复用的那个 seam（``petwisp.config._default_base``
     经本模块的模块级绑定），所以用例仍可自行覆盖：测试体内再
     ``monkeypatch.setattr(cmd, "_default_base", ...)`` 或直接替换
     ``cmd.topology_config_path``（后打的补丁生效）。
     """
     try:
-        from pet import overlay_settings_command as cmd_mod
+        from petwisp import overlay_settings_command as cmd_mod
     except Exception:
         return
     monkeypatch.setattr(cmd_mod, "_default_base", lambda: tmp_path)
@@ -191,7 +191,7 @@ def _close_session_writers():
     避免守护线程在 tmp_path 已清理后继续写盘（WinError 145 之类的 teardown 竞态）。"""
     yield
     try:
-        from pet.chat import session_store
+        from petwisp.chat import session_store
         session_store.reset_writers_for_tests()
     except Exception:
         pass
@@ -209,14 +209,14 @@ def _clear_click_sound_pool():
     """
     yield
     try:
-        from pet import click_sound
+        from petwisp import click_sound
         click_sound._pool.clear()
         click_sound._reset_caches_for_tests()
     except Exception:
         pass
     # 用例可能自建 winmm 池（替身后端也持句柄/可选 timer）：一并收口。
     try:
-        from pet import sound_winmm
+        from petwisp import sound_winmm
         sound_winmm._clear_live_pools_for_tests()
     except Exception:
         pass
@@ -234,8 +234,8 @@ def drop_stale_chime_quiet_listeners() -> None:
     订阅方管（产品侧 ``stop()`` 才摘），所以残留只能在测试边界上由收口手段清。
     """
     try:
-        from pet import quiet_mode
-        from pet.voice.chime_service import VoiceChimeService
+        from petwisp import quiet_mode
+        from petwisp.voice.chime_service import VoiceChimeService
     except Exception:
         return
     try:
@@ -276,7 +276,7 @@ def _no_filesystem_player_scan(monkeypatch):
     随套件进度漂移。需要真实扫描语义的用例自行 monkeypatch
     （test_music_player_cache.py 全部用例自带打桩，不受影响）。
     """
-    from pet.music import players as music_players
+    from petwisp.music import players as music_players
 
     monkeypatch.setattr(music_players, "_search", lambda key: None)
     yield
@@ -289,21 +289,21 @@ def _close_qt_top_level_widgets():
     # 内存取证（DSPET_MEM_DEBUG）是进程级开关 + 常驻 ticker 线程：用例打开后
     # 不复位会让后续用例凭空多一条 60s 日志线（且 reader 登记表跨用例残留）。
     try:
-        from pet import mem_debug as _mem_debug_mod
+        from petwisp import mem_debug as _mem_debug_mod
         _mem_debug_mod._reset_for_tests()
     except Exception:
         pass
     # 免打扰是**进程级单例**（issue #208）：某个用例开启后不复位，后续用例会
     # 凭空进入"普通提醒被拦下"的状态，失败点离真因很远。
     try:
-        from pet.quiet_mode import reset_shared_quiet_state
+        from petwisp.quiet_mode import reset_shared_quiet_state
         reset_shared_quiet_state()
     except Exception:
         pass
     # webm_clip 的「会话结束」闸门是进程级 latch（issue #111）：测试里置位后
     # 不复位会让后续用例静默拒绝一切 reader 启动（报错点离真因很远）。
     try:
-        from pet import webm_clip as _webm_clip_mod
+        from petwisp import webm_clip as _webm_clip_mod
         _webm_clip_mod._reset_session_ending_for_tests()
         # 首帧**跨库共享表**持有 QImage 强引用（同进程多库共用的首帧）：不逐用例
         # 清空会让上一个用例的首帧常驻到预算耗尽（内存噪声 + 命中计数被前序用例
@@ -314,7 +314,7 @@ def _close_qt_top_level_widgets():
     # collision IPC：4.4b 随多进程多宠退役层删除——collision_ipc 会话不再存在，
     # 对应的 `_stop_live_sessions_for_tests` 收口一并移除。
     try:
-        from pet.agent_link import AgentLinkManager, BaseAgentMonitor
+        from petwisp.agent_link import AgentLinkManager, BaseAgentMonitor
         AgentLinkManager._shutdown_live_for_tests()
         BaseAgentMonitor._shutdown_live_for_tests()
     except Exception:
@@ -325,17 +325,17 @@ def _close_qt_top_level_widgets():
     # flag_on 族逐用例单独跑亦复现，崩溃点 "Garbage-collecting / no Python
     # frame"）。按同族防线逐对象停表 + 过继 QApplication。
     try:
-        from pet.multi_window_shared import SharedSubsystems
+        from petwisp.multi_window_shared import SharedSubsystems
         SharedSubsystems._shutdown_live_for_tests()
     except Exception:
         pass
     try:
-        from pet.app import AppShell
+        from petwisp.app import AppShell
         AppShell._shutdown_live_for_tests()
     except Exception:
         pass
     try:
-        from pet.library import MovieLibrary
+        from petwisp.library import MovieLibrary
         MovieLibrary._shutdown_live_for_tests()
     except Exception:
         pass
@@ -344,7 +344,7 @@ def _close_qt_top_level_widgets():
     # 拆除就是原生段错误（macOS CI 3/3 同点复现 + Windows 本地 2/12 退出崩；
     # 崩点随套件进度漂移，与本防线的既有记录同族）。
     try:
-        from pet.overlay_shell import OverlayShell
+        from petwisp.overlay_shell import OverlayShell
         OverlayShell._shutdown_live_for_tests()
     except Exception:
         pass
@@ -408,7 +408,7 @@ def _close_webm_readers_at_session_end():
 
     logger = logging.getLogger("pytest.conftest.webm")
     try:
-        from pet import webm_clip as webm_clip_mod
+        from petwisp import webm_clip as webm_clip_mod
 
         registry = webm_clip_mod._ORPHAN_REGISTRY
 
@@ -446,7 +446,7 @@ def _close_webm_readers_at_session_end():
     # 保证无论哪个用例置位过都不会串到后续用例（那会让 reader 静默拒绝启动，
     # 报错点离真因很远）。
     try:
-        from pet import webm_clip as _webm_clip_mod
+        from petwisp import webm_clip as _webm_clip_mod
         _webm_clip_mod._reset_session_ending_for_tests()
     except Exception:
         pass

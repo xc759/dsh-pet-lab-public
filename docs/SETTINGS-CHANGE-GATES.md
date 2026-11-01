@@ -86,7 +86,7 @@ recovery
 ### 2026-10-21 — 新增一级域「功能」（功能模块启用/停用卡片，staged 语义）
 
 本刀**新增 1 个一级能力域与 1 个持久设置的可见入口**（`feature_activation` 键与迁移
-语义在期 1 地基里已就位：`pet/features.py` 清单、`pet/feature_activation.py` 快照/
+语义在期 1 地基里已就位：`petwisp/features.py` 清单、`petwisp/feature_activation.py` 快照/
 待生效分层，本刀不改它们的 API）；不改任何既有键的默认值、归属与保存语义。
 设计稿：`feature-modules` SPEC（§2 架构、§5.2 设置层、§9 已拍决策：侧栏新域
 「功能」放「桌面组件」之后 + 「推荐套件」一键勾选）。
@@ -159,7 +159,7 @@ recovery
 | 必填判据 | 必须含至少一个修饰键（Ctrl/Alt/Shift/Win）：无修饰的系统级热键会抢走普通打字 |
 | 独占失败 | Windows 全局热键表是独占的；`RegisterHotKey` 失败记 warning 并让该项不生效，不假装成功 |
 | 平台 | 只有 Windows 能注册；其它平台设置项照常可见可存，但不注册（`hotkeys.is_supported()`） |
-| 实现面 | 新增 `pet/hotkey_spec.py`（纯文本口径）/ `pet/hotkeys.py`（Win32 注册 + `WM_HOTKEY` 分发）/ `pet/settings_hotkeys.py`（三行）；`pet/platform_win.py` 加两个 ctypes 封装；`pet/app.py` 三处接线（启动装、外部配置变更重注册、退出注销） |
+| 实现面 | 新增 `petwisp/hotkey_spec.py`（纯文本口径）/ `petwisp/hotkeys.py`（Win32 注册 + `WM_HOTKEY` 分发）/ `petwisp/settings_hotkeys.py`（三行）；`petwisp/platform_win.py` 加两个 ctypes 封装；`petwisp/app.py` 三处接线（启动装、外部配置变更重注册、退出注销） |
 
 不复制动作实现：三个回调分别落到右键菜单同一条入口（`PetInstance.open_chat` /
 `OverlayShell.look_at_screen` / `OverlayShell.on_screen_capture`）。
@@ -170,7 +170,7 @@ recovery
 
 | 项 | 内容 |
 |---|---|
-| 标签改名 | `pet/settings_interaction.py` 的 `TAB_LABELS` 第四项由「抽签」改为「**趣味**」。理由：她 2026-10-15 的归类要求是「抽签这个功能…归类为趣味」。**卡片/分组名仍是「抽签」** |
+| 标签改名 | `petwisp/settings_interaction.py` 的 `TAB_LABELS` 第四项由「抽签」改为「**趣味**」。理由：她 2026-10-15 的归类要求是「抽签这个功能…归类为趣味」。**卡片/分组名仍是「抽签」** |
 | 为什么不复开一级域 | 本文 2026-10-17 的首条记录已判【趣味】一级域不合格（新域须 ≥2 稳组、且为塞第 11 个域压缩侧栏间距会损害所有域的点击目标）。**标签名与容器层级是两件事**：改名不必重新过一级域准入 |
 | 新增机器守卫 | `tests/test_settings_sidebar_and_chrome.py::test_new_top_level_domain_must_own_at_least_two_setting_groups`：逐域数 `SettingsSection`，**新增**一级域 <2 组即红；现存单组域（`文件识别`、`更新`）走快照豁免，并反向钉住"它们仍是 1 组" |
 | 守卫有效性 | 按「旧红新绿」自证：临时把快照里的「更新」移出 → **1 failed**；恢复 → **1 passed** |
@@ -186,8 +186,8 @@ recovery
 
 | 项 | 本刀口径 |
 |---|---|
-| setting_id / 行键 | `todo_reminder_speak`（行键与配置键同名，`pet/config.py::Config._initial_data`） |
-| 归属 | 「自动化与联动」域 →「待办提醒」组第三行（排在总开关、提前量之后）。面板 `pet/todo_panel.py` **不复制控件**，底部深链文案补上「语音播报」 |
+| setting_id / 行键 | `todo_reminder_speak`（行键与配置键同名，`petwisp/config.py::Config._initial_data`） |
+| 归属 | 「自动化与联动」域 →「待办提醒」组第三行（排在总开关、提前量之后）。面板 `petwisp/todo_panel.py` **不复制控件**，底部深链文案补上「语音播报」 |
 | 标题 / 说明 | 「语音播报」/「到点时把提醒念出来；音色 / 语速 / 音量与「语音报时」共用同一套（设置 → 语音），本项只控制开与关。免打扰期间不出声，也不在结束后补播。」 |
 | default | `False`（**关**）。主动打扰型能力默认关，与 `voice_chime_enabled` / `festival_reminder_speak` 同口径；关着时用户可见行为与改动前逐字相同 |
 | 保存时机 / commit_policy | `immediate`（随设置窗关闭的既有 `_write_config` 写回，不新增写盘路径）；保存后 `AppShell._sync_chime_service()` 使音频通道路由即刻生效，无需重启 |
@@ -230,8 +230,8 @@ recovery
 
 | 项 | 本刀口径 |
 |---|---|
-| 被修的口径 | 2026-10-16 的 #289 把 `already-exists` 支改成"**不清源**"（源每宠键原样保留、登记在 `retained_keys`）。实测该口径**在盘上不成立**：`Config.save()` 对全局身份**无条件** `pop(PER_PET_KEYS \| SLOT_LOCAL_KEYS)`（`pet/config.py:2328`），下一次保存就把源里那批键抹掉——`retained_keys` 描述的是"保留"，用户拿到的是空配置（已用真 `Config.save()` 跑通复现）。而全局配置 + 槽档案同时装每宠值 = 规范禁止的**双真值** |
-| 回正为 | `created` 与 `already-exists` **都清源每宠键**（全局 `config.json` 不留每宠键，只有一条规则）；`already-exists` 照旧**绝不写目标**（锁内复查 + `test_slot0_migration_never_overwrites_existing_profile` 逐字节钉死）。与 2026-10-10 那条"验证既有目标后清源"一致，也就是**回到 main 的既有口径**——`origin/main`（`056dc2a`）的 `pet/pet_profiles.py` 与合并基 `6a68570` 逐字节相同，"不清源"只是这个 PR 自己的改动 |
+| 被修的口径 | 2026-10-16 的 #289 把 `already-exists` 支改成"**不清源**"（源每宠键原样保留、登记在 `retained_keys`）。实测该口径**在盘上不成立**：`Config.save()` 对全局身份**无条件** `pop(PER_PET_KEYS \| SLOT_LOCAL_KEYS)`（`petwisp/config.py:2328`），下一次保存就把源里那批键抹掉——`retained_keys` 描述的是"保留"，用户拿到的是空配置（已用真 `Config.save()` 跑通复现）。而全局配置 + 槽档案同时装每宠值 = 规范禁止的**双真值** |
+| 回正为 | `created` 与 `already-exists` **都清源每宠键**（全局 `config.json` 不留每宠键，只有一条规则）；`already-exists` 照旧**绝不写目标**（锁内复查 + `test_slot0_migration_never_overwrites_existing_profile` 逐字节钉死）。与 2026-10-10 那条"验证既有目标后清源"一致，也就是**回到 main 的既有口径**——`origin/main`（`056dc2a`）的 `petwisp/pet_profiles.py` 与合并基 `6a68570` 逐字节相同，"不清源"只是这个 PR 自己的改动 |
 | 不丢数据由谁承担 | **备份**。`_backup_file` 在这条支路之前跑（`config.json.pre-slot0-migration.bak`，已存在则保留第一份、不覆盖）。清理前再验一次"这份备份**装的就是即将被清掉的那批值**"（`_backup_holds_values`，值逐条相等——比"键在不在"强）；若规范备份路径已被**另一份快照**占用（旧快照也能过键存在性校验），**不覆盖它**，另存时间戳恢复副本 `config.json.pre-slot0-migration-recovery-<毫秒>-<pid>.bak`，结果走新增字段 `recovery_path`。取不到恢复副本就**不清源**并返回 `backup-failed`——宁可不做，也不做不可恢复的删除 |
 | 相对 main 的净增量 | **只有上面"恢复保证"那半边**（清源口径与 main 一致）。实测对照：同一现场跑在 `origin/main` 上，`already-exists` 同样清源、同样不覆盖旧备份，但**没有恢复副本**（连 `recovery_path` 字段都不存在）⇒ 规范备份被旧快照占用时当前每宠键**真丢 6 个**；本刀把这条路堵上 |
 | 可诊断 | `already-exists` 结果：`retained_keys` = 未采用的源每宠键、`reason` 点名备份/副本文件名、另有一条 WARNING 写明路径与键名 |
@@ -247,7 +247,7 @@ recovery
    取不到副本就不清源且目标不动）；消融（撤掉产品改动）**4 failed**，先红后绿在案。
 3. **布局与可访问性**：不适用——本刀无 UI 改动（不新增/移动/删除任何设置行）。
 4. **跨平台**：无平台分支（判据是文件与值，与平台无关）；验证仅本机 Windows。
-5. **视觉与文档**：本记录即变更记录；同步改了 `pet/pet_profiles.py` 的模块头与函数
+5. **视觉与文档**：本记录即变更记录；同步改了 `petwisp/pet_profiles.py` 的模块头与函数
    docstring（清理口径、`retained_keys`/`recovery_path` 语义）、
    `PR-REPORT-ZERO-PET-NOTICE-AND-SLOT0-MIGRATION-2026-10-16.md` §九（原报告 §二/§三 的"不清源"表述已更正）
    与 `docs/INDEX.md` 对应行。
@@ -259,7 +259,7 @@ recovery
 
 | 项 | 本刀口径 |
 |---|---|
-| setting_id / 行键 | `cross_screen`（配置键 `allow_cross_screen`，`pet/config.py::Config._initial_data`） |
+| setting_id / 行键 | `cross_screen`（配置键 `allow_cross_screen`，`petwisp/config.py::Config._initial_data`） |
 | 归属 | 常规域（`settings`）→「窗口与系统」组，排在窗口旗标类（置顶 / 全屏隐藏 / 光标穿透 / 直播捕获）之后 |
 | 标题 / 说明 | 「允许桌宠跨屏」/ `settings_pet_controls.CROSS_SCREEN_HINT`：开启后每块有桌宠的显示器各开一张窗口、可以拖到别的显示器上；关闭时全部宠只留在启动那块屏、拖不过去也不会多开窗口；**各宠原来记着的屏不会被清掉**，重新开启后仍回到各自那块屏；**重启后生效**。文案末尾逐字带 `GLOBAL_SCOPE_NOTE`，由 `SettingRow.set_scope_note` 削进行内标注（说明表仍是唯一来源），搜索索引与 `accessibleDescription` 都保留全文 |
 | default | `False`（**关**）。关 = 单显示器口径与旧行为逐位相同：一张窗、一组控制器、拖不过缝 |
@@ -417,7 +417,7 @@ recovery
 | 项 | 本刀口径 |
 |---|---|
 | 权限模型 | 用户在设置页点「授予采集权限…」→ 系统弹**一次**管理员授权窗口 → 以管理员身份执行 `Add-LocalGroupMember -SID S-1-5-32-559`，把**当前账户**加入 `Performance Log Users`。桌宠本体始终普通权限：**不常驻提权进程、不装服务、不改注册表** |
-| 实现 | `pet/fps_permission.py`：按 SID 定位组（与系统语言无关）；**当前用户身份取自进程令牌**（`GetTokenInformation(TokenUser)` 的 SID，不信 `USERNAME`/`USERDOMAIN` 环境变量），SID 过严格正则（只含数字与连字符）才进脚本，脚本里不出现任何用户可控文本；两层 PowerShell 都用 `GetSystemDirectoryW` 下的绝对路径；内外两层走 `-EncodedCommand`；管理员脚本自带执行期限（等待上限前 10 秒），超时后才批准的 UAC 不加组；已是成员视为成功（幂等）；只有原生 `ERROR_CANCELLED` 才算 `cancelled`，其余启动失败单独报错 |
+| 实现 | `petwisp/fps_permission.py`：按 SID 定位组（与系统语言无关）；**当前用户身份取自进程令牌**（`GetTokenInformation(TokenUser)` 的 SID，不信 `USERNAME`/`USERDOMAIN` 环境变量），SID 过严格正则（只含数字与连字符）才进脚本，脚本里不出现任何用户可控文本；两层 PowerShell 都用 `GetSystemDirectoryW` 下的绝对路径；内外两层走 `-EncodedCommand`；管理员脚本自带执行期限（等待上限前 10 秒），超时后才批准的 UAC 不加组；已是成员视为成功（幂等）；只有原生 `ERROR_CANCELLED` 才算 `cancelled`，其余启动失败单独报错 |
 | 设置行 | 灵动岛页帧率段下一行 `game_fps_permission`（**仅 Windows 创建**，跟随帧率开关显隐）。**没有配置键、不写盘**；状态用进程内 API 现查（`CheckTokenMembership` 只认**已启用**的组；`NetLocalGroupGetMembers` 按 SID 查账户实际组成员关系；不起子进程，不卡设置页）。授权任务是设置进程内的后台线程（同一时刻只跑一个），GUI 用挂在对话框上的 `QTimer` 轮询回填。**设置页默认是独立进程**：关掉设置页即结束等待线程（已拉起的 UAC/管理员进程不受影响），重开后以账户实际组成员关系判「待重新登录」，不靠内存；加组幂等，重复授权无副作用 |
 | 状态口径 | 三态：已具备（当前令牌含该组）／已授权待重新登录（账户已在组里，跨设置进程判得出，但组成员关系只进**新登录令牌**）／未授权。**不把"已加入"说成"已能采集"** |
 | 哪些路径不许弹授权窗口 | 只有用户点那个按钮才弹；开关、开机恢复、切目标、重试一律不弹。权限类采集失败仍是终态不自动重试 |
@@ -438,7 +438,7 @@ recovery
 | 哪些路径不许弹 UAC | 开关、开机恢复、切游戏目标、隐藏/显示、暂停恢复、重试退避**一律不弹**；只有用户点那一个操作才弹。用户在 UAC 上点"否"= 取消，**不重试、不循环弹窗**，等待再次点击 |
 | 依赖与恢复 | 未授权时 `session_factory` 抛异常、卡片写**「需要授权」**（不摆假数字、不显示 0）；权限类失败仍是**终态不自动重试**。已经在 `Performance Log Users` 组里、普通权限就能采的机器**不经 UAC**（不强制提权） |
 | 必须如实说的常驻事实 | 授权期间助手是**一个常驻进程**（暂停采集时也在，只停 ETW 与后端）。设置页文案**不许**写"零开销 / 零进程" |
-| 代码状态（**接线已完成 ≠ 权限已验证**） | 传输层（`pet/fps_elevation_transport.py`：授权控制器 / 状态 / 取消 / 去重 / 会话适配）与请求线（`pet/fps_authorization.py`：主进程 `QLocalServer` 服务 + 设置进程异步客户端 + 主进程真确认框 + "已授权才走提权助手"的分发）都已实现并有独立测试；**设置页接线已完成**——灵动岛页帧率段下两行：只读状态行 `game_fps_authorization` + 动作行 `game_fps_authorize`（按钮「授权本次采集…」），点它只向主进程发一条本机请求、由**主进程**弹确认框，状态每 2 秒轮询一次且**只在帧率段开着时**跑。**两行不是设置项**：没有配置键、不写盘，"不持久化已获权限"因此在设置面也成立。指标行那句"首次使用可能需要在系统里授予相应权限"**保留**——普通权限机器（已在 `Performance Log Users` 组里）本来就照常出读数、不必授权。**仍未验**：真实 UAC 提权、真实 ETW 会话、任何真实帧读数（本机从未执行过 `runas`）。取证见 `PR-REPORT-GAME-FPS-2026-10-11.md` §十 |
+| 代码状态（**接线已完成 ≠ 权限已验证**） | 传输层（`petwisp/fps_elevation_transport.py`：授权控制器 / 状态 / 取消 / 去重 / 会话适配）与请求线（`petwisp/fps_authorization.py`：主进程 `QLocalServer` 服务 + 设置进程异步客户端 + 主进程真确认框 + "已授权才走提权助手"的分发）都已实现并有独立测试；**设置页接线已完成**——灵动岛页帧率段下两行：只读状态行 `game_fps_authorization` + 动作行 `game_fps_authorize`（按钮「授权本次采集…」），点它只向主进程发一条本机请求、由**主进程**弹确认框，状态每 2 秒轮询一次且**只在帧率段开着时**跑。**两行不是设置项**：没有配置键、不写盘，"不持久化已获权限"因此在设置面也成立。指标行那句"首次使用可能需要在系统里授予相应权限"**保留**——普通权限机器（已在 `Performance Log Users` 组里）本来就照常出读数、不必授权。**仍未验**：真实 UAC 提权、真实 ETW 会话、任何真实帧读数（本机从未执行过 `runas`）。取证见 `PR-REPORT-GAME-FPS-2026-10-11.md` §十 |
 | 边界 | 助手是本地构建的**未签名**候选（UAC 显示未知发布者）；**真实 UAC 提权、ETW 采集与任何真实帧读数本机均未验证**。打包侧三道校验与这一处边界见 [`ONEDIR_PACKAGING.md`](ONEDIR_PACKAGING.md)「按需 UAC 采集助手」、`PR-REPORT-GAME-FPS-2026-10-11.md` §九 |
 
 ### 2026-10-11 — 游戏帧率段：`island_metrics` 新增 `fps` 成员 + 2 个进程级目标键
@@ -483,7 +483,7 @@ recovery
 5. **视觉与文档**：本记录即变更记录；`ONEDIR_PACKAGING.md`（后端随包与两道构建门）、
    `THIRD_PARTY_NOTICES.md` 第 6 节（MIT 许可随包）、`docs/INDEX.md` 与
    `docs/PR-REPORT-GAME-FPS-2026-10-11.md`（本次交付证据）同步；`CONTEXT.md`
-   无新概念需要登记（"Present 帧率"的口径写在 `pet/game_fps.py` 与设置页文案里）。
+   无新概念需要登记（"Present 帧率"的口径写在 `petwisp/game_fps.py` 与设置页文案里）。
 
 ### 2026-10-10 — 终审修复批：全局 reset 入口 / 开机自启权限 / 死开关退役
 
@@ -494,10 +494,10 @@ recovery
 |---|---|
 | 全局 reset 无 UI 可达 | 设置页所有产品入口都带 `--instance slot-N`（含 slot0），侧栏原先只有一个「恢复默认设置…」按钮 → 走 `SlotRoutedConfig.reset_to_defaults`（本宠），而**已经在实现里活着的全局 reset 在产品 UI 上完全不可达**（只有手工命令行 `--settings` 能到）。修法：slot 页侧栏给出**两个动作**——「恢复默认设置…」（本宠，原按钮与文案逐字不变）与新增「恢复全局默认…」；全局动作落在 `settings_slot_config.global_config_of(config)`（= 路由视图背后的那份 `config.json`，显式全局身份，**不新建第三个 Config 实例**），文案复用既有的 `RESET_HEADLINE / RESET_KEPT / RESET_BODY`。作用域由 `resolve_reset_scope(host, scope)` 显式传递（缺省仍按配置面判，兼容既有调用面） |
 | 「开机自启」在 slot0/子宠页被误禁 | 旧判据 `if config.instance_id` 在 slot0 拿到显式身份（`slot-0`）后把**主宠自己的页面**也禁掉，tooltip 还写「仅主桌宠可设置」→ 指向用户正站着的地方。修法：判据退场，控件在任意宠的页面都可编辑，tooltip 与行说明改为一句话讲清作用域（「影响所有桌宠：系统登录项只有一份。」/行 hint「（影响所有桌宠）」）。`sync_system_autostart` 只在**全局**作用域收敛 OS 登录项（本宠作用域一个全局键都没重置，去写 OS 就是把用户没改过的登录项改掉） |
-| 「一键退出子肥鱼」静默 no-op | 这是**全局**动作，但写者按身份字符串真值回填 target：slot0 的 `slot-0` → `target=0`，而两个消费者都把非 `None` target 当**子槽**去 `_spawned` 里找（主 sprite 不在其中）→ 点了没反应。修法：新增 `settings_slot_config.is_main_identity(instance_id)`（判据 = slot 号，与 `app.py` 的 `slot_id in (None, 0)` 同源），主身份 → `target=None`（全部）、子宠 → 该子槽；按钮的 enable 判据同源（主宠页可用，子宠页置灰 + 指向托盘的真实可达提示） |
-| 死开关退役 | `spawn_inherit_dynamic_island`（「生小肥鱼继承灵动岛」）在设置页可编辑、写主配置，但**唯一行为读点** `slot_manager.seed_slot_config_from_main` 生产 0 调用点，新 spawn 只拷 `PER_PET_SETTING_KEYS`（不含该键），岛本身是进程级单例读主配置 → 开关两态在运行期没有任何差别。整块退役：控件创建、设置行、保存写回、域 claim 四处一并删除；**键本身的清洗/出厂默认保留**（旧键按迁移纪律读入即弃，不新增第三份真值，`Config` 一处未动） |
-| 文案与实现相反 | 「一键退出子肥鱼」行说明写「并删除它们的配置、会话与待办数据」，实现保留（`_remove_spawned_sprite` / `clear_spawned_pets` 只出活跃清单）→ 改为「它们的档案、设置、会话与待办数据全部保留，随时可以再生成」；「播放速率」行写「控制所有桌宠动画的播放速度」，而 `playback_speed` 在 `PER_PET_SETTING_KEYS` 内且不在窗口级集合里 → 改为每宠口径 |
-| 设置进程消费端 | 两个消费者（`overlay_shell._consume_settings_command`、`app._consume_settings_command`）语义**不改**：`target=None` 本就是"全部子肥鱼"。捕获模式下静默无效是**有意行为**（legacy 拓扑没有子宠可退，见 `PR-REPORT-STREAM-CAPTURE-PHASE-A-2026-10-07.md`），本刀未动 |
+| 「一键退出子宠」静默 no-op | 这是**全局**动作，但写者按身份字符串真值回填 target：slot0 的 `slot-0` → `target=0`，而两个消费者都把非 `None` target 当**子槽**去 `_spawned` 里找（主 sprite 不在其中）→ 点了没反应。修法：新增 `settings_slot_config.is_main_identity(instance_id)`（判据 = slot 号，与 `app.py` 的 `slot_id in (None, 0)` 同源），主身份 → `target=None`（全部）、子宠 → 该子槽；按钮的 enable 判据同源（主宠页可用，子宠页置灰 + 指向托盘的真实可达提示） |
+| 死开关退役 | `spawn_inherit_dynamic_island`（「生小宠继承灵动岛」）在设置页可编辑、写主配置，但**唯一行为读点** `slot_manager.seed_slot_config_from_main` 生产 0 调用点，新 spawn 只拷 `PER_PET_SETTING_KEYS`（不含该键），岛本身是进程级单例读主配置 → 开关两态在运行期没有任何差别。整块退役：控件创建、设置行、保存写回、域 claim 四处一并删除；**键本身的清洗/出厂默认保留**（旧键按迁移纪律读入即弃，不新增第三份真值，`Config` 一处未动） |
+| 文案与实现相反 | 「一键退出子宠」行说明写「并删除它们的配置、会话与待办数据」，实现保留（`_remove_spawned_sprite` / `clear_spawned_pets` 只出活跃清单）→ 改为「它们的档案、设置、会话与待办数据全部保留，随时可以再生成」；「播放速率」行写「控制所有桌宠动画的播放速度」，而 `playback_speed` 在 `PER_PET_SETTING_KEYS` 内且不在窗口级集合里 → 改为每宠口径 |
+| 设置进程消费端 | 两个消费者（`overlay_shell._consume_settings_command`、`app._consume_settings_command`）语义**不改**：`target=None` 本就是"全部子宠"。捕获模式下静默无效是**有意行为**（legacy 拓扑没有子宠可退，见 `PR-REPORT-STREAM-CAPTURE-PHASE-A-2026-10-07.md`），本刀未动 |
 
 准出对应：
 
@@ -524,7 +524,7 @@ recovery
   同一个 `SettingRow` 装配、同一个「灵动岛指标 ·」前缀、同一套 island_on × info_on 门）。
   勾选/保存仍写同一个 `island_metrics` 列表，顺序规则不变（已有且仍勾的按原序在前，
   新勾的按典范序追尾；典范序 = 内置段 + 组件按清单扫描序）。
-- **准入的真源是声明清单**（`pet/island_extension_host.py` 读出的静态 JSON metadata），
+- **准入的真源是声明清单**（`petwisp/island_extension_host.py` 读出的静态 JSON metadata），
   **不是运行期注册表**：主进程与独立设置进程读同一份，所以"设置进程保存一次就把用户的
   组件偏好清掉"这类跨进程分歧不可能发生（准入不看"谁在本进程注册过"）。
 - **行只读静态 metadata**：设置页不 import 任何组件代码（provider），所以组件是"暂缺
@@ -558,7 +558,7 @@ recovery
 | 项 | 本刀口径 |
 |---|---|
 | 问题 | overlay 拓扑下右键子宠 → 桌宠设置跑在独立设置进程里（`--instance slot-N` → 读写 `config-slot-N.json`），而运行期只有 `PER_SLOT_SETTING_KEYS` 的键逐宠取源（`overlay_shell._SpriteConfig.get`），**其余键一律读主配置**。于是子宠页上「语音报时 / 节日 / 待办 / 灵动岛 / 菜单外观 / 窗口级 7 键 …」约百行：保存成功、回显正确、运行期零效果。窗口级 7 行还标着「（对所有桌宠生效）」——实际对所有桌宠都不生效 |
-| 修法 | 设置进程的配置面按 key 分流（新增 `pet/settings_slot_config.py`）：分流键 → slot 文件，写走既有 `overlay_spawn_state.write_slot_setting` 的原子单键写（保留 `user_customized` 语义）；其余键 → 主 `config.json`，落盘遵守 **reload → set → save**（`Config.save` 是整表写，不先重读会盖回主进程/托盘的并发改动）。装配点是 `ModernSettingsDialog.__init__` 的配置入口（控件从配置构造，路由必须在构造前就位，否则初值仍来自 slot 文件的无效快照） |
+| 修法 | 设置进程的配置面按 key 分流（新增 `petwisp/settings_slot_config.py`）：分流键 → slot 文件，写走既有 `overlay_spawn_state.write_slot_setting` 的原子单键写（保留 `user_customized` 语义）；其余键 → 主 `config.json`，落盘遵守 **reload → set → save**（`Config.save` 是整表写，不先重读会盖回主进程/托盘的并发改动）。装配点是 `ModernSettingsDialog.__init__` 的配置入口（控件从配置构造，路由必须在构造前就位，否则初值仍来自 slot 文件的无效快照） |
 | 分流范围 | 仅 **overlay 拓扑下的 slot 身份**。主宠设置进程（无 `--instance`）与 legacy 单窗（含捕获模式）原样返回同一个配置对象、行为逐位不变——legacy 里那只宠读的就是自己那份 `config-slot-N.json` 的**全部**键，分流反而会让它的设置失效 |
 | 键集单一来源 | `PER_SLOT_SETTING_KEYS` 从 `overlay_shell.py` 挪进零 Qt 的 `overlay_spawn_state.py`（独立设置进程禁止导入 overlay_shell：会连带素材库/ffmpeg/托盘），壳侧改为引用它；`tests/test_settings_slot_config_route.py` 用 `is` 钉住两侧是同一对象。分流键集 = 该集合 ∪ `{"collision_enabled"}`（它有专属逐宠读点 `read_slot_collision_enabled`，写主配置既改不动这只宠也会改掉别的宠的继承值） |
 | 恢复默认 | `SlotRoutedConfig.reset_to_defaults` 只重置 slot 身份文件，**主配置一个键都不碰**。未闸住时 `Config.reset_to_defaults` 的整表语义会打到所有桌宠共用的主配置上（消融实测：`pet_opacity` 66→100、`voice_chime_enabled` True→False） |
@@ -636,7 +636,7 @@ recovery
 | 项 | 本刀口径 |
 |---|---|
 | 判定 | 行当前值 ≠ `Config` 出厂默认 → 该行进入「已修改」态（标记 + 默认值小字 + 重置入口）；默认态三者全不呈现 |
-| 默认值来源 | `Config._initial_data()`（唯一真相源）。新增 `pet/settings_default_marks.py` 只登记「行 → 配置键路径」，**一个默认值都不写**；对账用例见 `tests/test_settings_default_marks.py` |
+| 默认值来源 | `Config._initial_data()`（唯一真相源）。新增 `petwisp/settings_default_marks.py` 只登记「行 → 配置键路径」，**一个默认值都不写**；对账用例见 `tests/test_settings_default_marks.py` |
 | 覆盖 | 四类控件（ToggleSwitch / ModernSelect / BrowserSpinBox / QLineEdit）共 136 行中的 120 行有可比默认值；其余 16 行（AI 服务商逐条目字段、`island_metrics` 列表成员、台词编辑层记忆）没有单一默认值 ⇒ 不显示标记，清单钉在测试快照 `NO_DEFAULT_ROWS` |
 | 单项重置 | 只把控件值设回默认；落盘时机跟着**该行自己的保存语义**走——即时生效型开关（`click_sound_enabled` / `agent_link.sound_enabled`，控件 `toggled` 已直连宿主的 `_apply_*_enabled_now`）改一下就写盘，其余行随设置窗关闭的既有 `_write_config` 写回（`closeEvent` / Esc 也写）；本刀不新增写回路径、不绕过保存流；不弹确认框（代价低、可再改回）。全量「恢复默认设置…」流程未动 |
 | 禁改项 | 子宠页的进程级 / `mark_main_pet_only` 行照旧置灰，且不给重置入口；依赖隐藏行不显示标记（可见性由 Qt 传播，不做额外记账） |
@@ -651,7 +651,7 @@ recovery
 4. **跨平台**：无平台分支（四类控件的判定与 `Config` 默认值跨平台同源）；真实 GUI 验收仅本机 Windows，macOS / Linux 未跑（不推断）。
 5. **视觉与文档**：本记录即变更记录；代表截图未产出（本会话无图像复核手段，改用程序化几何断言 + 真实 GUI 实测数字，见第 3 条）；未改 Shared UX Contract / Settings System / Menu Action Model，`CONTEXT.md` 无需更新。
 
-补记（终审修复批，同日）：本刀有两处表述与现实不符，按现实更正，行为零改动——① 单项重置的落盘时机改为如实表述（见上表「单项重置」行）：即时生效型开关重置后立即写盘，其余随设置窗关闭写回；`pet/settings_widgets.py` 的按钮 tooltip 与 `pet/settings_default_marks.py` 的模块 docstring 同步更正。② macOS 专属行「显示 Dock 图标」原缺默认值映射（行键 `dock_icon` ≠ 配置键 `show_dock_icon`）：macOS 上该行既不出「已修改」标记也不能改回默认，且覆盖率快照必红；映射已补，并加了一条 darwin 模拟下的快照用例（`tests/test_settings_default_marks.py::test_macos_only_rows_align_with_the_same_snapshot`）。
+补记（终审修复批，同日）：本刀有两处表述与现实不符，按现实更正，行为零改动——① 单项重置的落盘时机改为如实表述（见上表「单项重置」行）：即时生效型开关重置后立即写盘，其余随设置窗关闭写回；`petwisp/settings_widgets.py` 的按钮 tooltip 与 `petwisp/settings_default_marks.py` 的模块 docstring 同步更正。② macOS 专属行「显示 Dock 图标」原缺默认值映射（行键 `dock_icon` ≠ 配置键 `show_dock_icon`）：macOS 上该行既不出「已修改」标记也不能改回默认，且覆盖率快照必红；映射已补，并加了一条 darwin 模拟下的快照用例（`tests/test_settings_default_marks.py::test_macos_only_rows_align_with_the_same_snapshot`）。
 
 ### 2026-10-08 — 设置页第四刀：搜索增强（折叠组标题 + 口语别名入索引，纯呈现层）
 
@@ -662,7 +662,7 @@ recovery
 | 项 | 本刀口径 |
 |---|---|
 | 折叠组标题入索引 | 只认可折叠组（`SettingsSection(advanced=True)` 与 `CollapsibleGroup`）；普通小标题不入（本就在首屏可见，纳入只会灌水）。命中组标题 = 该组**全部行**入候选，展开/切标签沿用既有祖先链机制 |
-| 口语别名 | 人工策展小表（`pet/settings_search.py::ROW_ALIASES`，7 条），每条有「真实用户会这么说」的理由；命中方向只认「别名 ⊂ 查询」。已考察并有意不收：穿透/唱歌/歌词/背景/提示音（关键词已覆盖，加了空转）、恢复默认（落点是侧栏按钮不是设置行，测试钉住 0 命中防误判） |
+| 口语别名 | 人工策展小表（`petwisp/settings_search.py::ROW_ALIASES`，7 条），每条有「真实用户会这么说」的理由；命中方向只认「别名 ⊂ 查询」。已考察并有意不收：穿透/唱歌/歌词/背景/提示音（关键词已覆盖，加了空转）、恢复默认（落点是侧栏按钮不是设置行，测试钉住 0 命中防误判） |
 | 次序与去重 | 关键词 → 组标题 → 别名，跨源去重保序；关键词永远排最前 ⇒ 既有首次命中/域跳转/页内标签切换与改动前逐位一致（9 个查询实测首命中全同） |
 | 依赖语义 | 依赖隐藏行「不改配置只给说明」的语义不变（「网络延迟检测」命中仍给「需先开启」说明，实测） |
 | 不做 | 拼音/分词引擎、新依赖、候选集纳入非 SettingRow 元素（侧栏按钮等） |
@@ -731,7 +731,7 @@ recovery
 | 新增键 | `divination_enabled`（默认 **开**）/ `divination_speak`（默认关）/ `divination_hint`（默认开）与运行时状态 `divination_state`（默认 `{}`；`{date, quote_id, drawn[≤48], hint_date}`）。**都是全新键**：老配置没有它们 → 取默认；出厂默认与「恢复全局默认」共用 `Config._initial_data()`，没有第二份真值。`divination_state` **没有设置行**——它是状态不是偏好，设置页不读也不写它 |
 | 三个开关为什么是**进程级**键 | 签是一天一支的进程级状态（不逐宠）：三个键都不在 `PER_SLOT_SETTING_KEYS`，子宠页改它们由设置进程的配置路由直写主配置（`settings_slot_config`），因此**不置灰**。由 `tests/test_settings_slot_config_route.py` 的 `main_only` 清单与"子宠页保存落主配置"用例钉住 |
 | 准入复核（新一级域不合格的三条理由） | ① 本文「准入记录」末段：新增一级能力域须"代表长期独立用户目标、预计包含**至少两个**稳定设置组"——【趣味】只有一个组、四行；② 同一能力域内的**同级任务**适合页内标签（既有先例：菜单域的 菜单编排/快捷启动/外观；互动域的 点击与音效/自言自语/天气）；③ 代价不对称——为在默认 800×560 里多塞第 11 个域，作者把侧栏布局间距与导航行距压到 0，**所有域**的点击目标与呼吸空间一起缩水 |
-| 归位落点 | 「互动」域 → 第四个页内标签「抽签」（`settings_interaction.TAB_KEYS/TAB_LABELS` 追加 `("divination","抽签")`）。判据是代码事实：抽签与「天气」同族——"用户主动拉一次、桌宠给一个结果"的互动面；且它的每日提示本来就挂在"点桌宠"这条交互路径上（`divination_hint_on_interaction`）。行与控件仍由 `pet/settings_divination.py` 构建（与 `settings_weather` 同口径），对话框只留一行保存委托 |
+| 归位落点 | 「互动」域 → 第四个页内标签「抽签」（`settings_interaction.TAB_KEYS/TAB_LABELS` 追加 `("divination","抽签")`）。判据是代码事实：抽签与「天气」同族——"用户主动拉一次、桌宠给一个结果"的互动面；且它的每日提示本来就挂在"点桌宠"这条交互路径上（`divination_hint_on_interaction`）。行与控件仍由 `petwisp/settings_divination.py` 构建（与 `settings_weather` 同口径），对话框只留一行保存委托 |
 | 侧栏间距撤回 | `modern_settings_dialog`：布局间距 **0→3**、导航行距 **0→1**；`settings_widgets.SETTINGS_DOMAIN_NAV` 删掉 `("趣味","play")`（回到 10 个域）；`SIDEBAR_ROW_HEIGHT` 上方那段"要从间距里挤"的注释随之删除。本机实测：800×560 下侧栏余量 **17px**、720×560 同样全落在视口内（探针 `.scratch/divination-pr290/probe_settings_layout.py`，真实 `windows` 插件） |
 | 文案去向 | 总开关关掉时那句去处提示 `设置 → 趣味 里打开` → `设置 → 互动 · 抽签 里打开`（用户照着去找，指向已不存在的域就是误导）；`config.py` / `settings_page_guide.py` 里同处注释一并归位；「试听今天的签」行说明里的 Markdown 星号 `**不改签号**` 去掉（Qt 里就是两个字形星号） |
 | 搜索 / 默认标记 | 三行行键与顶层配置键同名 → 走 `settings_default_marks` 的"同名回落"路径，进「已修改」标记覆盖面（按钮行「试听」不参与）；搜「抽签」「每日一签」「试听今天的签」都命中，且**自动切到抽签标签**（否则结果在视野外）。两组都有用例 |
@@ -747,7 +747,7 @@ recovery
    / `test_desktop_pet_features.py` 四处按**实际构造**断言（10 域 + 四标签）。失败路径不新增：
    总开关关掉时点击给一句去处提示且**不写状态**（用例 + 实机各一条）。
 2. **TDD**：本轮新增/改造 7 个测试文件（净 +249 / −14）。先红的证据：把
-   `pet/voice_chime_service.py` 换回 `HEAD` 版本后，旁路预合成的 3 条新用例**全部失败**
+   `petwisp/voice_chime_service.py` 换回 `HEAD` 版本后，旁路预合成的 3 条新用例**全部失败**
    （两条参数化 + 一条完成路径），恢复后全绿；IA 归位侧的四条新用例在改动前一条都不成立
    （没有「抽签」标签、侧栏间距是 0）。
 3. **布局与可访问性**：真实 `windows` 平台插件（非 offscreen）下六档实测——
@@ -762,5 +762,5 @@ recovery
 5. **视觉与文档**：本记录即变更记录；交付证据见
    `PR-REPORT-DIVINATION-2026-10-17.md`（逐文件说明 /
    离线性能实测 / 实机运行记录）并在 [`INDEX.md`](INDEX.md) 的「PR 报告存档」登记。
-   `CONTEXT.md` 无新概念需要登记（「每日一签」的口径写在 `pet/divination.py` 的模块
+   `CONTEXT.md` 无新概念需要登记（「每日一签」的口径写在 `petwisp/divination.py` 的模块
    docstring 与设置页文案里）。

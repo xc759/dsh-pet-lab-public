@@ -56,7 +56,7 @@ DEFAULT_INCLUDE = "random,events"
 VALIDATOR_REL = "scripts/check_frameseq_bundle.py"
 CONVERTER_REL = "tools/convert_frameseq.py"
 # 转换实现（含编码档、世代命名、供给范围）都在这两份源码里：改动即换 key。
-CONVERTER_SOURCES = ("pet/frameseq_provision.py", "tools/convert_frameseq.py")
+CONVERTER_SOURCES = ("petwisp/frameseq_provision.py", "tools/convert_frameseq.py")
 # 平台差异的真实来源：imageio-ffmpeg 每平台打包不同的 ffmpeg 构建，webp 编码走 Pillow。
 DEPENDENCY_DISTS = ("Pillow", "imageio-ffmpeg")
 

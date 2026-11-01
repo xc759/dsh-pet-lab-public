@@ -21,9 +21,9 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 import pytest  # noqa: E402
 from PySide6.QtWidgets import QApplication, QWidget  # noqa: E402
 
-from pet import catalog, pet_profiles  # noqa: E402
-from pet.app import AppShell  # noqa: E402
-from pet.config import Config  # noqa: E402
+from petwisp import catalog, pet_profiles  # noqa: E402
+from petwisp.app import AppShell  # noqa: E402
+from petwisp.config import Config  # noqa: E402
 
 app = QApplication.instance() or QApplication([])
 
@@ -74,7 +74,7 @@ def shell_with_slot_role(tmp_path):
     finally:
         # 建岛会向 ChatService 注册进程级完成回调（弱引用只覆盖弱集，这份是类级表）：
         # 撤掉它，免得测试进程里留下指向已拆壳的回调。
-        from pet.chat.service import ChatService
+        from petwisp.chat.service import ChatService
 
         ChatService.unregister_global_finished(shell._on_global_chat_finished)
         island = getattr(shell, "island", None)

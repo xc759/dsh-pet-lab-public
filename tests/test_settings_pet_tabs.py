@@ -35,7 +35,7 @@ EXPECTED_TABS = (("display_music", "显示与音乐"), ("motion_collision", "动
 #: （``settings_music.advanced_group_title``），用例里拼。
 TAB1_PRIMARY = ("显示", "音乐关联")
 #: 标签 2 的组序：主视线 5 组 + 垫底的「碰撞参数（高级）」。
-TAB2_SECTIONS = ("动画与移动", "拖拽与弹射", "边缘探头", "生小肥鱼", "多开碰撞", "碰撞参数（高级）")
+TAB2_SECTIONS = ("动画与移动", "拖拽与弹射", "边缘探头", "生小宠", "多开碰撞", "碰撞参数（高级）")
 
 TAB1_ROWS = (
     "scale", "bubble_text_scale", "pet_opacity",
@@ -71,9 +71,9 @@ def _qapp():
 
 @pytest.fixture
 def dialog(tmp_path, monkeypatch):
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
-    from pet.settings_slot_config import route_settings_config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
+    from petwisp.settings_slot_config import route_settings_config
 
     app = _qapp()
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -94,7 +94,7 @@ def _pet_page(dialog):
 
 
 def _pet_tabs(dialog):
-    from pet.settings_widgets import SettingsTabContainer
+    from petwisp.settings_widgets import SettingsTabContainer
 
     tabs = _pet_page(dialog).findChild(SettingsTabContainer, "settingsTaskTabs")
     assert tabs is not None, "桌宠域没有用页内标签组织"
@@ -102,7 +102,7 @@ def _pet_tabs(dialog):
 
 
 def _row(dialog, key):
-    from pet.modern_settings_dialog import SettingRow
+    from petwisp.modern_settings_dialog import SettingRow
 
     found = dialog.findChild(SettingRow, f"settingRow_{key}")
     assert found is not None, f"缺少设置行 {key}"
@@ -115,7 +115,7 @@ def _row_key(row) -> str:
 
 def _sections_of_tab(tabs, tab_key):
     """标签页里按真实布局顺序排列的 ``SettingsSection``（不是 child 顺序）。"""
-    from pet.settings_widgets import SettingsSection
+    from petwisp.settings_widgets import SettingsSection
 
     tabs.setCurrentKey(tab_key)
     content = tabs.stack.currentWidget()
@@ -138,7 +138,7 @@ def _section_title(section) -> str:
 
 def _section_of(row):
     """行所属的 ``SettingsSection``（走 widget 祖先链）。"""
-    from pet.modern_settings_dialog import SettingsSection
+    from petwisp.modern_settings_dialog import SettingsSection
 
     parent = row.parentWidget()
     while parent is not None and not isinstance(parent, SettingsSection):
@@ -160,7 +160,7 @@ def test_pet_domain_uses_in_page_tabs_without_changing_sidebar(dialog):
 
 def test_group_order_inside_each_tab_puts_the_advanced_group_last(dialog):
     """标签内组序：主视线组在前、高级组垫底；每行的 SettingsSection 归属唯一。"""
-    from pet.music import settings as settings_music
+    from petwisp.music import settings as settings_music
 
     tabs = _pet_tabs(dialog)
     expected = {
@@ -174,7 +174,7 @@ def test_group_order_inside_each_tab_puts_the_advanced_group_last(dialog):
         assert sections[-1].advanced is True, "高级组必须垫底其所属标签页"
 
     # 归属唯一：每个桌宠行的 SettingsSection 祖先有且只有一个（不会一组挂两处）。
-    from pet.modern_settings_dialog import SettingsSection
+    from petwisp.modern_settings_dialog import SettingsSection
 
     for key in TAB1_ROWS + TAB1_ADVANCED_ROWS + TAB2_ROWS + TAB2_ADVANCED_ROWS:
         parent, ancestors = _row(dialog, key).parentWidget(), []
@@ -188,7 +188,7 @@ def test_group_order_inside_each_tab_puts_the_advanced_group_last(dialog):
 def test_every_pet_row_routes_to_its_tab_and_is_reachable(dialog):
     """每行都由标签键路由到，切到所属标签后可见——分页没有丢掉任何一行。"""
     tabs = _pet_tabs(dialog)
-    # 「小肥鱼大小」只在**关闭**「生小肥鱼继承大小」时才显示（既有依赖契约）：
+    # 「小宠大小」只在**关闭**「生小宠继承大小」时才显示（既有依赖契约）：
     # 先满足依赖，再断言"切到所属标签后确实看得到"，否则量到的是依赖隐藏而非分页。
     _row(dialog, "spawn_inherit_size").control.setChecked(False)
     _qapp().processEvents()
@@ -256,7 +256,7 @@ def test_search_jumps_to_the_tab_that_owns_the_hit(dialog):
 
 def test_search_on_tab_one_hits_stay_on_tab_one(dialog):
     """标签 1 的行（含默认标签）命中后仍停在标签 1、行可见——回归，不是只测切过去。"""
-    from pet.music import settings as settings_music
+    from petwisp.music import settings as settings_music
 
     tabs = _pet_tabs(dialog)
     queries = [
@@ -297,7 +297,7 @@ def test_search_expands_the_pre_existing_collision_advanced_group(dialog):
 
 def test_pet_settings_save_round_trip_is_unchanged(dialog, tmp_path):
     """保存 round trip 不变：分页只改呈现，配置键/默认值/保存链一字未动。"""
-    from pet.config import Config
+    from petwisp.config import Config
 
     _row(dialog, "collision_enabled").control.setChecked(False)
     _row(dialog, "drag_physics").control.setChecked(True)
@@ -309,7 +309,7 @@ def test_pet_settings_save_round_trip_is_unchanged(dialog, tmp_path):
     _qapp().processEvents()
 
     # 每宠键（碰撞/拖拽）真值在 slot0 档案；全局键（歌词提前量）在主配置
-    from pet.settings_slot_config import route_settings_config
+    from petwisp.settings_slot_config import route_settings_config
 
     saved = route_settings_config(Config(base=tmp_path, instance_id="slot-0"))
     assert saved.get("collision_enabled") is False

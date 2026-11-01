@@ -19,7 +19,7 @@ import time
 
 import pytest
 
-from pet import weather as W
+from petwisp import weather as W
 
 # ---------------------------------------------------------------- 真机样本
 CN_SEARCH_鹿城 = (

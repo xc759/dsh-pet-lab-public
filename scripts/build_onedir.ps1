@@ -1,7 +1,7 @@
 ﻿# -*- coding: utf-8 -*-
 <#
 .SYNOPSIS
-    dsh-pet-standalone onedir build + portable zip packaging.
+    petwisp onedir build + portable zip packaging.
 
 .DESCRIPTION
     Builds a PyInstaller --onedir variant (no runtime extraction, no _MEI cache),
@@ -36,8 +36,8 @@
       the built app. Missing/renamed/re-cut models do not crash the app - they
       only make "screenshot -> text" quietly wrong, so the gate has to be here.
       The same script's --app-dir mode also proves both dynamic targets are in the
-      bundle: `pet.screen_capture.ocr` (the action layer resolves it by name
-      through importlib) and `pet.screen_capture.ocr_worker` (the recognition
+      bundle: `petwisp.screen_capture.ocr` (the action layer resolves it by name
+      through importlib) and `petwisp.screen_capture.ocr_worker` (the recognition
       subprocess, whose module name only ever appears inside a command-line
       string). The static analysis can see neither, so only the explicit
       --hidden-import lines below put them in the module graph (2026-10-13
@@ -89,10 +89,10 @@ python scripts\verify_bundle_tts.py --environment
 if ($LASTEXITCODE -ne 0) { throw '[tts] upgrade build dependencies with pip install -r requirements.txt' }
 
 $variants = @{
-    'webm-chat' = @{ Name = 'dsh-pet-standalone-webm-chat'; Entry = 'packaging\pet_entry.py' }
-    'webm'      = @{ Name = 'dsh-pet-standalone-webm';      Entry = 'packaging\pet_entry_no_chat.py'; NoChat = $true }
-    'gif-chat'  = @{ Name = 'dsh-pet-standalone-gif-chat';  Entry = 'packaging\pet_entry.py'; Gif = $true }
-    'gif'       = @{ Name = 'dsh-pet-standalone-gif';       Entry = 'packaging\pet_entry_no_chat.py'; Gif = $true; NoChat = $true }
+    'webm-chat' = @{ Name = 'petwisp-webm-chat'; Entry = 'packaging\pet_entry.py' }
+    'webm'      = @{ Name = 'petwisp-webm';      Entry = 'packaging\pet_entry_no_chat.py'; NoChat = $true }
+    'gif-chat'  = @{ Name = 'petwisp-gif-chat';  Entry = 'packaging\pet_entry.py'; Gif = $true }
+    'gif'       = @{ Name = 'petwisp-gif';       Entry = 'packaging\pet_entry_no_chat.py'; Gif = $true; NoChat = $true }
 }
 
 if (-not $variants.ContainsKey($Variant)) {
@@ -109,7 +109,7 @@ $noChat = $variants[$Variant].NoChat
 # runtime dependency therefore bricks the user's entire dsh plugin tree on load
 # (2026-09 incident: missing @deepseek-ai/dsh-llm, all profiles fail to start).
 # Red line: the bridge must stay ZERO-dependency; enforce it at build time.
-$bridgeManifest = Join-Path $root 'integrations\dsh-pet-bridge\package.json'
+$bridgeManifest = Join-Path $root 'integrations\petwisp-bridge\package.json'
 if (-not (Test-Path $bridgeManifest)) { throw "Bridge manifest missing: $bridgeManifest" }
 # PowerShell 5.1 reads Get-Content using the system ANSI codepage by default;
 # package.json is UTF-8 and its Chinese description would become invalid JSON.
@@ -130,7 +130,7 @@ if ($bridgeDepNames.Count -gt 0) {
 # PR gate (node --test) covers environments without it.
 $nodeExe = Get-Command node -ErrorAction SilentlyContinue
 if ($nodeExe) {
-    $smoke = Join-Path $root 'integrations\dsh-pet-bridge\verify_import.mjs'
+    $smoke = Join-Path $root 'integrations\petwisp-bridge\verify_import.mjs'
     if (-not (Test-Path $smoke)) { throw "missing verify script: $smoke" }
     Write-Host "[bridge] verifying zero-dependency plugin import (hermetic smoke)..." -ForegroundColor Cyan
     & node $smoke
@@ -147,7 +147,7 @@ $datas = if ($isGif) { 'assets/characters_gif;assets/characters_gif' } else { 'a
 # 少了 keyring 的变体只能把 Key 留在**写它的那个进程**的内存里——而设置页跑在独立
 # 进程（--settings），主程序读不到，界面却报「已保存」。四个变体三个平台都由
 # tests/test_packaging_keyring_notices.py 钉住。
-$excludes = if ($noChat) { @('--exclude-module', 'pet.chat') } else { @() }
+$excludes = if ($noChat) { @('--exclude-module', 'petwisp.chat') } else { @() }
 # PyOpenGL 与本应用无关（Qt 用自带 OpenGL），但其 freeglut_README.txt 是
 # CP1252 编码，会触发 check_bundle_encoding 的 UTF-8 严格校验（该自检针对
 # 中文资源，第三方 README 属误伤）；排除后包体也更小。
@@ -219,7 +219,7 @@ foreach ($m in @('django','hypothesis')) {
     $excludes += @('--exclude-module', $m)
 }
 # keyring 必须显式收集，且**四个变体都要**（API Key 的系统安全存储）：no-chat 变体把
-# pet.chat 排掉了，静态分析因此摸不到 keyring（chat 的 SecretStore 是它原来的唯一入口），
+# petwisp.chat 排掉了，静态分析因此摸不到 keyring（chat 的 SecretStore 是它原来的唯一入口），
 # 而语音报时的收费后端（pet/tts/mimo、pet/tts/doubao）照旧收 API Key。少了它，凭据只能
 # 留在写它的进程内存里，主程序永远读不到（见上面 $excludes 那段）。
 $keyringCollect = @('--collect-all', 'keyring')
@@ -248,8 +248,8 @@ $keyringCollect += @('--collect-all', 'win32ctypes')
 # 静默少一份声明，所以它要待在参数段里一眼看得见（守卫：tests/test_packaging_keyring_notices.py）。
 $chatData = if ($noChat) { @() } else {
     @(
-        '--add-data', 'pet\chat\legacy_styles.qss;pet\chat',
-        '--add-data', 'pet\chat\modern_styles.qss;pet\chat'
+        '--add-data', 'petwisp\chat\legacy_styles.qss;pet\chat',
+        '--add-data', 'petwisp\chat\modern_styles.qss;pet\chat'
     )
 }
 # GIF variants: generate GIF assets from webm first (auto when missing, -Gif forces regen)
@@ -362,7 +362,7 @@ if (-not $SkipBuild) {
 
     # 两个模块必须显式 hidden-import（2026-10-13 交叉审查 B1；切片 5 加了第二个）：
     #
-    # 1. 宿主侧引擎 `pet.screen_capture.ocr`——截图动作走的是**动态** seam
+    # 1. 宿主侧引擎 `petwisp.screen_capture.ocr`——截图动作走的是**动态** seam
     #    （`pet\screen_capture\actions.py` 用 importlib 按字符串 `OCR_MODULE = "ocr"`
     #    解析它），全仓没有一处静态 import 指向它。PyInstaller 的静态分析从入口
     #    `packaging\pet_entry.py` 出发摸不到这个模块，于是**原件全在、模块不在**：
@@ -371,10 +371,10 @@ if (-not $SkipBuild) {
     #    那一轮）。这里显式把它拉进模块图，它的依赖（rapidocr / cv2 / numpy /
     #    onnxruntime）随之被静态收集。
     #
-    # 2. 识别子进程 `pet.screen_capture.ocr_worker`（切片 5）——它的模块名只出现在
+    # 2. 识别子进程 `petwisp.screen_capture.ocr_worker`（切片 5）——它的模块名只出现在
     #    命令行字符串里（`<exe> --ocr-worker`，见 pet\screen_capture\ocr.py 的
     #    worker_command），静态分析同样摸不到。缺它不会崩，只是每次识屏都报"起不了
-    #    工作进程"。入口里的 `from pet.__main__ import _run_ocr_worker` 现在**恰好**
+    #    工作进程"。入口里的 `from petwisp.__main__ import _run_ocr_worker` 现在**恰好**
     #    能把它捎进图（静态分析会进 if 分支），但那条路由随时可能被挪走/改成惰性
     #    import——本参数是不依赖这种巧合的那一份保证，产物侧的门会把它验回来。
     # 无随包模型时这两个模块随之裁掉（它们的存在只为把 OCR 引擎的依赖拉进包）。
@@ -382,8 +382,8 @@ if (-not $SkipBuild) {
     $rapidocrHidden = @()
     if ($hasOcrModels) {
         $rapidocrHidden += @(
-            '--hidden-import', 'pet.screen_capture.ocr',
-            '--hidden-import', 'pet.screen_capture.ocr_worker'
+            '--hidden-import', 'petwisp.screen_capture.ocr',
+            '--hidden-import', 'petwisp.screen_capture.ocr_worker'
         )
     }
 
@@ -423,8 +423,8 @@ if (-not $SkipBuild) {
     $extraData = @()
     $dataMap = [ordered]@{
         'assets\big_blue_fat_fish' = 'assets\big_blue_fat_fish'
-        'pet\persona_presets'     = 'pet\persona_presets'
-        'pet\menu_templates'      = 'pet\menu_templates'
+        'petwisp\persona_presets'     = 'petwisp\persona_presets'
+        'petwisp\menu_templates'      = 'petwisp\menu_templates'
         'assets\sounds'           = 'assets\sounds'
         'assets\chat'             = 'assets\chat'
         'assets\icon.ico'         = 'assets'
@@ -681,7 +681,7 @@ function Wait-SmokeWindow {
 # 界面看不出来（那一段按 unsupported 不占位）。所以在产物里按**同一份**判据再验一次
 # （文件名 / sha256 / x86-64），缺件、拷坏、被后续步骤删掉都在这里中止。
 # 文件名从 pet\game_fps.py 读，不在本脚本里写第二份字面量（换版本只需改产品常量）。
-$backendName = (& python -c "from pet.island import game_fps; print(game_fps.BACKEND_EXE_NAME)").Trim()
+$backendName = (& python -c "from petwisp.island import game_fps; print(game_fps.BACKEND_EXE_NAME)").Trim()
 if (-not $backendName) { throw "[presentmon] cannot resolve BACKEND_EXE_NAME from pet/game_fps.py" }
 $backendInBundle = Join-Path $appDir ("_internal\resources\presentmon\" + $backendName)
 Write-Host "[presentmon] verifying bundled backend in the built app..." -ForegroundColor Cyan
@@ -695,7 +695,7 @@ Write-Host "[presentmon] bundle carries the capture backend + its license" -Fore
 # 的单一真相源（脚本自己读，本文件不抄第二份文件名/摘要）。
 #
 # 这里判三件，缺一「截图提取文字」都是不可用（--app-dir 一次判完，不再分两次调用）：
-#   1. 引擎模块 `pet.screen_capture.ocr` 在不在产物的模块图里——它是动态 seam 的目标，
+#   1. 引擎模块 `petwisp.screen_capture.ocr` 在不在产物的模块图里——它是动态 seam 的目标，
 #      静态分析摸不到，**只有**上面那条 --hidden-import 能让它进包（2026-10-13 B1）；
 #   2. 三个 ONNX 模型在不在、是不是校验过的那一份（文件名 + sha256）；
 #   3. rapidocr 的两份配置数据（config.yaml / default_models.yaml）在不在——它们不是
@@ -744,7 +744,7 @@ try {
     Wait-SmokeWindow -Process $settingsProc -Label '--settings' `
         -EarlyExitHint 'arg routing broken' `
         -NoWindowHint 'no settings window appeared'
-    # 配置目录名随打包变体走（= $name，如 dsh-pet-standalone-webm-chat），
+    # 配置目录名随打包变体走（= $name，如 petwisp-webm-chat），
     # 写死基础名会让 webm-chat 等变体误报"没拿到锁"（实机踩过）
     $settingsLock = Join-Path (Join-Path $smokeBase $name) 'settings.lock'
     if (-not (Test-Path $settingsLock)) {
@@ -768,4 +768,4 @@ if (-not $SkipZip) {
 }
 
 Write-Host "[3/3] Done. onedir dir: $appDir" -ForegroundColor Green
-Write-Host "      Installer: compile packaging\dsh-pet-$Variant.iss with ISCC.exe"
+Write-Host "      Installer: compile packaging\petwisp-$Variant.iss with ISCC.exe"

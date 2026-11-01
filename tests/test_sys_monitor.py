@@ -19,8 +19,8 @@ import types
 
 import pytest
 
-from pet.island import segments as isl
-from pet import sys_monitor as sm
+from petwisp.island import segments as isl
+from petwisp import sys_monitor as sm
 
 
 #: 采样线程的固定名字（收口断言用）
@@ -488,7 +488,7 @@ def test_cpu_only_run_never_constructs_a_gpu_reader_or_touches_pdh(monkeypatch):
     没有 ``GpuReader`` = 没加载 ``pdh.dll``、没建 query。这是把"无订阅零开销"钉在
     默认工厂路径上的守卫（而不是只钉在注入替身的用例上）。
     """
-    from pet import gpu_monitor as gpu_mod
+    from petwisp import gpu_monitor as gpu_mod
 
     def boom(*args, **kwargs):  # pragma: no cover - 只有违约时才会走到
         raise AssertionError("CPU-only 仍然构造了 GPU 读数器 / 踩了 PDH")

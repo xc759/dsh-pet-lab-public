@@ -12,11 +12,11 @@ from PySide6.QtGui import QDesktopServices
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication, QLabel, QPushButton, QVBoxLayout, QWidget
 
-from pet.config import Config
-from pet.context_menus.icons import THEMED_ICON_REQUEST
-from pet.modern_settings_dialog import ModernSettingsDialog
-from pet.settings_about import build_author_section
-from pet.settings_widgets import refresh_settings_icons
+from petwisp.config import Config
+from petwisp.context_menus.icons import THEMED_ICON_REQUEST
+from petwisp.modern_settings_dialog import ModernSettingsDialog
+from petwisp.settings_about import build_author_section
+from petwisp.settings_widgets import refresh_settings_icons
 
 app = QApplication.instance() or QApplication([])
 

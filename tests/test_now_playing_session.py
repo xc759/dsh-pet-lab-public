@@ -19,7 +19,7 @@ from datetime import datetime, timezone
 
 import pytest
 
-from pet.music import now_playing
+from petwisp.music import now_playing
 
 # MediaPlaybackStatus: 4 = PLAYING, 5 = Paused
 PLAYING = 4

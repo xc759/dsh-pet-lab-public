@@ -20,10 +20,10 @@ from pathlib import Path
 import pytest
 from PySide6.QtWidgets import QApplication
 
-from pet import agent_link, harness_launcher
-from pet.agent_link import AgentLinkManager, DshMonitor
-from pet.config import Config
-from pet.agent_link.dsh_state import DshState
+from petwisp import agent_link, harness_launcher
+from petwisp.agent_link import AgentLinkManager, DshMonitor
+from petwisp.config import Config
+from petwisp.agent_link.dsh_state import DshState
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
@@ -38,7 +38,7 @@ def _make_dsh_monitor(tmp_path, monkeypatch, online=True):
     _qapp()
     config_dir = tmp_path / "cfg"
     config_dir.mkdir(parents=True)
-    bridge_dir = tmp_path / "dsh-pet-bridge"
+    bridge_dir = tmp_path / "petwisp-bridge"
     bridge_dir.mkdir(parents=True)
     monkeypatch.setattr(harness_launcher, "is_running", lambda port: online)
     # 「桌面端进程在跑」是 online 的旁路判定（机器相关 OS 边界）：本文件用端口
@@ -114,7 +114,7 @@ def test_dsh_state_module_is_pure_logic():
     """
     import ast as _ast
 
-    tree = _ast.parse((REPO_ROOT / "pet" / "agent_link" / "dsh_state.py").read_text(encoding="utf-8"))
+    tree = _ast.parse((REPO_ROOT / "petwisp" / "agent_link" / "dsh_state.py").read_text(encoding="utf-8"))
     imported = set()
     for node in _ast.walk(tree):
         if isinstance(node, _ast.Import):
@@ -128,7 +128,7 @@ def test_dsh_state_module_is_pure_logic():
             bases = {_ast.unparse(b) for b in node.bases}
             assert not any("QObject" in b for b in bases), "dsh_state.py 不得再有 QObject 子类"
     # 桌面端端口候选钉住（offline 判定的唯一来源）
-    assert "19387" in (REPO_ROOT / "pet" / "agent_link" / "dsh_state.py").read_text(encoding="utf-8"), \
+    assert "19387" in (REPO_ROOT / "petwisp" / "agent_link" / "dsh_state.py").read_text(encoding="utf-8"), \
         "desktop 桌面端 host 端口 19387 必须在探测候选里"
 
 
@@ -167,7 +167,7 @@ class _Win:
 @pytest.fixture()
 def sound_spy(monkeypatch):
     """钉在播放漏斗层：winmm 直放 / Qt 后端 / 系统播放器全部经过这里。"""
-    from pet import click_sound
+    from petwisp import click_sound
     calls = []
     monkeypatch.setattr(click_sound._pool, "play_sound",
                         lambda path, volume=1.0: calls.append(("pool", path)) or True)
@@ -218,7 +218,7 @@ def test_link_sounds_play_through_funnel_when_enabled(tmp_path, monkeypatch, sou
 # ---------------------------------------------------------------- 3. 桥接脱敏
 def test_bridge_source_has_no_plaintext_or_retired_machinery():
     """index.js 静态闸：明文字段写函数与已删机制标识符零残留。"""
-    src = (REPO_ROOT / "integrations" / "dsh-pet-bridge" / "index.js").read_text(encoding="utf-8")
+    src = (REPO_ROOT / "integrations" / "petwisp-bridge" / "index.js").read_text(encoding="utf-8")
     # 脱敏（#226）：这些字段/函数的明文落盘路径必须不存在
     for banned in ("messageText", "commandFromArgs", "summarizeArgs", "extractCommand",
                    "latestCommandFor", "argsKey", "resultSummary",

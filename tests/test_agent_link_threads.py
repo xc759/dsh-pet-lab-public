@@ -16,8 +16,8 @@ import pytest
 from PySide6.QtCore import QObject
 from PySide6.QtWidgets import QApplication
 
-from pet.agent_link import AgentEvent, AgentLinkManager, BaseAgentMonitor, CursorMonitor
-from pet.config import Config
+from petwisp.agent_link import AgentEvent, AgentLinkManager, BaseAgentMonitor, CursorMonitor
+from petwisp.config import Config
 
 
 @pytest.fixture()
@@ -444,7 +444,7 @@ class TestOutboxPolicy:
 class TestOpenCodeDbRotation:
     def test_db_replacement_rebackfills(self, tmp_path):
         """OpenCode 库被替换/重建：身份变化自动重新 backfill，不回放旧库事件、不漏新库事件。"""
-        from pet.agent_link import OpenCodeMonitor
+        from petwisp.agent_link import OpenCodeMonitor
 
         db1 = tmp_path / "opencode.db"
         _make_opencode_db(db1, [("session.created", {"sessionID": "s1"})])

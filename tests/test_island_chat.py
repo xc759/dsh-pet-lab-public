@@ -16,11 +16,11 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QTextDocument
 from PySide6.QtWidgets import QApplication
 
-from pet.app import AppShell
-from pet.chat.service import ChatService
-from pet.config import Config
-from pet.island.dynamic_island import DynamicIsland
-from pet.island.chat import IslandChatBubble
+from petwisp.app import AppShell
+from petwisp.chat.service import ChatService
+from petwisp.config import Config
+from petwisp.island.dynamic_island import DynamicIsland
+from petwisp.island.chat import IslandChatBubble
 
 
 def _qapp() -> QApplication:
@@ -276,7 +276,7 @@ def test_shell_click_toggles_island_chat_bubble(tmp_path):
 
 
 def test_shell_click_when_no_chat_reshows_pets(tmp_path):
-    """纯桌宠版（打包时排除 `pet.chat`）：桌宠隐藏时单击岛必须把桌宠叫回来。
+    """纯桌宠版（打包时排除 `petwisp.chat`）：桌宠隐藏时单击岛必须把桌宠叫回来。
 
     旧行为：岛按 `hidden_chat` 发 `chat_requested` → `_chat_from_island` →
     `_show_island_chat` 因 `_island_chat_available()` 为假**直接返回**，整次点击
@@ -374,7 +374,7 @@ def test_shell_show_pets_from_island_chat_restores_per_sprite_hidden_pets(tmp_pa
         overlay.spawn_pet()
         overlay.set_pet_visible(True)       # 前提：桌宠当前可见（岛同步为可见）
         sprites = list(overlay.overlay.sprites)
-        assert len(sprites) == 2, "前提：主宠 + 一只子肥鱼"
+        assert len(sprites) == 2, "前提：主宠 + 一只子宠"
         assert overlay.overlay.isVisible() is True, "前提：合成窗可见"
 
         for sprite in sprites:              # 逐只全藏（主宠与子宠同等计入）
@@ -790,7 +790,7 @@ def test_pause_agent_link_for_hide_decision(tmp_path):
     _qapp()
     from PySide6.QtWidgets import QWidget
 
-    from pet.window_optional_services import WindowFeatureGateMixin
+    from petwisp.window_optional_services import WindowFeatureGateMixin
 
     class _Win(QWidget, WindowFeatureGateMixin):
         pass

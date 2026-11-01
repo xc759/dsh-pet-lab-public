@@ -15,7 +15,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 // noteRetryConnection / resetRetryConnection），不启动 DSH 宿主。
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const bridgeDir = path.resolve(here, "../integrations/dsh-pet-bridge");
+const bridgeDir = path.resolve(here, "../integrations/petwisp-bridge");
 
 let retry;
 test.before(async () => {

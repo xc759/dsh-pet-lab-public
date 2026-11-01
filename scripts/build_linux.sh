@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 构建 dsh-pet-standalone Linux onedir（本地与 CI 共用的唯一构建入口）。
+# 构建 petwisp Linux onedir（本地与 CI 共用的唯一构建入口）。
 #
 # CI（.github/workflows/build-linux.yml）与本脚本必须保持一致——构建逻辑
 # 只有这一份，CI 通过调用本脚本复用，不在 workflow 内联 PyInstaller 命令，
@@ -38,7 +38,7 @@ fi
 mkdir -p "$DIST_DIR" "$WORK_DIR"
 
 # 按当前 PySide6 Qt 精确版本构建 Fcitx 插件，避免系统 Qt6 插件的私有 ABI 不匹配。
-FCITX5_PLUGIN_DIR="$(mktemp -d /tmp/dsh-pet-fcitx-package.XXXXXX)"
+FCITX5_PLUGIN_DIR="$(mktemp -d /tmp/petwisp-fcitx-package.XXXXXX)"
 trap 'rm -rf "$FCITX5_PLUGIN_DIR"' EXIT
 FCITX5_PLUGIN="$FCITX5_PLUGIN_DIR/libfcitx5platforminputcontextplugin.so"
 "$ROOT/scripts/build_pyside6_fcitx_plugin.sh" "$PYTHON_BIN" "$FCITX5_PLUGIN"
@@ -94,26 +94,26 @@ done
 
 # 两个模块都要显式 --hidden-import（2026-10-13 交叉审查 B1；切片 5 加了第二个）：
 #
-# 1. 宿主侧引擎 pet.screen_capture.ocr —— 截图动作走的是**动态** seam：
+# 1. 宿主侧引擎 petwisp.screen_capture.ocr —— 截图动作走的是**动态** seam：
 #    pet/screen_capture/actions.py 用 importlib 按字符串（OCR_MODULE = "ocr"）解析它，
 #    全仓没有一处静态 import 指向这个模块。PyInstaller 从入口出发的静态分析摸不到它，
 #    于是模型和配置都在包里、引擎模块却不在：冻结包里解析不出引擎，右键「截图 →
 #    提取文字」永远置灰。它的依赖（rapidocr / cv2 / numpy / onnxruntime）随这条
 #    hidden-import 被静态收集。
-# 2. 识别子进程 pet.screen_capture.ocr_worker（切片 5）—— 模块名只出现在命令行
+# 2. 识别子进程 petwisp.screen_capture.ocr_worker（切片 5）—— 模块名只出现在命令行
 #    字符串里（<exe> --ocr-worker），静态分析同样摸不到。缺它不会崩，只是每次识屏
 #    报"起不了工作进程"。
-RAPIDOCR_HIDDEN=(--hidden-import pet.screen_capture.ocr --hidden-import pet.screen_capture.ocr_worker)
+RAPIDOCR_HIDDEN=(--hidden-import petwisp.screen_capture.ocr --hidden-import petwisp.screen_capture.ocr_worker)
 
 for variant in "${variant_list[@]}"; do
     case "$variant" in
         webm-chat)  entry="packaging/pet_entry.py";            assets="assets/characters";       excludes="" ;;
-        webm)       entry="packaging/pet_entry_no_chat.py";    assets="assets/characters";       excludes="pet.chat" ;;
+        webm)       entry="packaging/pet_entry_no_chat.py";    assets="assets/characters";       excludes="petwisp.chat" ;;
         gif-chat)   entry="packaging/pet_entry.py";            assets="assets/characters_gif";   excludes="" ;;
-        gif)        entry="packaging/pet_entry_no_chat.py";    assets="assets/characters_gif";   excludes="pet.chat" ;;
+        gif)        entry="packaging/pet_entry_no_chat.py";    assets="assets/characters_gif";   excludes="petwisp.chat" ;;
         *) echo "未知变体: $variant" >&2; exit 1 ;;
     esac
-    name="dsh-pet-standalone-$variant"
+    name="petwisp-$variant"
     printf "VARIANT = '%s'\n" "$variant" > packaging/build_variant.py
 
     # 运行期图标（窗口/标题栏）也要进包：Linux 上 PyInstaller 忽略 --icon，图标只能
@@ -121,7 +121,7 @@ for variant in "${variant_list[@]}"; do
     # 不会有任何报错（只有源文件不存在时 PyInstaller 才会挡下），因此由
     # tests/test_application_icon.py 的打包契约测试守着。
     #
-    # keyring（2026-10-17）：四个变体都收集。no-chat 变体排掉了 pet.chat，静态分析因此
+    # keyring（2026-10-17）：四个变体都收集。no-chat 变体排掉了 petwisp.chat，静态分析因此
     # 摸不到 keyring（chat 的 SecretStore 是它原来的唯一入口），而语音报时的收费后端
     # （pet/tts/mimo、pet/tts/doubao）照旧收 API Key——少了它，凭据只能留在写它的进程
     # 内存里，设置页（独立进程）报「已保存」而主程序永远读不到。
@@ -175,7 +175,7 @@ for variant in "${variant_list[@]}"; do
     "$PYTHON_BIN" -m PyInstaller "${args[@]}" "$entry"
     # 本地 OCR 随包校验（与 Windows 的 build_onedir.ps1 同口径）：上面那条门只证明
     # 源目录里的模型是对的，产物里还缺两件同样致命的东西——**引擎模块**
-    # （pet.screen_capture.ocr，动态 seam 的目标，只有 --hidden-import 能把它拉进包）
+    # （petwisp.screen_capture.ocr，动态 seam 的目标，只有 --hidden-import 能把它拉进包）
     # 与 rapidocr 的两份配置数据。三者缺一「截图提取文字」都不可用，所以一并判。
     "$PYTHON_BIN" scripts/verify_rapidocr_models.py --app-dir "$DIST_DIR/$name"
     "$PYTHON_BIN" scripts/verify_bundle_tts.py --app-dir "$DIST_DIR/$name"

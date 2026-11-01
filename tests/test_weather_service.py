@@ -24,8 +24,8 @@ pytest.importorskip("PySide6")
 
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
-from pet import weather as W  # noqa: E402
-from pet.weather.service import WeatherService  # noqa: E402
+from petwisp import weather as W  # noqa: E402
+from petwisp.weather.service import WeatherService  # noqa: E402
 
 app = QApplication.instance() or QApplication([])
 

@@ -31,8 +31,8 @@ import pytest
 from PySide6.QtCore import QObject, QPointF, QRect, Signal
 from PySide6.QtGui import QImage
 
-from pet.pet_sprite import PetSprite
-from pet.sprite_behavior import (
+from petwisp.pet_sprite import PetSprite
+from petwisp.sprite_behavior import (
     _ACTS_TAIL_GRACE_MAX_S,
     _ACTS_TAIL_GRACE_MIN_S,
     STATE_ACTS,

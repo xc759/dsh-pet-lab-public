@@ -17,10 +17,10 @@ import pytest
 from PySide6.QtCore import QPointF, QRect, QRectF
 from PySide6.QtWidgets import QApplication
 
-from pet import physics as physics_mod
-from pet.pet_sprite import INTERACTION_NORMAL, INTERACTION_THROWN, PetSprite
-from pet.sprite_physics import ThrowPhysicsController
-from pet.window_placement import snap_to_nearest_screen
+from petwisp import physics as physics_mod
+from petwisp.pet_sprite import INTERACTION_NORMAL, INTERACTION_THROWN, PetSprite
+from petwisp.sprite_physics import ThrowPhysicsController
+from petwisp.window_placement import snap_to_nearest_screen
 from tests.test_sprite_physics import BOUNDS, FakeClock, _make_sprite
 
 app = QApplication.instance() or QApplication([])
@@ -175,7 +175,7 @@ def test_snap_triggers_on_half_body_hanging_out():
 def test_island_supported_settle_also_snaps():
     """落岛落定（k3 S1）：_settle_supported 把 thrown 宠钉在静态成员上时，
     身体在空洞里同样吸附——鸭子类型调用，不 import pet_sprite。"""
-    from pet.sprite_collision import SpriteCollisionWorld
+    from petwisp.sprite_collision import SpriteCollisionWorld
     from tests.test_sprite_collision import FakeSprite
 
     calls = []
@@ -194,7 +194,7 @@ def test_island_supported_settle_also_snaps():
 def test_slingshot_cancel_snaps_before_forcing_normal():
     """弹弓 Esc 取消（k3 S2）：锚点在空洞里时，强制 NORMAL 前先吸附——
     否则 drop_gravity 的 THROWN 兜底被覆盖，宠钉死在空洞。"""
-    from pet.sprite_slingshot import SlingshotController
+    from petwisp.sprite_slingshot import SlingshotController
 
     events = []
     class FakeSlingshotSprite:

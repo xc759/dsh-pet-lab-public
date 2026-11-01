@@ -10,8 +10,8 @@ from datetime import date, datetime
 
 import pytest
 
-from pet.growth import dashboard as dash
-from pet.growth.schema import default_archive
+from petwisp.growth import dashboard as dash
+from petwisp.growth.schema import default_archive
 
 
 def _moment(y, m, d, hh=10, mm=0) -> datetime:

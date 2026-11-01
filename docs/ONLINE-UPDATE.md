@@ -1,10 +1,10 @@
 # 在线更新协议与发布清单
 
-> 基线：`v4.2.1` 代码工作树，2026-09-24。本文描述当前 `pet/updater.py` 与 Inno Setup 安装包的实现，不代表已经发布的静态 `update.json` 已自动生成。
+> 基线：`v4.2.1` 代码工作树，2026-09-24。本文描述当前 `petwisp/updater.py` 与 Inno Setup 安装包的实现，不代表已经发布的静态 `update.json` 已自动生成。
 
 ## 1. 用户流程
 
-1. 右键菜单“检查更新”、更新提示气泡和设置页“更新”入口都进入同一套 `pet.updater` 服务。
+1. 右键菜单“检查更新”、更新提示气泡和设置页“更新”入口都进入同一套 `petwisp.updater` 服务。
 2. 客户端按顺序查询 GitHub Releases API，以及 `cdn.jsdelivr.net` 的三个边缘节点镜像；某一源超时或返回非法 JSON 时继续尝试下一源。
 3. 发现新版本后，设置页展示版本说明。Windows 冻结版且找到匹配安装包时，“下载并安装”按钮可用；源码运行、便携/非 Windows 运行方式或缺少可信安装包时只提供下载页，不执行自动安装。
 4. 安装包下载到用户配置目录下的 `updates/`，先写 `.part` 临时文件，再校验大小和 SHA-256，成功后原子改名。
@@ -17,14 +17,14 @@
 ```json
 {
   "version": "4.2.2",
-  "html_url": "https://github.com/MerZlin/dsh-pet-indesktop/releases/tag/v4.2.2",
+  "html_url": "https://github.com/MerZlin/petwisp-indesktop/releases/tag/v4.2.2",
   "notes": "版本说明",
   "assets": {
-    "dsh-pet-standalone-webm-chat-setup.exe": {
-      "fileName": "dsh-pet-standalone-webm-chat-setup.exe",
+    "petwisp-webm-chat-setup.exe": {
+      "fileName": "petwisp-webm-chat-setup.exe",
       "urls": [
-        "https://github.com/MerZlin/dsh-pet-indesktop/releases/download/v4.2.2/dsh-pet-standalone-webm-chat-setup.exe",
-        "https://可信镜像.example/releases/v4.2.2/dsh-pet-standalone-webm-chat-setup.exe"
+        "https://github.com/MerZlin/petwisp-indesktop/releases/download/v4.2.2/petwisp-webm-chat-setup.exe",
+        "https://可信镜像.example/releases/v4.2.2/petwisp-webm-chat-setup.exe"
       ],
       "size": 123456789,
       "sha256": "64 个十六进制字符",

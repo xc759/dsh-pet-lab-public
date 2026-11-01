@@ -2,7 +2,7 @@
 """ProactiveMemory 跨进程并发：读→改→写与 clear 必须跨进程互斥。
 
 产品路径（不是理论场景）：默认「独立设置页」进程
-（`python -m pet --settings` → `modern_settings_dialog.py:1174` 的
+（`python -m petwisp --settings` → `modern_settings_dialog.py:1174` 的
 `ProactiveMemory(...).clear()`）与主进程后台主动识屏
 （`proactive.py:631` 的 `self.memory.record(...)`）写的是同一个
 `<config.dir>/proactive_screen_memory.json`。两条路径各自读→改→写时，
@@ -27,7 +27,7 @@ from pathlib import Path
 import pytest
 from PySide6.QtCore import QLockFile
 
-from pet.proactive import memory as pm
+from petwisp.proactive import memory as pm
 
 REPO = str(Path(__file__).resolve().parent.parent)
 WAIT = 60.0  # 子进程同步的宽预算（CI 慢机不赌时序）
@@ -63,7 +63,7 @@ target = os.environ["PM_TARGET"]
 mode = os.environ["PM_MODE"]
 release = os.environ["PM_RELEASE"]
 
-from pet.proactive.memory import ProactiveMemory, lock_path_for
+from petwisp.proactive.memory import ProactiveMemory, lock_path_for
 
 if mode == "write":
     m = ProactiveMemory(target, max_entries=500,

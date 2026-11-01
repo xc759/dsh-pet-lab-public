@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """_warm_landing_idles 回归测试：起飞预热绝不在 GUI 线程同步解码。
 
-实机教训（肥鱼互撞超级卡）：该方法曾在 GUI 线程同步执行
+实机教训（桌宠互撞超级卡）：该方法曾在 GUI 线程同步执行
 clip.warm_first_frame() —— 碰撞风暴下每次撞飞进 throw 都同步拉起
 ffmpeg（~100ms/只），多鱼互撞时 GUI 看门狗连续抓 200ms+ 卡顿。
 修复后预热在 daemon 线程执行；这些测试锁定该语义（改回同步即判红）。
@@ -11,7 +11,7 @@ from __future__ import annotations
 import threading
 from types import SimpleNamespace
 
-from pet.window import PetWindow
+from petwisp.window import PetWindow
 
 
 class _FakeClip:
@@ -153,7 +153,7 @@ def test_ffr_evict_respects_late_pin():
     常驻/飞行期 pin 可能落在两者之间——不复查的话"绝不逐出"语义形同虚设。
     """
     import threading
-    from pet import webm_clip
+    from petwisp import webm_clip
 
     class _Victim:
         def __init__(self, **flags):
@@ -178,7 +178,7 @@ def test_landing_pin_skips_lru_selection(monkeypatch):
     突变判别：_ffr_touch 的选型失去落地标志 → 被 pin 的 a 被选中/摘表，
     victims 变成 [a] 且账面错位 → 断言红。
     """
-    from pet import webm_clip
+    from petwisp import webm_clip
 
     class _Img:
         def width(self):

@@ -6,10 +6,10 @@ from PySide6.QtCore import QRect
 from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QApplication, QMenu
 
-from pet.config import Config
-from pet.context_menu import populate_context_menu
-from pet.modern_settings_dialog import ModernSettingsDialog, SettingRow
-from pet.window_optional_services import WindowFeatureGateMixin
+from petwisp.config import Config
+from petwisp.context_menu import populate_context_menu
+from petwisp.modern_settings_dialog import ModernSettingsDialog, SettingRow
+from petwisp.window_optional_services import WindowFeatureGateMixin
 
 
 def _qapp():
@@ -95,7 +95,7 @@ def test_settings_dialog_has_effect_toggles_and_writes_config(tmp_path, monkeypa
     # 该用例只验证设置写回，不验证音频预热；在 Windows headless CI 上触发
     # QSoundEffect 异步加载的 processEvents 可能产生 access violation。
     monkeypatch.setattr(
-        "pet.modern_settings_dialog.warm_click_sound_effects",
+        "petwisp.modern_settings_dialog.warm_click_sound_effects",
         lambda *args, **kwargs: None,
     )
     cfg = Config(tmp_path)
@@ -142,7 +142,7 @@ class _FilterHost(WindowFeatureGateMixin):
 
 
 def test_effect_filter_switch_restricts_probe_session_to_idle_turn():
-    from pet.window_optional_services import WindowFeatureGateMixin
+    from petwisp.window_optional_services import WindowFeatureGateMixin
 
     host = _FilterHost()
     assert host._effects_filter_switch("turn") == "turn"
@@ -162,7 +162,7 @@ def test_real_window_paint_with_active_rotation_does_not_raise(tmp_path):
     """
     from tests.pet_window_fakes import FakeLibrary
 
-    from pet.window import PetWindow
+    from petwisp.window import PetWindow
 
     app = _qapp()
     cfg = Config(tmp_path)
@@ -186,7 +186,7 @@ def test_real_window_direct_golden_spin_on_click_accumulates(tmp_path):
     """点击直连模式：真实 PetWindow 点击不播动画，直接回旋并累计圈数。"""
     from tests.pet_window_fakes import FakeLibrary
 
-    from pet.window import PetWindow
+    from petwisp.window import PetWindow
 
     app = _qapp()
     cfg = Config(tmp_path)
@@ -221,8 +221,8 @@ def test_real_window_move_blocked_during_edge_probe(tmp_path, monkeypatch):
     """
     from tests.pet_window_fakes import FakeLibrary
 
-    from pet.edge_probe import OFF, PEEKING
-    from pet.window import PetWindow
+    from petwisp.edge_probe import OFF, PEEKING
+    from petwisp.window import PetWindow
 
     class _Scr:
         def availableGeometry(self):

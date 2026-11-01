@@ -5,8 +5,8 @@
 build_macos.sh，透传到 fix_bridge_bundle.py --app-dir dist/<name>；
 脚本随后 subprocess.run([node, smoke], cwd=dst_bridge) 把**相对** smoke
 路径交给 node，node 相对自己的 cwd（= dst_bridge）再拼一次，路径双重嵌套：
-  dist/<app>/_internal/integrations/dsh-pet-bridge/dist/<app>/_internal/...
-  integrations/dsh-pet-bridge/verify_import.mjs
+  dist/<app>/_internal/integrations/petwisp-bridge/dist/<app>/_internal/...
+  integrations/petwisp-bridge/verify_import.mjs
 → "Cannot find module"，Linux/macOS 构建红（Windows 走 build_onedir.ps1
 的绝对路径实现，不受影响）。
 
@@ -37,7 +37,7 @@ def _load_module():
 def _make_bundle(tmp_path: Path) -> Path:
     """构造最小合法 dist 产物结构（零依赖 bridge 副本）。"""
     bridge = (tmp_path / "dist" / "app" / "_internal"
-              / "integrations" / "dsh-pet-bridge")
+              / "integrations" / "petwisp-bridge")
     bridge.mkdir(parents=True)
     (bridge / "package.json").write_text(json.dumps({"name": "x"}), encoding="utf-8")
     (bridge / "verify_import.mjs").write_text("// smoke\n", encoding="utf-8")

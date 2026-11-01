@@ -33,8 +33,8 @@ sys.path.insert(0, str(_REPO))
 
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
-from pet import webm_clip  # noqa: E402
-from pet.library import MovieLibrary  # noqa: E402
+from petwisp import webm_clip  # noqa: E402
+from petwisp.library import MovieLibrary  # noqa: E402
 
 OUT = _REPO / "_plan" / "current" / "AUDIT_WARM_CACHE_DATA.json"
 
@@ -238,7 +238,7 @@ def audit_character(char_id: str, tmp_dir: Path) -> dict:
 
 def main() -> int:
     _ = QApplication.instance() or QApplication([])
-    tmp_dir = Path(tempfile.mkdtemp(prefix="dsh-pet-audit-"))
+    tmp_dir = Path(tempfile.mkdtemp(prefix="petwisp-audit-"))
     results = []
     chars = sorted(p.name for p in (Path("assets") / "characters").iterdir() if p.is_dir())
     for char_id in chars:

@@ -36,9 +36,9 @@ from PySide6.QtCore import QSize  # noqa: E402
 from PySide6.QtGui import QIcon  # noqa: E402
 from PySide6.QtWidgets import QApplication, QWidget  # noqa: E402
 
-import pet.context_menus.icons as icons  # noqa: E402
-from pet.config import Config  # noqa: E402
-from pet.settings_theme_qss import _settings_stylesheet, settings_selection_accent  # noqa: E402
+import petwisp.context_menus.icons as icons  # noqa: E402
+from petwisp.config import Config  # noqa: E402
+from petwisp.settings_theme_qss import _settings_stylesheet, settings_selection_accent  # noqa: E402
 
 app = QApplication.instance() or QApplication([])
 
@@ -149,15 +149,15 @@ def test_settings_icon_falls_back_to_the_system_theme_before_it_is_published(mon
 
     若这里退回恒定 ``#595959``，深色系统下侧栏图标在 ``#26262b`` 上只有约 2.2:1 对比度。
     """
-    monkeypatch.setattr("pet.settings_theme_qss._system_dark", lambda: True)
+    monkeypatch.setattr("petwisp.settings_theme_qss._system_dark", lambda: True)
     assert _dominant(_pixmap(_settings_host(), "settings")) == REST_DARK
-    monkeypatch.setattr("pet.settings_theme_qss._system_dark", lambda: False)
+    monkeypatch.setattr("petwisp.settings_theme_qss._system_dark", lambda: False)
     assert _dominant(_pixmap(_settings_host(), "settings")) == REST_LIGHT
 
 
 def test_chat_and_context_menu_icons_keep_the_light_surface_ink(monkeypatch):
     """深色系统下聊天窗图标仍是深灰（白底白图回归的修复点），强调底仍取浅灰。"""
-    monkeypatch.setattr("pet.settings_theme_qss._system_dark", lambda: True)
+    monkeypatch.setattr("petwisp.settings_theme_qss._system_dark", lambda: True)
     assert _dominant(_pixmap(_menu_host(), "minimize")) == REST_LIGHT
     accent_host = _menu_host()
     accent_host.setProperty("modernDark", True)
@@ -326,11 +326,11 @@ def test_hover_stays_clearly_weaker_than_the_selected_state(theme, pane):
 
 # ----------------------------------------------------------------- 5. 真实设置窗
 def _dialog(tmp_path: Path, monkeypatch, *, dark: bool):
-    import pet.modern_settings_dialog as settings_mod
+    import petwisp.modern_settings_dialog as settings_mod
 
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
     monkeypatch.setattr(settings_mod, "_system_dark", lambda: dark)
-    monkeypatch.setattr("pet.settings_theme_qss._system_dark", lambda: dark)
+    monkeypatch.setattr("petwisp.settings_theme_qss._system_dark", lambda: dark)
     dialog = settings_mod.ModernSettingsDialog(Config(base=tmp_path), include_ai=True)
     dialog.resize(800, 560)
     dialog.show()
@@ -394,11 +394,11 @@ def _switchable_dialog(tmp_path, monkeypatch, *, system_dark: bool):
     ``settings_theme_qss._system_dark`` 是导航图标在 ``settingsDark`` 还没挂上时的兜底
     （改前"深色系统 + 强制浅色"就在这条路径上取错色）。
     """
-    import pet.modern_settings_dialog as settings_mod
+    import petwisp.modern_settings_dialog as settings_mod
 
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
     monkeypatch.setattr(settings_mod, "_system_dark", lambda: system_dark)
-    monkeypatch.setattr("pet.settings_theme_qss._system_dark", lambda: system_dark)
+    monkeypatch.setattr("petwisp.settings_theme_qss._system_dark", lambda: system_dark)
     dialog = settings_mod.ModernSettingsDialog(Config(base=tmp_path), include_ai=True)
     dialog.resize(800, 560)
     dialog.show()
@@ -475,7 +475,7 @@ def test_recording_covers_the_icon_consumers_not_their_hosts(tmp_path, monkeypat
     """
     dialog = _switchable_dialog(tmp_path, monkeypatch, system_dark=False)
     try:
-        from pet.settings_widgets import THEMED_ICON_REQUEST
+        from petwisp.settings_widgets import THEMED_ICON_REQUEST
 
         recorded = {
             widget.property(THEMED_ICON_REQUEST)[0]
@@ -484,7 +484,7 @@ def test_recording_covers_the_icon_consumers_not_their_hosts(tmp_path, monkeypat
         }
         assert recorded >= {"save", "search", "retry", "edit", "multi_select", "add",
                             "remove", "more", "sound"}, f"漏记的消费者：{recorded}"
-        from pet.settings_widgets import refresh_settings_icons
+        from petwisp.settings_widgets import refresh_settings_icons
 
         assert refresh_settings_icons(dialog) >= dialog.sidebar.count() + 5, (
             "重画枚数少于「侧栏导航 + 保存/搜索/重置」这几枚：有消费者没被扫到")
@@ -494,7 +494,7 @@ def test_recording_covers_the_icon_consumers_not_their_hosts(tmp_path, monkeypat
 
 def _recorded_consumers(dialog) -> list[tuple[QWidget, tuple[str, int]]]:
     """窗内所有"记了图标请求、且现在挂着一枚图标"的消费者及其请求。"""
-    from pet.settings_widgets import THEMED_ICON_REQUEST
+    from petwisp.settings_widgets import THEMED_ICON_REQUEST
 
     found = []
     for widget in dialog.findChildren(QWidget):

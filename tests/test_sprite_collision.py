@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""pet/sprite_collision.py 的纯逻辑测试（零 Qt：轻量假 sprite 鸭子类型）。
+"""petwisp/sprite_collision.py 的纯逻辑测试（零 Qt：轻量假 sprite 鸭子类型）。
 
 覆盖：两体弹性碰撞、拖拽方无限质量、扫掠防穿透、位置分离去抖、真撞击
 置 thrown + 限速、静态成员反弹（灵动岛预留 API）、on_collision 回调。
@@ -7,8 +7,8 @@
 
 import math
 
-from pet import collision
-from pet.sprite_collision import (
+from petwisp import collision
+from petwisp.sprite_collision import (
     INTERACTION_DRAG,
     INTERACTION_NORMAL,
     INTERACTION_THROWN,
@@ -164,7 +164,7 @@ def test_position_only_separation_is_debounced():
     M12a 后窗口是秒基（``SEPARATION_DEBOUNCE_SECS`` = T0 15 tick 等价），
     用假钟推进窗口，不依赖真实时间流逝。
     """
-    from pet.sprite_collision import SEPARATION_DEBOUNCE_SECS
+    from petwisp.sprite_collision import SEPARATION_DEBOUNCE_SECS
 
     clock = FakeClock()
     world = SpriteCollisionWorld(clock=clock)
@@ -360,7 +360,7 @@ def test_world_wakes_on_motion_and_static_change(monkeypatch):
 
 # ---------------------------------------------------------------- D9：岛 stadium（胶囊圆链）
 def test_capsule_circles_geometry():
-    from pet.sprite_collision import capsule_circles
+    from petwisp.sprite_collision import capsule_circles
     # 宽扁岛 600×90：高度截到 44（island_collision._CAPSULE_HEIGHT 口径），
     # r=22，轴线 y=top+22，x∈[left+22, left+578]，圆间距 ≤ r 连续覆盖
     circles = capsule_circles(100, 200, 600, 90)
@@ -377,7 +377,7 @@ def test_capsule_circles_geometry():
 
 def test_static_member_capsule_covers_axis_midpoint():
     """胶囊中段的碰撞（内切三圆口径会漏——两端圆心距 278px，中段是空档）。"""
-    from pet.sprite_collision import capsule_circles
+    from petwisp.sprite_collision import capsule_circles
     world = SpriteCollisionWorld()
     # 岛 400×80 @ (100,100)：rect 三圆圆心在 122/300/478（r=44→截 44,r=22 口径不同，
     # 但即便同口径三圆也只覆盖两端+中心），胶囊圆链连续

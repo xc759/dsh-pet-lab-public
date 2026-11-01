@@ -11,7 +11,7 @@
 
 from __future__ import annotations
 
-from pet import window_alerts
+from petwisp import window_alerts
 
 
 class _Cfg(dict):
@@ -124,8 +124,8 @@ def test_missing_speak_key_at_runtime_reads_as_off():
 
 def test_speak_setting_defaults_off_and_persists(tmp_path):
     """朗读是「额外出声」：默认关闭（与 config.py 默认值一致），打开后能落盘回读。"""
-    from pet.config import Config
-    from pet.settings_slot_config import route_settings_config
+    from petwisp.config import Config
+    from petwisp.settings_slot_config import route_settings_config
 
     # 每宠键真值在 slot0 档案：生产里设置页拿到的就是这份路由视图
     config = route_settings_config(Config(base=tmp_path, instance_id="slot-0"))
@@ -142,10 +142,10 @@ def test_missing_speak_key_normalizes_to_off(tmp_path):
     """配置文件里没写过这个键（老配置文件）→ 规范化后取关闭，不是沿用旧的开启。"""
     import json
 
-    from pet.config import Config
+    from petwisp.config import Config
 
     root = tmp_path / "appdata"
-    cfg_dir = root / "dsh-pet-standalone"
+    cfg_dir = root / "petwisp"
     cfg_dir.mkdir(parents=True)
     (cfg_dir / "config.json").write_text(json.dumps({"version": 4}), encoding="utf-8")
 
@@ -156,11 +156,11 @@ def test_stored_speak_choice_survives_default_flip(tmp_path):
     """默认值变更只动缺省与规范化：用户已存过的值（开、关都算）一律原样保留。"""
     import json
 
-    from pet.config import Config
+    from petwisp.config import Config
 
     for stored in (True, False):
         root = tmp_path / f"appdata-{stored}"
-        cfg_dir = root / "dsh-pet-standalone"
+        cfg_dir = root / "petwisp"
         cfg_dir.mkdir(parents=True)
         (cfg_dir / "config.json").write_text(
             json.dumps({"version": 4, "self_talk_speak_enabled": stored}),
@@ -182,7 +182,7 @@ def _click_once(*, click_self_talk: bool, periodic: bool, speak_enabled: bool = 
     只提供该路径真正用到的属性/方法；``_show_click_self_talk`` 委托到真实 seam
     （``window_alerts.show_click_self_talk``），所以"显示什么、朗读什么"由产品代码决定。
     """
-    from pet.window import PetWindow
+    from petwisp.window import PetWindow
 
     class _Pet:
         _just_dragged = False
@@ -274,7 +274,7 @@ def test_click_self_talk_speech_toggle_off_keeps_bubble_only_at_click():
 
 def test_click_speech_alone_asks_for_the_audio_channel():
     """音频通道存在性判定：只想要点击出声的用户也要拿到通道。"""
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     class _Shell:
         def __init__(self, **values):
@@ -303,7 +303,7 @@ def test_click_speech_judges_each_pet_own_slot_view():
     里：设置页写进 ``config-slot-N.json``，主配置里根本没有这两个键。判据读主配置
     就永远是 False —— 音频通道不建，点击静默无声、连日志都没有。
     """
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     class _Shell:
         def __init__(self, main, pets):

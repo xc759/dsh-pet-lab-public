@@ -43,8 +43,8 @@ from PySide6.QtCore import QObject, Signal  # noqa: E402
 from PySide6.QtGui import QImage  # noqa: E402
 from PySide6.QtWidgets import QApplication, QWidget  # noqa: E402
 
-from pet.screen_capture import actions as actions_mod  # noqa: E402
-from pet.screen_capture.actions import (  # noqa: E402
+from petwisp.screen_capture import actions as actions_mod  # noqa: E402
+from petwisp.screen_capture.actions import (  # noqa: E402
     ACTION_ASK,
     ACTION_COPY,
     ACTION_OCR,
@@ -52,8 +52,8 @@ from pet.screen_capture.actions import (  # noqa: E402
     ScreenCaptureActions,
     ScreenCapturePresenter,
 )
-from pet.screen_capture.result_panel import ScreenResult, ScreenResultPanel  # noqa: E402
-from pet.screen_capture.session import SelectionRect  # noqa: E402
+from petwisp.screen_capture.result_panel import ScreenResult, ScreenResultPanel  # noqa: E402
+from petwisp.screen_capture.session import SelectionRect  # noqa: E402
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -392,7 +392,7 @@ def test_the_translation_engine_is_the_configured_chat_model(monkeypatch):
     一起交给它，再把译文填进第二槽——翻译走哪条端点/用什么 Key 是 ``translate.py``
     自己的事（见 ``test_screen_capture_translate.py``）。
     """
-    from pet.screen_capture import translate as translate_mod
+    from petwisp.screen_capture import translate as translate_mod
 
     seen: list[tuple] = []
     monkeypatch.setattr(translate_mod, "translate_text",
@@ -471,7 +471,7 @@ def test_retranslate_reuses_the_cached_source_and_never_reruns_ocr(monkeypatch):
     "OCR 不重跑"是这条链路的全部意义：重新识别既慢、又可能给出另一段原文——用户
     只是换了个目标语言，却拿到"另一张图"的翻译。
     """
-    from pet.screen_capture import translate as translate_mod
+    from petwisp.screen_capture import translate as translate_mod
 
     calls: list[tuple] = []
     monkeypatch.setattr(
@@ -739,7 +739,7 @@ def test_the_ask_dialog_follows_the_selection_it_came_from():
 
 def test_default_ask_dialog_is_built_from_the_host_config():
     """端到端：不注入替身时默认造真浮窗（宿主配置面在就造得出来），且是复用件。"""
-    from pet.screen_capture.ask_dialog import ScreenAskDialog
+    from petwisp.screen_capture.ask_dialog import ScreenAskDialog
 
     host = _FakeHost()
     host.cfg = {"context_menu_appearance": {"theme": "light"}}
@@ -1069,7 +1069,7 @@ def test_release_does_not_block_the_gui_thread_or_the_result():
 
 def test_release_seam_matches_the_engine_module_contract():
     """跨切片契约：``ocr.py`` 必须真的有编排层要调的那个释放入口。"""
-    engine = pytest.importorskip("pet.screen_capture.ocr")
+    engine = pytest.importorskip("petwisp.screen_capture.ocr")
     assert callable(getattr(engine, actions_mod.OCR_RELEASE_ENTRY, None))
     assert callable(actions_mod.resolve_ocr_release())
 
@@ -1092,14 +1092,14 @@ def test_ocr_seam_matches_the_engine_module_contract():
     这是**跨切片契约**的机器化：入口改名/挪位在这里红，而不是等用户点了菜单
     才发现"本地识别没接线"。引擎模块不在时跳过（本片可以独立交付）。
     """
-    engine = pytest.importorskip("pet.screen_capture.ocr")
+    engine = pytest.importorskip("petwisp.screen_capture.ocr")
     assert callable(getattr(engine, actions_mod.OCR_ENTRY, None))
     assert actions_mod.ocr_engine_available() is True
 
 
 def test_actions_tuple_is_the_dispatch_closed_set():
     """分发表的闭集：四个动作都在，且就是覆盖层动作条那一组 id（同一批对象）。"""
-    from pet.screen_capture import overlay as overlay_mod
+    from petwisp.screen_capture import overlay as overlay_mod
 
     assert actions_mod.ACTIONS == (ACTION_OCR, ACTION_TRANSLATE, ACTION_ASK, ACTION_COPY)
     assert actions_mod.ACTION_COPY is overlay_mod.ACTION_COPY
@@ -1115,8 +1115,8 @@ def test_presenter_drives_the_real_dynamic_island(tmp_path):
     岛没有公开的消息读取入口——``_last_message`` 就是卡片那一行渲染的那一份，
     所以这里读它（不是断言私有调用顺序，而是断言用户看得见的那段文案）。
     """
-    from pet.config import Config
-    from pet.island.dynamic_island import DynamicIsland
+    from petwisp.config import Config
+    from petwisp.island.dynamic_island import DynamicIsland
 
     cfg = Config(tmp_path)
     data = dict(cfg.get("dynamic_island", {}) or {})
@@ -1303,8 +1303,8 @@ def test_a_stale_round_arriving_after_the_newer_one_finished_changes_nothing(tmp
     岛用**真件**（``DynamicIsland``，离屏 show 只为让"可见"判据成立）：断言读的是它真在
     渲染的那份 ``_last_message``，不是替身记的调用序列。
     """
-    from pet.config import Config
-    from pet.island.dynamic_island import DynamicIsland
+    from petwisp.config import Config
+    from petwisp.island.dynamic_island import DynamicIsland
 
     cfg = Config(tmp_path)
     data = dict(cfg.get("dynamic_island", {}) or {})
@@ -1594,8 +1594,8 @@ class _RoundRig:
     def __init__(self, monkeypatch, *, ocr, translator=None, run_inline=False, host=None):
         from PySide6.QtGui import QColor, QPixmap
 
-        from pet.screen_capture import brand_icons
-        from pet.screen_capture import result_panel as rp
+        from petwisp.screen_capture import brand_icons
+        from petwisp.screen_capture import result_panel as rp
 
         deck = [brand_icons.load_jingwa(), brand_icons.load_ds_whale()]
         for color in ("#ff0000", "#00ff00"):

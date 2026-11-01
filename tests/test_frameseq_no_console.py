@@ -11,7 +11,7 @@ import subprocess
 
 import pytest
 
-from pet import frameseq_provision as fp
+from petwisp import frameseq_provision as fp
 
 
 @pytest.mark.skipif(os.name != "nt", reason="creationflags 仅 Windows 生效")

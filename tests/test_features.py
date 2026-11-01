@@ -21,8 +21,8 @@ from pathlib import Path
 
 import pytest
 
-from pet import features
-from pet.features import FEATURES, MIGRATION_BASELINE, FeatureSpec
+from petwisp import features
+from petwisp.features import FEATURES, MIGRATION_BASELINE, FeatureSpec
 
 #: SPEC §3 里可停用的模块全集（核心能力一律不在内）。
 EXPECTED_IDS = {
@@ -332,7 +332,7 @@ class TestResolveDependencies:
 def test_import_does_not_pull_in_qt():
     """启动早期就要 import：这个模块连间接拉进 Qt 都不允许。"""
     code = (
-        "import sys, pet.features;"
+        "import sys, petwisp.features;"
         "bad=[m for m in sys.modules if m.split('.')[0] in {'PySide6','PyQt5','PyQt6','shiboken6'}];"
         "print(','.join(bad))"
     )

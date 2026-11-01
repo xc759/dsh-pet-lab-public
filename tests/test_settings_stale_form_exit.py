@@ -28,10 +28,10 @@ from pathlib import Path
 
 import pytest
 
-from pet import pet_profiles
-from pet import settings_close_flow
-from pet import settings_slot_config
-from pet.config import Config
+from petwisp import pet_profiles
+from petwisp import settings_close_flow
+from petwisp import settings_slot_config
+from petwisp.config import Config
 
 SLOT = 1
 KEEP_LABEL = "继续编辑"
@@ -75,7 +75,7 @@ def _profile_exists(tmp_path, values: dict) -> None:
 
 
 def _dialog(tmp_path, *, standalone: bool = True):
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     return ModernSettingsDialog(
         Config(base=tmp_path, instance_id=f"slot-{SLOT}"),
@@ -385,7 +385,7 @@ def test_autostart_exception_does_not_hang_the_close(tmp_path, app, monkeypatch)
     """
     from PySide6.QtWidgets import QDialog
 
-    import pet.modern_settings_dialog as settings_mod
+    import petwisp.modern_settings_dialog as settings_mod
 
     _main_config(tmp_path)
     _profile_exists(tmp_path, {"scale": 0.8})
@@ -460,7 +460,7 @@ def test_plain_disk_failure_can_be_discarded_and_closes(tmp_path, app, monkeypat
     """普通写盘失败（不是代次冲突）：文案说磁盘，出口一样有，选放弃照样关窗。"""
     from PySide6.QtWidgets import QDialog
 
-    from pet import config_write_lock as cwl
+    from petwisp import config_write_lock as cwl
 
     _main_config(tmp_path)
     _profile_exists(tmp_path, {"scale": 0.8})
@@ -499,7 +499,7 @@ def test_unexpected_exception_asks_instead_of_dropping_the_draft(tmp_path, app, 
     """
     import shiboken6
 
-    from pet.file_interpret import settings as settings_file_interpret
+    from petwisp.file_interpret import settings as settings_file_interpret
 
     _main_config(tmp_path)
     _profile_exists(tmp_path, {"scale": 0.8})
@@ -536,7 +536,7 @@ def test_unexpected_exception_can_still_be_discarded(tmp_path, app, monkeypatch)
     """异常路径的出口同样可达：选放弃即可关窗（异常不是"必须留下"的理由）。"""
     from PySide6.QtWidgets import QDialog
 
-    from pet.file_interpret import settings as settings_file_interpret
+    from petwisp.file_interpret import settings as settings_file_interpret
 
     _main_config(tmp_path)
     _profile_exists(tmp_path, {"scale": 0.8})
@@ -562,8 +562,8 @@ def test_invalid_menu_layout_gets_the_same_exit(tmp_path, app, monkeypatch):
     """表单校验没过（菜单布局无效）也是"保存没成"：同样不能被一个关不掉的窗口困住。"""
     from PySide6.QtWidgets import QDialog
 
-    from pet.context_menus.registry import MENU_ACTIONS
-    from pet.menu_layout import resolve_menu_layout
+    from petwisp.context_menus.registry import MENU_ACTIONS
+    from petwisp.menu_layout import resolve_menu_layout
 
     _main_config(tmp_path)
     _profile_exists(tmp_path, {"scale": 0.8})
@@ -672,8 +672,8 @@ def test_discard_in_the_settings_process_releases_the_lock_for_the_next_open(
     from PySide6.QtCore import QLockFile, Qt, QTimer
     from PySide6.QtTest import QTest
 
-    from pet import __main__ as entry
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp import __main__ as entry
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     _main_config(tmp_path)
     _profile_exists(tmp_path, {"scale": 0.8})
@@ -742,7 +742,7 @@ def _shared_dialog(shared):
     对象 identity 不作为"隔离了"的判据（astra CF01-GLOBAL 的教训：登记表独立 ≠ 草稿独立）；
     这里只用它排除"又是同一个对象"，真正的隔离由第 8 节的行为交错用例钉住。
     """
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     dialog = ModernSettingsDialog(shared, include_ai=False, standalone=False)
     form = dialog.config
@@ -1245,7 +1245,7 @@ def _exit_host(tmp_path, app, monkeypatch, *, keep_editing: bool):
     """
     from types import SimpleNamespace
 
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     shared, _main = _shared_route(tmp_path)
     _profile_exists(tmp_path, {"scale": 0.8})
@@ -1392,7 +1392,7 @@ def test_session_end_paths_keep_the_no_dialog_semantics():
     """
     import ast
 
-    source = Path("pet/app.py").read_text(encoding="utf-8")
+    source = Path("petwisp/app.py").read_text(encoding="utf-8")
     tree = ast.parse(source)
     checked = []
     for node in ast.walk(tree):
@@ -1536,7 +1536,7 @@ def test_two_views_save_different_leaves_and_keep_external_deltas(tmp_path, app,
 
 # ------------------------------------------------------------ 10. 会话结束（注销/关机）的关闭路径
 #: ops P2：Qt 在 aboutToQuit 之后还会 closeAllWindows，设置窗照样进 closeEvent。会话结束
-#: 标记用现成的进程级闸门 ``pet.webm_clip.session_ending``（issue #111 同一个标记，conftest
+#: 标记用现成的进程级闸门 ``petwisp.webm_clip.session_ending``（issue #111 同一个标记，conftest
 #: 每个用例后自动复位），这里用真标记置位/复位，不用 monkeypatch 假函数。
 
 
@@ -1544,7 +1544,7 @@ def test_session_end_close_never_pops_a_dialog_and_does_not_delay(tmp_path, app,
     """会话结束 + 保存会失败：不许弹失败框（关机被模态循环挂住），照常无确认关窗。"""
     from PySide6.QtWidgets import QDialog
 
-    from pet import webm_clip
+    from petwisp import webm_clip
 
     _main_config(tmp_path)
     _profile_exists(tmp_path, {"scale": 0.8})
@@ -1574,9 +1574,9 @@ def test_session_end_close_never_pops_a_dialog_and_does_not_delay(tmp_path, app,
 
 def test_session_end_close_saves_best_effort_and_skips_autostart(tmp_path, app, monkeypatch):
     """会话结束 + 保存能成功：设置 best-effort 落盘；开机自启收尾跳过（下次启动收敛）。"""
-    import pet.modern_settings_dialog as settings_mod
+    import petwisp.modern_settings_dialog as settings_mod
 
-    from pet import webm_clip
+    from petwisp import webm_clip
 
     _main_config(tmp_path)
     _profile_exists(tmp_path, {"scale": 0.8})
@@ -1612,7 +1612,7 @@ def test_session_end_close_saves_best_effort_and_skips_autostart(tmp_path, app, 
 
 def test_session_end_does_not_mask_a_normal_close(tmp_path, app, monkeypatch):
     """标记没置位时，普通关闭照旧弹失败框并允许「继续编辑」——会话结束分支不许外溢。"""
-    from pet import webm_clip
+    from petwisp import webm_clip
 
     _main_config(tmp_path)
     _profile_exists(tmp_path, {"scale": 0.8})

@@ -24,7 +24,7 @@ from PySide6.QtCore import QObject, QPointF, QRect, Signal
 from PySide6.QtGui import QImage
 from PySide6.QtWidgets import QApplication
 
-from pet.pet_sprite import PetSprite
+from petwisp.pet_sprite import PetSprite
 
 app = QApplication.instance() or QApplication([])
 
@@ -292,7 +292,7 @@ def test_bind_jumps_for_frameseq_without_frame(tmp_path):
     """FrameSeqClip 无帧 → jumpToFrame(0)（同步磁盘读 ~2.5ms，便宜且必需：
     它的 start 是异步交付首帧）。真 FrameSeqClip 实例（isinstance 判定）。"""
     from PySide6.QtGui import QImage as _QI
-    from pet.frameseq_clip import FrameSeqClip
+    from petwisp.frameseq_clip import FrameSeqClip
 
     d = tmp_path / "clip"
     d.mkdir()

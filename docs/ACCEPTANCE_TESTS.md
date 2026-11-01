@@ -1,6 +1,6 @@
 # 验收测试文件清单
 
-仓库中不存在 `tests/test_modern_settings_dialog.py` 和 `tests/test_dsh_pet_bridge.py`。检查 Git 历史（包括所有本地及远程引用）后，未发现这两个路径曾被提交、重命名或拆分后保留原文件名。因此验收不创建同名空文件，而按实际测试边界执行下列文件。
+仓库中不存在 `tests/test_modern_settings_dialog.py` 和 `tests/test_petwisp_bridge.py`。检查 Git 历史（包括所有本地及远程引用）后，未发现这两个路径曾被提交、重命名或拆分后保留原文件名。因此验收不创建同名空文件，而按实际测试边界执行下列文件。
 
 ## 设置窗口验收
 
@@ -36,16 +36,16 @@ Bridge 验收采用真实插件源码上的 Node contract 测试，并结合桌�
 - `tests/test_bridge_question_callid.js`：question 写盘的 callId 身份管理（会话隔离复合键、register/forget 幂等）；
 - `tests/test_bridge_user_action_guard.js`：tool/result 兜底只走 resolveQuestion，不再写恒不可达的 user_action；
 - `tests/test_bridge_manifest.js`：插件可独立加载（inject 契约）+ 清单零依赖红线；
-- `integrations/dsh-pet-bridge/verify_import.mjs`：hermetic 零依赖冒烟（无 node_modules 隔离目录 import + 已删机制/明文字符串静态禁令）；
+- `integrations/petwisp-bridge/verify_import.mjs`：hermetic 零依赖冒烟（无 node_modules 隔离目录 import + 已删机制/明文字符串静态禁令）；
 - `tests/test_agent_link.py`：真实 `AgentLinkManager`、tailer、事件映射、请求生命周期和交互队列；
 - `tests/test_dsh_state.py`：真实 DSH JSONL 状态读取与状态转换。
 
 验收命令：
 
 ```powershell
-node --check integrations/dsh-pet-bridge/index.js
+node --check integrations/petwisp-bridge/index.js
 node --test tests/test_bridge_hardfailure.js tests/test_bridge_instance_scope.js tests/test_bridge_interaction_dedup.js tests/test_bridge_manifest.js tests/test_bridge_question_callid.js tests/test_bridge_retry.js tests/test_bridge_root_control.js tests/test_bridge_user_action_guard.js
-node integrations/dsh-pet-bridge/verify_import.mjs
+node integrations/petwisp-bridge/verify_import.mjs
 $env:QT_QPA_PLATFORM = "offscreen"
 python -m pytest -q tests/test_agent_link.py tests/test_dsh_state.py
 ```

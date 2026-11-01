@@ -21,7 +21,7 @@ from pathlib import Path
 
 import pytest
 
-from pet import node_runtime
+from petwisp import node_runtime
 
 
 def _dir(path: Path) -> Path:
@@ -371,7 +371,7 @@ class TestPosixEnvironment:
 
     def test_node_modules_root_layout_is_recognized(self, tmp_path, monkeypatch):
         """共享根本身就是全局 node_modules 时（nvm 的 lib/node_modules）也要命中。"""
-        from pet import agent_link
+        from petwisp import agent_link
 
         root = _dir(tmp_path / "nvm" / "versions" / "node" / "v18.20.5" / "lib" / "node_modules")
         cli = _file(root / "pnpm" / "bin" / "pnpm.cjs")
@@ -382,7 +382,7 @@ class TestPosixEnvironment:
 
     def test_pnpm_found_without_any_path_entry(self, tmp_path, monkeypatch):
         """端到端：PATH 里什么都没有时（macOS .app / Linux 桌面启动器）仍能定位 pnpm。"""
-        from pet import agent_link
+        from petwisp import agent_link
 
         posix = _FakePosixHome(tmp_path)
         cli = _file(posix.local_lib / "pnpm" / "bin" / "pnpm.cjs")
@@ -399,7 +399,7 @@ class TestPosixEnvironment:
         布局是 POSIX（nvm 的 `bin/pnpm` → `lib/node_modules/pnpm/bin/pnpm.cjs`），
         但解析逻辑与平台无关，三平台都跑。
         """
-        from pet import agent_link
+        from petwisp import agent_link
 
         node_root = _dir(tmp_path / "nvm" / "versions" / "node" / "v18.20.5")
         cli = _file(node_root / "lib" / "node_modules" / "pnpm" / "bin" / "pnpm.cjs")
@@ -418,7 +418,7 @@ class TestPosixEnvironment:
 
     def test_shell_shim_command_runs_without_node_prefix(self, tmp_path, monkeypatch):
         """POSIX 包装脚本自带 shebang：直接执行，不再拼 [node, cli]。"""
-        from pet import agent_link
+        from petwisp import agent_link
 
         shim = _file(tmp_path / "pnpm", "#!/bin/sh\nexec node \"$basedir/pnpm.cjs\"\n")
         monkeypatch.setattr(agent_link, "_pnpm_cli", lambda: str(shim))
@@ -437,7 +437,7 @@ class TestVersionManagerDiscovery:
     def test_posix_nvm_without_dot_is_covered(self, tmp_path, monkeypatch):
         """GUI 启动（macOS .app / 桌面启动器）拿不到 shell 里设的 NVM_DIR，
         只认 ~/.nvm 会漏掉自定义根 ~/nvm。"""
-        from pet import agent_link
+        from petwisp import agent_link
 
         home = _dir(tmp_path / "home")
         node_root = home / "nvm" / "versions" / "node" / "v18.20.5"
@@ -493,7 +493,7 @@ class TestConfiguredPnpmBin:
     """
 
     def _isolate(self, monkeypatch):
-        from pet import agent_link
+        from petwisp import agent_link
 
         monkeypatch.setattr(agent_link, "_configured_pnpm_bin", "")
         monkeypatch.delenv("DSH_PNPM_BIN", raising=False)
@@ -501,7 +501,7 @@ class TestConfiguredPnpmBin:
         monkeypatch.setattr(node_runtime, "_POSIX_ABS_NODE_MODULES", ())
 
     def test_configured_file_wins_over_discovery(self, tmp_path, monkeypatch):
-        from pet import agent_link
+        from petwisp import agent_link
 
         self._isolate(monkeypatch)
         cli = _file(tmp_path / "custom" / "pnpm.cjs")
@@ -513,7 +513,7 @@ class TestConfiguredPnpmBin:
         assert _same_path(agent_link._find_pnpm_cli(), cli)
 
     def test_configured_directory_is_resolved(self, tmp_path, monkeypatch):
-        from pet import agent_link
+        from petwisp import agent_link
 
         self._isolate(monkeypatch)
         cli = _file(tmp_path / "tools" / "node_modules" / "pnpm" / "bin" / "pnpm.cjs")
@@ -525,7 +525,7 @@ class TestConfiguredPnpmBin:
         assert _same_path(agent_link._find_pnpm_cli(), cli)
 
     def test_configured_wins_over_env(self, tmp_path, monkeypatch):
-        from pet import agent_link
+        from petwisp import agent_link
 
         self._isolate(monkeypatch)
         configured = _file(tmp_path / "configured" / "pnpm.cjs")
@@ -539,7 +539,7 @@ class TestConfiguredPnpmBin:
         assert _same_path(agent_link._find_pnpm_cli(), configured)
 
     def test_env_still_used_when_config_empty(self, tmp_path, monkeypatch):
-        from pet import agent_link
+        from petwisp import agent_link
 
         self._isolate(monkeypatch)
         env_cli = _file(tmp_path / "env" / "pnpm.cjs")
@@ -553,7 +553,7 @@ class TestConfiguredPnpmBin:
 
     def test_broken_config_falls_back_to_discovery(self, tmp_path, monkeypatch):
         """配错路径不该让桥接彻底装不上：只记警告并回落到自动发现。"""
-        from pet import agent_link
+        from petwisp import agent_link
 
         self._isolate(monkeypatch)
         home = _dir(tmp_path / "home")
@@ -571,8 +571,8 @@ class TestConfiguredPnpmBin:
     def test_apply_config_syncs_configured_value(self, tmp_path, monkeypatch):
         from PySide6.QtWidgets import QApplication
 
-        from pet import agent_link
-        from pet.config import Config
+        from petwisp import agent_link
+        from petwisp.config import Config
 
         QApplication.instance() or QApplication([])
         monkeypatch.setattr(agent_link, "_configured_pnpm_bin", "")
@@ -602,7 +602,7 @@ class TestConfiguredPnpmBin:
 class TestPnpmCliDiscovery:
     def test_resolves_windows_cmd_shim_to_real_entry(self, tmp_path, monkeypatch):
         """nvm-windows / Program Files 布局：pnpm 是 .cmd 包装，真实入口在包装脚本里。"""
-        from pet import agent_link
+        from petwisp import agent_link
 
         node_root = tmp_path / "nvm" / "v18.20.5"
         shim = _file(
@@ -619,7 +619,7 @@ class TestPnpmCliDiscovery:
 
     def test_resolves_lib_node_modules_cjs_layout(self, tmp_path, monkeypatch):
         """用户 B 的场景：nvm 下 pnpm 的入口是 lib/node_modules/pnpm/bin/pnpm.cjs。"""
-        from pet import agent_link
+        from petwisp import agent_link
 
         node_root = tmp_path / "nvm" / "versions" / "node" / "v18.20.5"
         cli = _file(node_root / "lib" / "node_modules" / "pnpm" / "bin" / "pnpm.cjs")
@@ -632,7 +632,7 @@ class TestPnpmCliDiscovery:
 
     def test_supports_cjs_behind_unparsable_shim(self, tmp_path, monkeypatch):
         """pnpm ≤10 的 JS 入口是 pnpm.cjs：只认 pnpm.mjs 的旧实现会漏。"""
-        from pet import agent_link
+        from petwisp import agent_link
 
         nodejs_dir = tmp_path / "nodejs"
         cli = _file(nodejs_dir / "node_modules" / "pnpm" / "bin" / "pnpm.cjs")
@@ -645,7 +645,7 @@ class TestPnpmCliDiscovery:
         assert _same_path(agent_link._find_pnpm_cli(), cli)
 
     def test_dsh_pnpm_bin_accepts_js_file_and_directory(self, tmp_path, monkeypatch):
-        from pet import agent_link
+        from petwisp import agent_link
 
         cli = _file(tmp_path / "custom" / "pnpm.cjs")
         monkeypatch.setattr(agent_link, "_which", lambda name: None)
@@ -659,7 +659,7 @@ class TestPnpmCliDiscovery:
 
     def test_pnpm_command_runs_standalone_binary_without_node(self, tmp_path, monkeypatch):
         """独立安装的 pnpm.exe 自带 node：不能再拼 [node, cli]。"""
-        from pet import agent_link
+        from petwisp import agent_link
 
         exe = _file(tmp_path / "pnpm-home" / "pnpm.exe", "MZ")
         monkeypatch.setattr(agent_link, "_pnpm_cli", lambda: str(exe))
@@ -679,7 +679,7 @@ class TestPnpmCliDiscovery:
         assert calls[0] == [str(exe), "add", "pkg"]
 
     def test_pnpm_command_prefixes_js_cli_with_node(self, tmp_path, monkeypatch):
-        from pet import agent_link
+        from petwisp import agent_link
 
         cli = _file(tmp_path / "pnpm.mjs")
         monkeypatch.setattr(agent_link, "_pnpm_cli", lambda: str(cli))
@@ -693,7 +693,7 @@ class TestPnpmCliDiscovery:
 
     def test_pnpm_command_wraps_cmd_shim_with_cmd_exe(self, tmp_path, monkeypatch):
         """对齐 harness_launcher._wrap_cmd 的实测结论：Windows 上 .cmd 必须经 cmd 启动。"""
-        from pet import agent_link
+        from petwisp import agent_link
 
         shim = _file(tmp_path / "pnpm.cmd", "@echo off\n")
         monkeypatch.setattr(agent_link, "_pnpm_cli", lambda: str(shim))
@@ -701,7 +701,7 @@ class TestPnpmCliDiscovery:
         assert agent_link._pnpm_command() == ["cmd.exe", "/c", str(shim)]
 
     def test_run_pnpm_failure_messages_name_the_escape_hatch(self, tmp_path, monkeypatch):
-        from pet import agent_link
+        from petwisp import agent_link
 
         monkeypatch.setattr(agent_link, "_pnpm_cli", lambda: None)
         monkeypatch.setattr(agent_link, "_which", lambda name: None)
@@ -718,7 +718,7 @@ class TestPnpmCliDiscovery:
         assert "DSH_PNPM_BIN" in out, "失败文案要给出环境变量逃生阀"
 
     def test_npm_cli_found_in_nvm_lib_layout(self, tmp_path, monkeypatch):
-        from pet import agent_link
+        from petwisp import agent_link
 
         node_root = tmp_path / "nvm" / "v18.20.5"
         cli = _file(node_root / "lib" / "node_modules" / "npm" / "bin" / "npm-cli.js")
@@ -736,7 +736,7 @@ class TestPnpmCliDiscovery:
 class TestHarnessGlobalRoots:
     def test_posix_launch_finds_dsh_under_npm_global_root(self, tmp_path, monkeypatch):
         """macOS/Linux：dsh 装在全局根（PATH 上没有 dsh）也要能一键拉起。"""
-        from pet import harness_launcher as hl
+        from petwisp import harness_launcher as hl
 
         home = _dir(tmp_path / "home")
         root = _dir(home / ".npm-global" / "lib" / "node_modules")
@@ -762,8 +762,8 @@ class TestHarnessGlobalRoots:
         ]
 
     def test_manual_launch_finds_dsh_under_nvm_windows_root(self, tmp_path, monkeypatch):
-        from pet import harness_launcher as hl
-        from pet import node_runtime
+        from petwisp import harness_launcher as hl
+        from petwisp import node_runtime
 
         root = _dir(tmp_path / "nvm" / "v18.20.5" / "node_modules")
         bin_js = _file(root / "@deepseek-ai" / "dsh" / "lib" / "bin.js", "//")

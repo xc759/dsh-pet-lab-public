@@ -24,9 +24,9 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication
 
-from pet import tick_governor
-from pet.tick_driver import TickDriver
-from pet.tick_governor import (
+from petwisp import tick_governor
+from petwisp.tick_driver import TickDriver
+from petwisp.tick_governor import (
     POWER_CACHE_TTL_S,
     TIER_ACTIVE,
     TIER_IDLE_ANIM,
@@ -171,7 +171,7 @@ def test_v6_interval_formula_unchanged():
 
 def test_power_flip_reapplies_t1_interval_on_next_tick(monkeypatch):
     """档位不变、电源翻面：下一次 tick 复评把 T1 间隔切到满速（≤5s 感知）。"""
-    from pet.tick_governor import DOWNGRADE_HOLD_MS
+    from petwisp.tick_governor import DOWNGRADE_HOLD_MS
 
     driver, clock = _driver(monkeypatch, 170.0)
     state = {"ac": False}
@@ -207,7 +207,7 @@ def test_power_flip_reapplies_t1_interval_on_next_tick(monkeypatch):
 
 def test_battery_t1_low_budget_when_downgraded_by_quiet(monkeypatch):
     """降档滞回语义不变：电池下静默到期照旧降到 T2（250ms 心跳）。"""
-    from pet.tick_governor import ACTIVE_HOLD_MS, DOWNGRADE_HOLD_MS
+    from petwisp.tick_governor import ACTIVE_HOLD_MS, DOWNGRADE_HOLD_MS
 
     driver, clock = _driver(monkeypatch, 170.0)
     driver._governor._power_probe = lambda: False

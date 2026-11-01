@@ -19,7 +19,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO))
 
-from pet import tts_secrets  # noqa: E402
+from petwisp import tts_secrets  # noqa: E402
 
 
 class _FakeKeyring:
@@ -54,7 +54,7 @@ def test_round_trip_through_keyring(monkeypatch):
     assert tts_secrets.set("tts/mimo", "k-1") is True
     assert tts_secrets.get("tts/mimo") == "k-1"
     assert tts_secrets.persisted("tts/mimo") is True, "钥匙串里真的该有这一条"
-    assert fake.store == {("dsh-pet-standalone", "tts/mimo"): "k-1"}
+    assert fake.store == {("petwisp", "tts/mimo"): "k-1"}
 
     tts_secrets.clear("tts/mimo")
     assert tts_secrets.get("tts/mimo") == ""
@@ -166,7 +166,7 @@ class _NoKeyring:
         if fullname == "keyring" or fullname.startswith("keyring."):
             raise ModuleNotFoundError(fullname)
 sys.meta_path.insert(0, _NoKeyring())
-from pet import tts_secrets
+from petwisp import tts_secrets
 assert tts_secrets.set("tts/mimo", "value-in-settings-process") is False
 print(repr(tts_secrets.get("tts/mimo")))
 """
@@ -175,4 +175,4 @@ print(repr(tts_secrets.get("tts/mimo")))
 def test_mimo_ref_is_namespaced():
     """ref 取名规则：tts/<backend>，与 chat 的 provider/<id> 同构、天然不冲突。"""
     assert tts_secrets.MIMO_API_KEY_REF == "tts/mimo"
-    assert tts_secrets.SERVICE_NAME == "dsh-pet-standalone"
+    assert tts_secrets.SERVICE_NAME == "petwisp"

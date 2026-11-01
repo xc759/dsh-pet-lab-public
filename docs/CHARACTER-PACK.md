@@ -78,8 +78,8 @@
 除内置的 `assets/characters/`，还支持运行时外挂目录（按优先级）：
 
 1. 程序（或源码根目录）同级的 `characters/`
-2. 打包变体的数据目录下的 `characters/`（如 `%APPDATA%/dsh-pet-standalone-webm-chat/characters/`）
-3. 旧版目录 `dsh-pet-standalone/characters/`（兼容老用户）
+2. 打包变体的数据目录下的 `characters/`（如 `%APPDATA%/petwisp-webm-chat/characters/`）
+3. 旧版目录 `petwisp/characters/`（兼容老用户）
 
 把整个 `<角色 id>/` 目录丢进去即可，重启后在菜单里出现。
 

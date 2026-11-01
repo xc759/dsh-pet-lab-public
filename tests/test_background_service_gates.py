@@ -26,11 +26,11 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from PySide6.QtWidgets import QApplication
 
-import pet.app as app_mod
-import pet.overlay_shell as overlay_shell_mod
-from pet import harness_launcher
-from pet.app import AppShell
-from pet.config import APP_DIR_NAME, Config
+import petwisp.app as app_mod
+import petwisp.overlay_shell as overlay_shell_mod
+from petwisp import harness_launcher
+from petwisp.app import AppShell
+from petwisp.config import APP_DIR_NAME, Config
 
 app = QApplication.instance() or QApplication([])
 
@@ -262,13 +262,13 @@ def test_stream_capture_mode_boots_legacy_single_window(tmp_path, monkeypatch):
     ``OverlayShell`` 根本不构造，overlay 的多宠恢复点
     （``overlay_shell._restore_spawned_pets``）不可能被走到。
     """
-    from pet import overlay_settings_command as cmd_mod
-    from pet import overlay_spawn_state
+    from petwisp import overlay_settings_command as cmd_mod
+    from petwisp import overlay_spawn_state
 
     # 壳替身：万一退回 overlay 分支，断言会干净失败（真实壳会去建素材库/合成窗）
     monkeypatch.setattr(overlay_shell_mod, "OverlayShell", _StubOverlayShell)
 
-    # 活跃宠清单 [1, 2]：overlay 拓扑启动会按它复活 2 只子肥鱼
+    # 活跃宠清单 [1, 2]：overlay 拓扑启动会按它复活 2 只子宠
     active_dir = tmp_path / APP_DIR_NAME
     active_dir.mkdir(parents=True, exist_ok=True)
     assert overlay_spawn_state.save_active_slots(active_dir, [1, 2])
@@ -285,7 +285,7 @@ def test_stream_capture_mode_boots_legacy_single_window(tmp_path, monkeypatch):
         assert ui_created == [], "slot0不活跃不得创建捕获窗"
         assert getattr(shell, "_overlay_shell", None) is None, "捕获模式不得建 overlay 壳"
         assert len(shell._instances) == 1, "多宠必须收拢为主宠物"
-        # 清单本身不删：关掉捕获模式再重启，小肥鱼应当回来
+        # 清单本身不删：关掉捕获模式再重启，小宠应当回来
         assert overlay_spawn_state.load_active_slots(active_dir) == [1, 2]
     finally:
         cmd_mod.reset_topology_snapshot()
@@ -293,7 +293,7 @@ def test_stream_capture_mode_boots_legacy_single_window(tmp_path, monkeypatch):
 
 def test_overlay_topology_would_restore_spawned_pets(tmp_path, monkeypatch):
     """对照组：同一份活跃宠清单在 overlay 拓扑下确实由壳接管（对照非空转）。"""
-    from pet import overlay_spawn_state
+    from petwisp import overlay_spawn_state
 
     active_dir = tmp_path / APP_DIR_NAME
     active_dir.mkdir(parents=True, exist_ok=True)
@@ -303,18 +303,18 @@ def test_overlay_topology_would_restore_spawned_pets(tmp_path, monkeypatch):
     shell = _start_shell(tmp_path, monkeypatch, topology="overlay")
     assert shell._overlay_shell is not None
     assert shell._overlay_shell.started == 1
-    assert len(shell._instances) == 1  # 子肥鱼由壳负责（sprite），不走 AppShell._instances
+    assert len(shell._instances) == 1  # 子宠由壳负责（sprite），不走 AppShell._instances
 
 
 def test_capture_mode_refuses_manual_spawn(tmp_path, monkeypatch):
-    """审查修复 2：捕获模式（单窗）下右键「生小肥鱼」被拒 + 冒泡，不新建任何窗。
+    """审查修复 2：捕获模式（单窗）下右键「生小宠」被拒 + 冒泡，不新建任何窗。
 
     走真接线：``PetInstance._wire_window``（app.py:529）把菜单的 ``on_spawn_pet``
     挂到 ``AppShell.spawn_pet``，这里直接触发那个回调。显式 env legacy（dev 逃生
     门）与配置捕获开关同拓扑同语义，同一个门一起拒（见 ``spawn_pet`` 的判定）。
     """
-    from pet import overlay_settings_command as cmd_mod
-    from pet.app import AppShell
+    from petwisp import overlay_settings_command as cmd_mod
+    from petwisp.app import AppShell
 
     win = _RecorderWin()
     shell = _start_shell(
@@ -336,7 +336,7 @@ def test_capture_mode_refuses_manual_spawn(tmp_path, monkeypatch):
 
 
 def test_overlay_topology_still_spawns_on_menu_action(tmp_path, monkeypatch):
-    """对照：默认 overlay 拓扑下同一回调照常生小肥鱼（证明上一条不是空转）。"""
+    """对照：默认 overlay 拓扑下同一回调照常生小宠（证明上一条不是空转）。"""
 
     monkeypatch.setattr(overlay_shell_mod, "OverlayShell", _StubOverlayShell)
     win = _RecorderWin()

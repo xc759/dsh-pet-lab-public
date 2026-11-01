@@ -25,15 +25,15 @@ from PySide6.QtCore import QObject, QRect, Signal  # noqa: E402
 from PySide6.QtGui import QColor, QImage, QPainter  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
-from pet.screen_capture.controller import ScreenCaptureController  # noqa: E402
-from pet.screen_capture.overlay import (  # noqa: E402
+from petwisp.screen_capture.controller import ScreenCaptureController  # noqa: E402
+from petwisp.screen_capture.overlay import (  # noqa: E402
     ACTION_ASK,
     ACTION_COPY,
     ACTION_OCR,
     ACTION_TRANSLATE,
 )
-from pet.screen_capture.pixels import SRGB8_FORMAT  # noqa: E402
-from pet.screen_capture.session import CapturePhase, SelectionRect  # noqa: E402
+from petwisp.screen_capture.pixels import SRGB8_FORMAT  # noqa: E402
+from petwisp.screen_capture.session import CapturePhase, SelectionRect  # noqa: E402
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -451,13 +451,13 @@ def test_hide_failure_still_skips_the_settle_and_the_grab(qapp):
 
 def test_the_default_settler_is_the_real_one():
     """默认必须是真实现（注入件只在测试与真机对照里用）。"""
-    from pet.screen_capture.controller import ScreenCaptureController, settle_before_grab
+    from petwisp.screen_capture.controller import ScreenCaptureController, settle_before_grab
 
     assert ScreenCaptureController()._settler is settle_before_grab
 
 
 def test_settle_prefers_the_compositor_flush_and_skips_the_sleep(qapp, monkeypatch):
-    from pet.screen_capture import controller as controller_mod
+    from petwisp.screen_capture import controller as controller_mod
 
     calls: list[str] = []
     monkeypatch.setattr(controller_mod, "_process_pending_events",
@@ -474,7 +474,7 @@ def test_settle_prefers_the_compositor_flush_and_skips_the_sleep(qapp, monkeypat
 
 
 def test_settle_falls_back_to_one_refresh_frame(qapp, monkeypatch):
-    from pet.screen_capture import controller as controller_mod
+    from petwisp.screen_capture import controller as controller_mod
 
     calls: list[str] = []
     monkeypatch.setattr(controller_mod, "_process_pending_events",
@@ -490,7 +490,7 @@ def test_settle_falls_back_to_one_refresh_frame(qapp, monkeypatch):
 
 def test_settle_swallows_every_broken_waiter(qapp, monkeypatch):
     """三层都得吞异常：调用方只关心"等过没等过"，不关心谁坏了。"""
-    from pet.screen_capture import controller as controller_mod
+    from petwisp.screen_capture import controller as controller_mod
 
     def _boom(*_args, **_kwargs):
         raise RuntimeError("waiter boom")
@@ -503,7 +503,7 @@ def test_settle_swallows_every_broken_waiter(qapp, monkeypatch):
 
 
 def test_one_frame_sleep_follows_the_screen_refresh_rate(monkeypatch):
-    from pet.screen_capture import controller as controller_mod
+    from petwisp.screen_capture import controller as controller_mod
 
     slept: list[float] = []
     monkeypatch.setattr(controller_mod.time, "sleep", slept.append)
@@ -518,7 +518,7 @@ def test_one_frame_sleep_follows_the_screen_refresh_rate(monkeypatch):
 
 def test_one_frame_sleep_is_clamped_and_survives_a_bogus_refresh_rate(monkeypatch):
     """读不到/不合理/离谱慢的刷新率都不许把一次截图卡住：夹到上限或退回 60 Hz。"""
-    from pet.screen_capture import controller as controller_mod
+    from petwisp.screen_capture import controller as controller_mod
 
     slept: list[float] = []
     monkeypatch.setattr(controller_mod.time, "sleep", slept.append)
@@ -544,7 +544,7 @@ def test_one_frame_sleep_is_clamped_and_survives_a_bogus_refresh_rate(monkeypatc
 
 
 def test_dwm_flush_is_a_noop_off_windows(monkeypatch):
-    from pet.screen_capture import controller as controller_mod
+    from petwisp.screen_capture import controller as controller_mod
 
     monkeypatch.setattr(controller_mod.sys, "platform", "linux")
 

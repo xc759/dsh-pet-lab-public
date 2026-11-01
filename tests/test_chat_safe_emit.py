@@ -12,7 +12,7 @@ from PySide6.QtWidgets import QApplication
 
 import shiboken6
 
-from pet.chat.utils import _safe_emit
+from petwisp.chat.utils import _safe_emit
 
 
 class _Obj(QObject):

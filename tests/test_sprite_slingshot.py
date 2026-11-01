@@ -28,14 +28,14 @@ from PySide6.QtCore import QEvent, QObject, QPoint, QPointF, QRect, Qt, Signal
 from PySide6.QtGui import QImage, QKeyEvent, QMouseEvent, QPainter, QRegion
 from PySide6.QtWidgets import QApplication
 
-from pet import physics as physics_mod
-from pet.overlay_window import OverlayWindow
-from pet.pet_sprite import (INTERACTION_DRAG, INTERACTION_NORMAL,
+from petwisp import physics as physics_mod
+from petwisp.overlay_window import OverlayWindow
+from petwisp.pet_sprite import (INTERACTION_DRAG, INTERACTION_NORMAL,
                             INTERACTION_THROWN, PetSprite)
-from pet.sprite_behavior import BehaviorController
-from pet.sprite_collision import SpriteCollisionWorld
-from pet.sprite_physics import ThrowPhysicsController
-from pet.sprite_slingshot import SlingshotController
+from petwisp.sprite_behavior import BehaviorController
+from petwisp.sprite_collision import SpriteCollisionWorld
+from petwisp.sprite_physics import ThrowPhysicsController
+from petwisp.sprite_slingshot import SlingshotController
 
 app = QApplication.instance() or QApplication([])
 

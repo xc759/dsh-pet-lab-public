@@ -36,7 +36,7 @@ from PySide6.QtCore import QEvent, QThreadPool
 from PySide6.QtGui import QImage
 from PySide6.QtWidgets import QApplication, QMenu
 
-from pet.context_menus.shared import (
+from petwisp.context_menus.shared import (
     _AnimationIconApplier,
     _AnimationIconWorker,
     _populate_animation_category,
@@ -222,12 +222,12 @@ def test_failure_log_has_a_reason_and_does_not_flood(tmp_path, caplog):
     menu = _menu(tmp_path)
     submenu = menu.addMenu("随机动作")
     try:
-        with caplog.at_level("DEBUG", logger="pet.context_menus.shared"):
+        with caplog.at_level("DEBUG", logger="petwisp.context_menus.shared"):
             _populate_animation_category(
                 submenu, pet, names, lambda _name: None, True, False)
             assert _wait_until(lambda: not submenu._animation_icon_workers), calls
 
-        records = [r for r in caplog.records if r.name == "pet.context_menus.shared"]
+        records = [r for r in caplog.records if r.name == "petwisp.context_menus.shared"]
         warnings = [r for r in records if r.levelno >= 30]
         assert len(warnings) == 1, [r.getMessage() for r in records]
         text = warnings[0].getMessage()
@@ -259,7 +259,7 @@ _CHILD_SCRIPT = textwrap.dedent(
     from PySide6.QtCore import QEvent, QThreadPool, QTimer
     from PySide6.QtWidgets import QApplication, QMenu
 
-    from pet.context_menus.shared import _AnimationIconApplier, _AnimationIconWorker
+    from petwisp.context_menus.shared import _AnimationIconApplier, _AnimationIconWorker
 
     app = QApplication([])
     pools = []
@@ -411,7 +411,7 @@ def test_released_host_is_not_written_by_late_worker(tmp_path):
 
 def test_applier_payload_contract():
     """载荷契约：失败载荷是独立类型、可带原因；None/有效图仍按旧语义处理。"""
-    from pet.context_menus.shared import _AnimationIconFailure
+    from petwisp.context_menus.shared import _AnimationIconFailure
 
     error = RuntimeError("库已销毁")
     failure = _AnimationIconFailure("动作", error)

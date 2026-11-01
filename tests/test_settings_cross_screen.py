@@ -22,12 +22,12 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 import pytest  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
-import pet.modern_settings_dialog as settings_mod  # noqa: E402
-import pet.settings_pet_controls as pet_controls  # noqa: E402
-from pet import settings_default_marks  # noqa: E402
-from pet.config import Config  # noqa: E402
-from pet.modern_settings_dialog import SettingRow  # noqa: E402
-from pet.settings_pet_controls import GLOBAL_SCOPE_NOTE  # noqa: E402
+import petwisp.modern_settings_dialog as settings_mod  # noqa: E402
+import petwisp.settings_pet_controls as pet_controls  # noqa: E402
+from petwisp import settings_default_marks  # noqa: E402
+from petwisp.config import Config  # noqa: E402
+from petwisp.modern_settings_dialog import SettingRow  # noqa: E402
+from petwisp.settings_pet_controls import GLOBAL_SCOPE_NOTE  # noqa: E402
 
 app = QApplication.instance() or QApplication([])
 
@@ -136,7 +136,7 @@ def test_hint_describes_the_window_count_split_by_scaling():
     100% 时又会把 Qt 报错的负原点屏坐标当真（#310）。反向也不能写成"永远每屏一张"：
     多块屏缩放全是 100% 时仍是单窗。
     """
-    from pet.settings_pet_controls import CROSS_SCREEN_HINT
+    from petwisp.settings_pet_controls import CROSS_SCREEN_HINT
 
     assert "一张合成窗铺满所有显示器组成的桌面" not in CROSS_SCREEN_HINT
     assert "每块屏各自有一张合成窗" in CROSS_SCREEN_HINT

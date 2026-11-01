@@ -17,11 +17,11 @@ import pytest
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QImage
 
-from pet import character_pack as cp
-from pet import frameseq_provision
-from pet import pack_download as pd
-from pet.frameseq_clip import FrameSeqClip
-from pet.library import MovieLibrary
+from petwisp import character_pack as cp
+from petwisp import frameseq_provision
+from petwisp import pack_download as pd
+from petwisp.frameseq_clip import FrameSeqClip
+from petwisp.library import MovieLibrary
 
 FRAMES = 4
 
@@ -160,7 +160,7 @@ def test_installed_pack_is_discovered_by_product_chain(served, tmp_path, monkeyp
     只找 `<id>/videos` —— UI 显示"已安装"但桌宠不会用。这条用例**不显式注入
     asset_dir**，走真实解析链。
     """
-    from pet import catalog
+    from petwisp import catalog
 
     zpath, _url = served
     root = tmp_path / "characters"
@@ -173,7 +173,7 @@ def test_installed_pack_is_discovered_by_product_chain(served, tmp_path, monkeyp
     assert catalog.resolve_character_video_dir("demo") != char_dir,         "装了什么不等于用哪个：没有 active.json 时不许自动激活"
 
     # 2) 显式"使用这套"之后才生效
-    from pet import character_pack as cp
+    from petwisp import character_pack as cp
     assert cp.set_active(char_dir) is True
     assert catalog.resolve_character_video_dir("demo") == char_dir
 

@@ -13,8 +13,8 @@ import time
 
 import pytest
 
-from pet.chat import session_store as ss
-from pet.chat.models import ChatMessage
+from petwisp.chat import session_store as ss
+from petwisp.chat.models import ChatMessage
 
 
 @pytest.fixture()

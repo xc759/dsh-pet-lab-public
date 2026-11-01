@@ -15,7 +15,7 @@ def _reset(thumbnail, monkeypatch, tmp_path):
 
 
 def test_disk_cache_hit_and_mtime_invalidation(monkeypatch, tmp_path):
-    import pet.animation_thumbnail as thumbnail
+    import petwisp.animation_thumbnail as thumbnail
 
     _reset(thumbnail, monkeypatch, tmp_path)
     path = tmp_path / "clip.webm"
@@ -40,7 +40,7 @@ def test_disk_cache_hit_and_mtime_invalidation(monkeypatch, tmp_path):
 
 
 def test_half_written_cache_file_is_ignored(monkeypatch, tmp_path):
-    import pet.animation_thumbnail as thumbnail
+    import petwisp.animation_thumbnail as thumbnail
 
     _reset(thumbnail, monkeypatch, tmp_path)
     path = tmp_path / "clip.webm"
@@ -61,7 +61,7 @@ def test_half_written_cache_file_is_ignored(monkeypatch, tmp_path):
 
 
 def test_disk_cache_eviction_keeps_limit(monkeypatch, tmp_path):
-    import pet.animation_thumbnail as thumbnail
+    import petwisp.animation_thumbnail as thumbnail
 
     _reset(thumbnail, monkeypatch, tmp_path)
     monkeypatch.setattr(thumbnail, "_DISK_CACHE_LIMIT", 2)
@@ -76,7 +76,7 @@ def test_disk_cache_eviction_keeps_limit(monkeypatch, tmp_path):
 
 
 def test_decode_failure_falls_back_without_cache_entry(monkeypatch, tmp_path):
-    import pet.animation_thumbnail as thumbnail
+    import petwisp.animation_thumbnail as thumbnail
 
     _reset(thumbnail, monkeypatch, tmp_path)
     path = tmp_path / "clip.webm"
@@ -96,7 +96,7 @@ def test_decode_result_is_bounded_to_thumbnail_size(monkeypatch, tmp_path):
     100MB+（实机：右键逛动画菜单 90→231MB 不回落）；菜单图标槽位只有
     ~18 逻辑像素，缩略图视觉无损。
     """
-    import pet.animation_thumbnail as thumbnail
+    import petwisp.animation_thumbnail as thumbnail
 
     _reset(thumbnail, monkeypatch, tmp_path)
     path = tmp_path / "big.webm"
@@ -115,7 +115,7 @@ def test_decode_result_is_bounded_to_thumbnail_size(monkeypatch, tmp_path):
 
 def test_legacy_fullres_disk_entry_scaled_on_read(monkeypatch, tmp_path):
     """旧版磁盘缓存里的全尺寸 PNG：读入内存时缩放，不把大图带进缓存。"""
-    import pet.animation_thumbnail as thumbnail
+    import petwisp.animation_thumbnail as thumbnail
 
     _reset(thumbnail, monkeypatch, tmp_path)
     path = tmp_path / "legacy.webm"

@@ -22,14 +22,14 @@ from PySide6.QtCore import QObject, QPointF, QRect, QRectF, Qt, Signal
 from PySide6.QtGui import QImage
 from PySide6.QtWidgets import QApplication
 
-from pet import physics as physics_mod
-from pet.pet_sprite import (
+from petwisp import physics as physics_mod
+from petwisp.pet_sprite import (
     INTERACTION_DRAG,
     INTERACTION_NORMAL,
     INTERACTION_THROWN,
     PetSprite,
 )
-from pet.sprite_physics import ThrowPhysicsController
+from petwisp.sprite_physics import ThrowPhysicsController
 
 app = QApplication.instance() or QApplication([])
 
@@ -476,8 +476,8 @@ def test_grounded_drop_skips_thrown_capture_and_landing_warm(monkeypatch):
     预热，数次数会把「用例顺序」写进断言（本地单跑绿、全量跑红）。半空对照
     证明同装配下这条链路确实会提交，贴地那半不是空过。
     """
-    from pet import sprite_behavior
-    from pet.sprite_behavior import BehaviorController, STATE_THROWN
+    from petwisp import sprite_behavior
+    from petwisp.sprite_behavior import BehaviorController, STATE_THROWN
 
     submitted: list = []
     monkeypatch.setattr(sprite_behavior._WARM_EXECUTOR, "submit",
@@ -598,7 +598,7 @@ def test_sprite_bounds_inset_by_body_box(monkeypatch):
     body_box=(100,60,400,330) × scale 0.5 → 局部身体框 QRect(50,30,150,135)；
     bounds (0,0,800,600) → 左上角活动范围 (-50,-30,600,435)。
     """
-    from pet import catalog
+    from petwisp import catalog
 
     monkeypatch.setattr(catalog, "character_body_box", lambda _cid, *a, **k: (100, 60, 400, 330))
     sprite = _make_sprite()
@@ -639,7 +639,7 @@ class WarmClip(FakeClip):
 
 def _throw_scene(clip, *, idles=("fake",)):
     """起飞现场：sprite 已甩出（interaction_state = thrown），行为控制器待接管。"""
-    from pet.sprite_behavior import BehaviorController
+    from petwisp.sprite_behavior import BehaviorController
 
     lib = FakeLibrary(clip)
     lib.idles = list(idles)
@@ -675,7 +675,7 @@ def test_throw_entry_warms_and_pins_landing_idles_off_gui_thread():
 
 def test_landing_returns_to_idle_and_unpins_landing_idles():
     """落地（物理切回 normal）→ 收口回待机并摘 pin（window.py:4289）。"""
-    from pet.sprite_behavior import STATE_IDLE
+    from petwisp.sprite_behavior import STATE_IDLE
 
     clip = WarmClip()
     sprite, behavior = _throw_scene(clip)
@@ -696,7 +696,7 @@ def test_landing_returns_to_idle_and_unpins_landing_idles():
 
 def test_flight_interrupted_by_drag_unpins_landing_idles():
     """飞行被拖拽打断（空中抓住）→ 摘 pin（window.py:4318 同款语义）。"""
-    from pet.sprite_behavior import STATE_DRAG
+    from petwisp.sprite_behavior import STATE_DRAG
 
     clip = WarmClip()
     sprite, behavior = _throw_scene(clip)

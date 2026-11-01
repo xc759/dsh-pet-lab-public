@@ -25,7 +25,7 @@ import time
 import pytest
 from PIL import Image
 
-from pet import frameseq_provision as fp
+from petwisp import frameseq_provision as fp
 
 
 def _blend(rgb: tuple[int, int, int], alpha: int) -> tuple[int, int, int]:

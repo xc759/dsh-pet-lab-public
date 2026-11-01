@@ -20,8 +20,8 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 from PySide6.QtCore import QRect
 from PySide6.QtWidgets import QApplication
 
-from pet import collision
-from pet.app import AppShell
+from petwisp import collision
+from petwisp.app import AppShell
 from tests.test_overlay_hosts_multiscreen import (
     _install_screens,
     _make_shell,

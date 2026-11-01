@@ -45,7 +45,7 @@ from PySide6.QtWidgets import (  # noqa: E402
     QWidget,
 )
 
-from pet.screen_capture.result_panel import (  # noqa: E402
+from petwisp.screen_capture.result_panel import (  # noqa: E402
     SHORT_RESULT_LIMIT,
     SYSTEM_STYLE,
     ScreenResult,
@@ -255,7 +255,7 @@ def test_the_panel_lands_below_the_selection_it_came_from(qapp):
 
     落点是"这块图的下文"，用户的视线不用在选区和屏幕角落之间来回跳。
     """
-    from pet.screen_capture.session import SelectionRect
+    from petwisp.screen_capture.session import SelectionRect
 
     rect = SelectionRect(200, 200, 300, 100)
     panel = ScreenResultPanel()
@@ -273,7 +273,7 @@ def test_the_selection_beats_the_anchor_and_the_screen_corner(qapp):
     （锚/角落是"没有选区上下文"时的退路——两套口径混用会让结果卡在岛边、问答窗
     在选区边，用户看到的是同一张图的两个落点。）
     """
-    from pet.screen_capture.session import SelectionRect
+    from petwisp.screen_capture.session import SelectionRect
 
     screen = QGuiApplication.primaryScreen()
     assert screen is not None
@@ -476,7 +476,7 @@ def test_hiding_the_card_keeps_its_round_so_a_covered_card_is_still_the_same_rou
     "采集换了件事"：同一轮再来卡片时不许重抽（中途换脸＝用户以为换了件事）；
     真正结束这一轮的是本轮的终态结果或显式收口（见 ``end_loading``）。
     """
-    from pet.screen_capture import brand_icons, result_panel as rp
+    from petwisp.screen_capture import brand_icons, result_panel as rp
 
     jingwa, whale = brand_icons.load_jingwa(), brand_icons.load_ds_whale()
     order = [jingwa, whale]
@@ -781,7 +781,7 @@ def test_a_loading_round_rolls_once_and_only_a_new_round_rolls_again(qapp, monke
     整次加载保持所选的那一只——旧实现按相位在两只之间轮换，所以这里把相位推到
     老的换场点（3.1 ≈ 1.2s）再问一次，轮播一回来就红。
     """
-    from pet.screen_capture import brand_icons, result_panel as rp
+    from petwisp.screen_capture import brand_icons, result_panel as rp
 
     jingwa, whale = brand_icons.load_jingwa(), brand_icons.load_ds_whale()
     order = [jingwa, whale]
@@ -824,7 +824,7 @@ def test_a_rounds_identity_decides_who_rolls_and_who_may_end_it(qapp, monkeypatc
     - **别人的轮收不得**：重翻链路的收口不许把采集链路还在跑的那一轮连图一起收掉
       （两条链路共用一块面板，各自的轮次身份互不覆盖）。
     """
-    from pet.screen_capture import brand_icons, result_panel as rp
+    from petwisp.screen_capture import brand_icons, result_panel as rp
 
     jingwa, whale = brand_icons.load_jingwa(), brand_icons.load_ds_whale()
     order = [jingwa, whale]
@@ -864,7 +864,7 @@ def _round_presenter():
     也得连不上面板的短结果一起判，所以"谁能改这块屏"的用例必须打在这一层；面板侧只剩
     "照着摆"。）
     """
-    from pet.screen_capture.actions import ScreenCapturePresenter
+    from petwisp.screen_capture.actions import ScreenCapturePresenter
 
     return ScreenCapturePresenter(panel_factory=ScreenResultPanel)
 
@@ -878,7 +878,7 @@ def test_a_superseded_rounds_result_cannot_overwrite_the_card_that_took_over(qap
     **再**判轮次归属，连第二张还在转的加载动画一起收掉：用户看到的是一张静止的旧结果，
     第二张"正在跑"没有任何痕迹。
     """
-    from pet.screen_capture import brand_icons, result_panel as rp
+    from petwisp.screen_capture import brand_icons, result_panel as rp
 
     jingwa, whale = brand_icons.load_jingwa(), brand_icons.load_ds_whale()
     order = [jingwa, whale]
@@ -964,7 +964,7 @@ def test_consecutive_loading_cards_on_the_same_panel_are_one_round(qapp, monkeyp
     （这条纠正了上一版把"连续 show_result 即算新轮"当契约的写法——真实链路
     ``actions._run_translate`` 一次操作连发两张过程态卡片，那是过程更新。）
     """
-    from pet.screen_capture import brand_icons, result_panel as rp
+    from petwisp.screen_capture import brand_icons, result_panel as rp
 
     jingwa, whale = brand_icons.load_jingwa(), brand_icons.load_ds_whale()
     order = [jingwa, whale]
@@ -1000,11 +1000,11 @@ def test_one_translate_operation_keeps_one_icon_across_its_two_loading_cards(qap
     （外加 release 假件，免去碰真 OCR 引擎的释放）。
     """
     from PySide6.QtCore import QObject, Signal
-    from pet.screen_capture import result_panel as rp
-    from pet.screen_capture.actions import (ACTION_TRANSLATE, ScreenCaptureActions,
+    from petwisp.screen_capture import result_panel as rp
+    from petwisp.screen_capture.actions import (ACTION_TRANSLATE, ScreenCaptureActions,
                                             ScreenCapturePresenter)
-    from pet.screen_capture.brand_icons import load_ds_whale, load_jingwa
-    from pet.screen_capture.session import SelectionRect
+    from petwisp.screen_capture.brand_icons import load_ds_whale, load_jingwa
+    from petwisp.screen_capture.session import SelectionRect
 
     class _FakeController(QObject):
         """采集闭环替身：只提供编排层要连的三条信号（不在测试里跑真采集）。"""
@@ -1082,7 +1082,7 @@ def test_one_translate_operation_keeps_one_icon_across_its_two_loading_cards(qap
 
 def test_the_loading_roll_is_jingwa_only_below_one_in_ten(qapp, monkeypatch):
     """抽取口径：``random() < 0.1`` 出鲸蛙，0.1 及以上一律 DS logo（边界逐点钉）。"""
-    from pet.screen_capture import brand_icons
+    from petwisp.screen_capture import brand_icons
 
     jingwa, whale = brand_icons.load_jingwa(), brand_icons.load_ds_whale()
     assert jingwa.isNull() is False and whale.isNull() is False, "两只素材都应随包在场"
@@ -1095,7 +1095,7 @@ def test_the_loading_roll_is_jingwa_only_below_one_in_ten(qapp, monkeypatch):
 def test_the_loading_roll_falls_back_to_the_ds_logo_without_the_jingwa_asset(qapp, monkeypatch):
     """鲸蛙素材缺席：不该掷出空帧，直接给 DS logo；两只都缺席才回空图。"""
     from PySide6.QtGui import QPixmap
-    from pet.screen_capture import brand_icons
+    from petwisp.screen_capture import brand_icons
 
     whale = brand_icons.load_ds_whale()
     monkeypatch.setattr(brand_icons, "load_jingwa", lambda: QPixmap())
@@ -1109,7 +1109,7 @@ def test_the_loading_roll_falls_back_to_the_ds_logo_without_the_jingwa_asset(qap
 def test_the_loading_animation_falls_back_to_dots_without_assets(qapp, monkeypatch):
     """两只素材全缺席：回退三点跳动（动画自己绝不许成为故障点）。"""
     from PySide6.QtGui import QPixmap
-    from pet.screen_capture import result_panel as rp
+    from petwisp.screen_capture import result_panel as rp
 
     monkeypatch.setattr(rp, "pick_loading_icon", lambda: QPixmap())
     fish = rp._LoadingFish()
@@ -1131,7 +1131,7 @@ def test_the_loading_icon_keeps_its_box_size_at_any_dpr(qapp, monkeypatch):
     比画面上的实际宽度（动画挂在白底宿主里，量的才是它自己画的像素）。
     """
     from PySide6.QtGui import QPixmap
-    from pet.screen_capture import result_panel as rp
+    from petwisp.screen_capture import result_panel as rp
 
     widths = []
     for dpr in (1.0, 2.0):
@@ -1158,7 +1158,7 @@ def test_the_non_square_icon_is_fitted_without_distortion(qapp, monkeypatch):
     期望值由素材自己那圈不透明范围映射进槽里算出来（不写死像素数）；旧实现按
     44×44 硬拉伸，高度会顶到 ~42（宽高比从 1.25 掉到 1.05）。
     """
-    from pet.screen_capture import brand_icons, result_panel as rp
+    from petwisp.screen_capture import brand_icons, result_panel as rp
 
     jingwa = brand_icons.load_jingwa()
     assert jingwa.isNull() is False
@@ -1205,7 +1205,7 @@ def test_the_whole_icon_is_drawn_not_just_one_corner(qapp, monkeypatch):
     也是同一个颜色铺满框），所以用四象限四种颜色，按画面上四个象限中心的颜色断言。
     """
     from PySide6.QtGui import QPainter, QPixmap
-    from pet.screen_capture import result_panel as rp
+    from petwisp.screen_capture import result_panel as rp
 
     quadrants = {"tl": "#ff0000", "tr": "#00c000", "bl": "#0040ff", "br": "#ffd000"}
 
@@ -1261,7 +1261,7 @@ def test_a_broken_first_candidate_falls_through_to_the_next_one(qapp, monkeypatc
     好图留在源码树候选上。
     """
     from PySide6.QtGui import QPixmap
-    from pet.screen_capture import brand_icons
+    from petwisp.screen_capture import brand_icons
 
     good = brand_icons.load_ds_whale()
     assert good.isNull() is False, "源码树里的 DS logo 素材应当在场"
@@ -1286,7 +1286,7 @@ def test_a_broken_first_candidate_falls_through_to_the_next_one(qapp, monkeypatc
 def test_all_candidates_broken_gives_the_null_pixmap_and_only_tries_once(qapp, monkeypatch,
                                                                         tmp_path):
     """所有候选都解不开：如实给空图（调用方回退三点跳动），且只试一次。"""
-    from pet.screen_capture import brand_icons
+    from petwisp.screen_capture import brand_icons
 
     frozen = tmp_path / "frozen" / "assets" / "chat"
     frozen.mkdir(parents=True)
@@ -1321,7 +1321,7 @@ def test_all_candidates_broken_gives_the_null_pixmap_and_only_tries_once(qapp, m
 
 def test_the_decoded_pixmap_is_cached_and_never_decoded_twice(qapp, monkeypatch):
     """缓存：第二次调用直接用缓存（不再碰磁盘、不再解码一次）。"""
-    from pet.screen_capture import brand_icons
+    from petwisp.screen_capture import brand_icons
 
     monkeypatch.setattr(brand_icons, "_CACHE", {})
     decoded: list[str] = []

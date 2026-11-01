@@ -10,7 +10,7 @@
   模式）：没有 flavor、仍按纯文本命中，升级不作废它；但查找顺序是「当前配置的产物 →
   经典文本缓存」，它不凌驾于当前配置生成的产物之上；
 - 合成走「设置 → 语音报时」同一条链路（``pet/tts`` 注册表 + 同一音色），所以「试听
-  有声音」等价于「台词语音能生成」；自建 CosyVoice 只剩 ``DSH_PET_TTS_URL`` 这条可选
+  有声音」等价于「台词语音能生成」；自建 CosyVoice 只剩 ``PETWISP_TTS_URL`` 这条可选
   覆盖，且它不在线时必须落回注册表而不是静默收工（issue #305）；
 - 名单 = 每只宠**自己 slot 档案**里的自言自语（``self_talk_texts`` 是每宠键）＋该宠
   各角色**点击动画绑定**台词，跨宠按文本去重（读错作用域 → 在别人的名单上生成、
@@ -33,10 +33,10 @@ from types import SimpleNamespace
 
 import pytest
 
-from pet.voice import self_talk as stv
-from pet import tts
-from pet.config import Config
-from pet.voice_chime import cache_key
+from petwisp.voice import self_talk as stv
+from petwisp import tts
+from petwisp.config import Config
+from petwisp.voice_chime import cache_key
 
 # --------------------------------------------------------------- 替身与夹具
 
@@ -321,7 +321,7 @@ def test_collect_lines_includes_bindings_and_dedupes(tmp_path):
 
 def test_collect_all_lines_reads_each_pet_own_slot_scope(tmp_path):
     """每只宠的名单必须来自**它自己**的 slot 档案（``self_talk_texts`` 是每宠键）。"""
-    from pet.settings_slot_config import route_settings_config
+    from petwisp.settings_slot_config import route_settings_config
 
     main = Config(base=tmp_path)
     main.set("self_talk_texts", ["主配置层那份（不该被读）。"])
@@ -463,7 +463,7 @@ def _stub_http(monkeypatch, *, healthy=True, fail_texts=()):
 
 
 def test_local_service_override_still_writes_the_classic_wav(tmp_path, monkeypatch, fake_tts):
-    """``DSH_PET_TTS_URL`` 指向的自建服务仍可用，且产出落在老路径上（不浪费老缓存）。"""
+    """``PETWISP_TTS_URL`` 指向的自建服务仍可用，且产出落在老路径上（不浪费老缓存）。"""
     provider = fake_tts()
     cfg = _cfg(tmp_path, backend=provider.id)
     monkeypatch.setenv(stv.SERVER_ENV, "http://127.0.0.1:9880")
@@ -638,7 +638,7 @@ def test_settings_page_toggle_round_trip(tmp_path):
     """设置页开关能落盘回读，且挂在「点击行为」那组里（门禁：持久化往返 + 归属）。"""
     from PySide6.QtWidgets import QApplication
 
-    import pet.modern_settings_dialog as settings_mod
+    import petwisp.modern_settings_dialog as settings_mod
 
     app = QApplication.instance() or QApplication([])
     cfg = Config(base=tmp_path)
@@ -658,7 +658,7 @@ def test_settings_page_toggle_round_trip(tmp_path):
 
 def test_click_self_talk_precache_hint_no_longer_promises_a_local_cosyvoice():
     """设置页文案必须与实现一致：合成走的是「语音报时」的后端，不是"必须先装 CosyVoice"。"""
-    src = (Path(__file__).resolve().parents[1] / "pet" / "settings_interaction.py").read_text(
+    src = (Path(__file__).resolve().parents[1] / "petwisp" / "settings_interaction.py").read_text(
         encoding="utf-8")
 
     assert "CosyVoice" not in src, "文案还写着需要本机 CosyVoice 服务，与实际实现不符"
@@ -671,7 +671,7 @@ def test_click_self_talk_precache_hint_no_longer_promises_a_local_cosyvoice():
 def _appshell(cfg):
     from PySide6.QtWidgets import QApplication
 
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     QApplication.instance() or QApplication([])
     return AppShell(QApplication.instance(), cfg, enable_chat=False)
@@ -752,7 +752,7 @@ def test_external_settings_save_starts_the_precache(tmp_path, monkeypatch):
     ``settings_process_isolation`` 默认开启时根本不会执行，缺了这一行就是
     "打开开关并保存、本次运行一个文件都不生成"（issue #305）。
     """
-    import pet.app as app_mod
+    import petwisp.app as app_mod
 
     cfg = _cfg(tmp_path)
     cfg.set("self_talk_voice_precache_enabled", False)

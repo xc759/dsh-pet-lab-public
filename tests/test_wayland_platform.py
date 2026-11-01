@@ -13,7 +13,7 @@ import sys
 
 import pytest
 
-from pet.app import _default_xcb_platform_on_wayland
+from petwisp.app import _default_xcb_platform_on_wayland
 
 
 @pytest.fixture

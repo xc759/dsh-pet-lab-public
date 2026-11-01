@@ -6,7 +6,7 @@ import logging
 
 import pytest
 
-from pet.agent_event_protocol import (
+from petwisp.agent_event_protocol import (
     MAX_DATA_BYTES,
     MAX_STRING_CHARS,
     MIN_CONTENT_STRING_CHARS,
@@ -140,8 +140,8 @@ def test_oversized_failure_still_counted_by_model_access_tracker():
     只断言"键还在"是不够的：`_resets` 读 data['ok']，`is_model_access` 读
     failure.code/message —— 值被剪坏时键依然存在，但语义已经反了。
     """
-    from pet.agent_event_normalizer import RetryEvent, normalize_event
-    from pet.model_access_tracker import ModelAccessTracker
+    from petwisp.agent_event_normalizer import RetryEvent, normalize_event
+    from petwisp.model_access_tracker import ModelAccessTracker
 
     tracker = ModelAccessTracker()
     retry = {
@@ -184,8 +184,8 @@ _LONG_MSG = ("HTTP request to the model endpoint failed after 2 attempts: "
 
 
 def test_long_error_message_survives_trimming_and_still_counts_as_model_access():
-    from pet.agent_event_normalizer import RetryEvent, normalize_event
-    from pet.model_access_tracker import ModelAccessTracker
+    from petwisp.agent_event_normalizer import RetryEvent, normalize_event
+    from petwisp.model_access_tracker import ModelAccessTracker
 
     assert _LONG_MSG.index("ETIMEDOUT") > MIN_CONTENT_STRING_CHARS, \
         "前置：关键字必须落在旧下限之后，否则本用例不成立"
@@ -212,11 +212,11 @@ def test_long_identity_ids_survive_trimming_so_interaction_still_pairs():
     """审批收尾靠身份字符串**相等**配对（agent_link._on_normalized_event:2633、
     _on_approval_resolved:3608），而待办登记端存的是**未修剪**的原始 payload
     （_register_interaction(rpc_id=payload.get("rpcId")):3383）。桥接写出的收尾帧是
-    `interaction/resolved` + 顶层 rpcId/approvalId（integrations/dsh-pet-bridge
+    `interaction/resolved` + 顶层 rpcId/approvalId（integrations/petwisp-bridge
     index.js:1283），这两个键不在 from_record 的排除表里 → 进 data → 受修剪。
     身份被剪短 = 两侧永不相等 = 审批永久挂在待办里（或错配到别的审批）。
     """
-    from pet.agent_event_normalizer import InteractionResolvedEvent, normalize_event
+    from petwisp.agent_event_normalizer import InteractionResolvedEvent, normalize_event
 
     rpc = "rpc-" + "9" * 96
     approval = "appr-" + "8" * 96
@@ -283,7 +283,7 @@ def test_fittable_long_semantic_value_is_kept_whole_while_content_is_squeezed():
 def test_trimming_never_flips_an_outcome():
     """修剪前后的语义结局必须一致：基线是**未修剪**负载（直接构造 AgentEvent），
     对照是走真实 parse 的修剪结果。"""
-    from pet.agent_event_normalizer import normalize_event
+    from petwisp.agent_event_normalizer import normalize_event
 
     raw_data = {"ok": "error", "tool": "write", "errorMessage": _LONG_MSG, "content": _FILLER}
     baseline = AgentEvent(SCHEMA, 1.0, "dsh", "dsh", "", "", "s1", "", None, None,
@@ -303,7 +303,7 @@ def test_content_only_payload_success_is_a_preexisting_default():
     这不妨碍反面口径成立：不允许修剪把**原本失败**的事件剪成成功
     （见 test_trimming_never_flips_an_outcome）。
     """
-    from pet.agent_event_normalizer import EvidenceEvent, ToolResultEvent, normalize_event
+    from petwisp.agent_event_normalizer import EvidenceEvent, ToolResultEvent, normalize_event
 
     raw_data = {"tool": "read", "content": _FILLER}
     baseline = AgentEvent(SCHEMA, 1.0, "dsh", "dsh", "", "", "s1", "", None, None,
@@ -343,7 +343,7 @@ def test_content_item_quota_never_drops_semantic_keys():
     assert raw.get("tool") == "write", f"tool 被条目配额切掉：{sorted(raw)[:6]}…"
     assert _size(raw) <= MAX_DATA_BYTES
 
-    from pet.agent_event_normalizer import ToolResultEvent, normalize_event
+    from petwisp.agent_event_normalizer import ToolResultEvent, normalize_event
 
     event = parse_agent_event({"ts": 1.0, "agent": "dsh", "sessionId": "s1",
                                "event": "tool/result", "data": payload})
@@ -390,8 +390,8 @@ def test_semantic_container_is_not_sliced_by_content_quota():
     assert raw["failure"]["message"] == "rate limit exceeded"
     assert _size(raw) <= MAX_DATA_BYTES
 
-    from pet.agent_event_normalizer import RetryEvent, normalize_event
-    from pet.model_access_tracker import ModelAccessTracker
+    from petwisp.agent_event_normalizer import RetryEvent, normalize_event
+    from petwisp.model_access_tracker import ModelAccessTracker
 
     event = parse_agent_event({"ts": 1.0, "agent": "dsh", "sessionId": "s1",
                                "event": "llm/retry", "data": payload})
@@ -452,8 +452,8 @@ def test_root_level_message_is_error_semantics_not_display_content():
     assert event.data.get("message") == _LONG_MSG, \
         f"根级 message 被剪短：{event.data.get('message')!r}"
 
-    from pet.agent_event_normalizer import RetryEvent, normalize_event
-    from pet.model_access_tracker import ModelAccessTracker
+    from petwisp.agent_event_normalizer import RetryEvent, normalize_event
+    from petwisp.model_access_tracker import ModelAccessTracker
 
     semantic = normalize_event(event)
     assert isinstance(semantic, RetryEvent) and semantic.message == _LONG_MSG
@@ -541,7 +541,7 @@ def test_content_mapping_keys_keep_the_120_char_trim():
 
 def test_legacy_resolution_event_names_normalize_to_interaction_resolved():
     """approval/decided、approval/resolved、question/resolved 归一到收尾事件。"""
-    from pet.agent_event_normalizer import InteractionResolvedEvent, normalize_event
+    from petwisp.agent_event_normalizer import InteractionResolvedEvent, normalize_event
 
     # approval/decided：桥接 STATE_EVENT_TYPES 直写的最小形态（无身份字段）
     decided = normalize_event(parse_agent_event(
@@ -575,7 +575,7 @@ def test_interaction_resolved_reads_top_level_call_id():
     顶层；from_record 只把 callId/requestId 移出 data（其余留在 data），所以
     callId 只能从信封字段回退取到。
     """
-    from pet.agent_event_normalizer import InteractionResolvedEvent, normalize_event
+    from petwisp.agent_event_normalizer import InteractionResolvedEvent, normalize_event
 
     event = parse_agent_event({
         "event": "interaction/resolved", "source": "dsh", "agentName": "dsh",
@@ -608,7 +608,7 @@ RETIRED_CONTROL_EVENTS = ("control-result", "bridge/control-result", "watchdog/c
 
 def test_retired_control_result_events_no_longer_produce_semantic_events():
     """三种 control-result 形态都不再产出语义事件。"""
-    from pet.agent_event_normalizer import normalize_event
+    from petwisp.agent_event_normalizer import normalize_event
 
     for name in RETIRED_CONTROL_EVENTS:
         event = normalize_event(parse_agent_event(
@@ -620,6 +620,6 @@ def test_retired_control_result_events_no_longer_produce_semantic_events():
 
 def test_control_result_event_class_stays_removed():
     """退役的事件类不得回流（无生产者即无契约，留着只会误导消费端）。"""
-    from pet import agent_event_normalizer
+    from petwisp import agent_event_normalizer
 
     assert not hasattr(agent_event_normalizer, "ControlResultEvent")

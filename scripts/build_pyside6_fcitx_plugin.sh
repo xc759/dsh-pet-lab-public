@@ -33,7 +33,7 @@ if [[ ! "$PYSIDE_QT_VERSION" =~ ^6\.[0-9]+\.[0-9]+$ ]] || [[ ! -f "$PYSIDE_QT_LI
 fi
 
 # 所有源码、覆盖头文件和对象文件都在临时目录；只把最终插件复制到调用方指定位置。
-WORK_DIR="$(mktemp -d /tmp/dsh-pet-fcitx-plugin.XXXXXX)"
+WORK_DIR="$(mktemp -d /tmp/petwisp-fcitx-plugin.XXXXXX)"
 trap 'rm -rf "$WORK_DIR"' EXIT
 QTBASE_SOURCE="$WORK_DIR/qtbase"
 FCITX_SOURCE="$WORK_DIR/fcitx5-qt"

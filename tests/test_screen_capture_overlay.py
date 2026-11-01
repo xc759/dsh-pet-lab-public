@@ -26,7 +26,7 @@ from PySide6.QtCore import QEvent, QPoint, QPointF, QRect, Qt  # noqa: E402
 from PySide6.QtGui import QColor, QImage, QKeyEvent, QMouseEvent, QPainter  # noqa: E402
 from PySide6.QtWidgets import QApplication, QLabel, QPushButton  # noqa: E402
 
-from pet.screen_capture.overlay import (  # noqa: E402
+from petwisp.screen_capture.overlay import (  # noqa: E402
     ACTION_ASK,
     ACTION_COPY,
     ACTION_OCR,
@@ -37,7 +37,7 @@ from pet.screen_capture.overlay import (  # noqa: E402
     SelectionOverlay,
 )
 
-from pet.screen_capture.session import SelectionRect  # noqa: E402
+from petwisp.screen_capture.session import SelectionRect  # noqa: E402
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -54,7 +54,7 @@ def _fresh_shared_memory(monkeypatch):
     ``current_selection() is None`` 的用例会因此莫名其妙地红。隔离的是**进程级
     那一份**，用例自己注入 ``SelectionMemory()`` 的路径不受影响。
     """
-    from pet.screen_capture import overlay as overlay_mod
+    from petwisp.screen_capture import overlay as overlay_mod
 
     monkeypatch.setattr(overlay_mod, "_SHARED_MEMORY", overlay_mod.SelectionMemory())
 
@@ -395,7 +395,7 @@ def test_action_ids_are_exactly_what_the_orchestrator_dispatches(qapp):
     按**渲染出来的按钮**（objectName）读这一组 id，不按私有元组的下标读——
     元组的形状（现在带了图标名）是会变的，objectName 才是与编排层对齐的那一面。
     """
-    from pet.screen_capture import actions as actions_mod
+    from petwisp.screen_capture import actions as actions_mod
 
     overlay = SelectionOverlay(screen=_FakeScreen(800, 600), memory=SelectionMemory())
     _drag(overlay, (100, 100), (300, 220))

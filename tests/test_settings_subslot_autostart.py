@@ -12,9 +12,9 @@ from __future__ import annotations
 import pytest
 from PySide6.QtWidgets import QApplication
 
-from pet.config import Config
-from pet.modern_settings_dialog import ModernSettingsDialog
-from pet.settings_slot_config import route_settings_config
+from petwisp.config import Config
+from petwisp.modern_settings_dialog import ModernSettingsDialog
+from petwisp.settings_slot_config import route_settings_config
 
 
 @pytest.fixture
@@ -37,7 +37,7 @@ def test_modern_settings_dialog_keeps_autostart_editable_for_every_pet(
 
 def test_autostart_row_hint_states_the_global_scope_on_a_pet_page(app, tmp_path):
     """行说明也要说清作用域：作用域是行内独立标注，且不再写"仅主桌宠可设置"。"""
-    from pet.modern_settings_dialog import SettingRow
+    from petwisp.modern_settings_dialog import SettingRow
 
     cfg = route_settings_config(Config(tmp_path, instance_id="slot-1"))
     dialog = ModernSettingsDialog(cfg, include_ai=False)
@@ -53,7 +53,7 @@ def test_autostart_row_hint_states_the_global_scope_on_a_pet_page(app, tmp_path)
 
 def test_child_page_autostart_save_lands_in_the_global_config(app, tmp_path, monkeypatch):
     """子宠页勾选后，值落在**主配置**（不是 slot 文件）——全局键只有一个真值。"""
-    from pet import autostart as autostart_mod
+    from petwisp import autostart as autostart_mod
 
     monkeypatch.setattr(autostart_mod, "is_enabled", lambda: False)
     monkeypatch.setattr(autostart_mod, "set_enabled", lambda _on: True)

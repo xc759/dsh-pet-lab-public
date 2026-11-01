@@ -24,8 +24,8 @@ from PySide6.QtCore import QObject, QPointF, QRect, Qt, Signal
 from PySide6.QtGui import QImage, QRegion
 from PySide6.QtWidgets import QApplication
 
-from pet.overlay_window import OverlayWindow
-from pet.pet_sprite import INTERACTION_THROWN, PetSprite
+from petwisp.overlay_window import OverlayWindow
+from petwisp.pet_sprite import INTERACTION_THROWN, PetSprite
 
 app = QApplication.instance() or QApplication([])
 

@@ -20,8 +20,8 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 from PySide6.QtCore import QPoint, QTimer
 from PySide6.QtWidgets import QApplication
 
-from pet import platform_win
-from pet.platform_win import WindowsPerPixelInputController as Ctl
+from petwisp import platform_win
+from petwisp.platform_win import WindowsPerPixelInputController as Ctl
 
 app = QApplication.instance() or QApplication([])
 

@@ -58,8 +58,8 @@ def _qapp():
 
 @pytest.fixture
 def dialog(tmp_path, monkeypatch):
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = _qapp()
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -77,7 +77,7 @@ def _interaction_page(dialog):
 
 
 def _row(dialog, key: str):
-    from pet.modern_settings_dialog import SettingRow
+    from petwisp.modern_settings_dialog import SettingRow
 
     found = dialog.findChild(SettingRow, f"settingRow_{key}")
     assert found is not None, f"缺少设置行 {key}"
@@ -86,7 +86,7 @@ def _row(dialog, key: str):
 
 def test_interaction_domain_uses_in_page_tabs_without_changing_sidebar(dialog):
     """页内标签组织互动域，侧栏域清单不变（域契约是外部可见的）。"""
-    from pet.settings_widgets import SettingsTabContainer
+    from petwisp.settings_widgets import SettingsTabContainer
 
     assert [dialog.sidebar.item(i).text() for i in range(dialog.sidebar.count())] == EXPECTED_SIDEBAR
 
@@ -110,7 +110,7 @@ def test_every_interaction_row_routes_to_its_tab_and_is_reachable(dialog):
     ``click_sound_*`` 细项随「点击音效」、``golden_spin_direct`` 随「点击回旋」。
     所以先把这四个父开关全打开，再断言"激活标签后确实看得到"。
     """
-    from pet.settings_widgets import SettingsTabContainer
+    from petwisp.settings_widgets import SettingsTabContainer
 
     for parent in ("self_talk_check", "click_self_talk_check", "click_sound_check", "golden_spin_click_check"):
         getattr(dialog, parent).setChecked(True)
@@ -127,7 +127,7 @@ def test_every_interaction_row_routes_to_its_tab_and_is_reachable(dialog):
 
 def test_rows_of_the_other_tab_are_out_of_view_but_not_destroyed(dialog):
     """另一标签的行只是不可见（isVisibleTo False），对象与取值都还在——整理没有删功能。"""
-    from pet.settings_widgets import SettingsTabContainer
+    from petwisp.settings_widgets import SettingsTabContainer
 
     tabs = _interaction_page(dialog).findChild(SettingsTabContainer, "settingsTaskTabs")
     tabs.setCurrentKey("click")
@@ -143,7 +143,7 @@ def test_rows_of_the_other_tab_are_out_of_view_but_not_destroyed(dialog):
 
 def test_search_jumps_to_the_owning_tab(dialog):
     """搜索命中非默认标签的行 → 自动切标签（否则结果在视野外，等于搜不到）。"""
-    from pet.settings_widgets import SettingsTabContainer
+    from petwisp.settings_widgets import SettingsTabContainer
 
     app = _qapp()
     dialog.self_talk_check.setChecked(True)  # 让「配图概率」按父开关联动显现
@@ -168,7 +168,7 @@ def test_sections_keep_their_titles_inside_the_tabs(dialog):
     """组名不变（外部契约/既有用例硬编码）：输入 / 点击反馈 在第一标签，自言自语 在第二。"""
     from PySide6.QtWidgets import QLabel
 
-    from pet.settings_widgets import SettingsSection, SettingsTabContainer
+    from petwisp.settings_widgets import SettingsSection, SettingsTabContainer
 
     tabs = _interaction_page(dialog).findChild(SettingsTabContainer, "settingsTaskTabs")
 
@@ -199,7 +199,7 @@ def test_every_setting_row_still_lives_in_a_domain_page(dialog):
     """全局不变量：没有孤儿行、没有掉进「待分类（开发期）」。"""
     from PySide6.QtWidgets import QLabel, QWidget
 
-    from pet.modern_settings_dialog import SettingRow
+    from petwisp.modern_settings_dialog import SettingRow
 
     pages = [dialog.pages.widget(i) for i in range(dialog.pages.count())]
     orphans = [
@@ -223,7 +223,7 @@ def test_every_setting_row_still_lives_in_a_domain_page(dialog):
 
 def test_divination_rows_hang_off_the_interaction_domain_not_a_new_sidebar_domain(dialog):
     """侧栏没有叫「趣味」的一级域——抽签的行在「互动」域里。"""
-    from pet.settings_widgets import SettingsTabContainer
+    from petwisp.settings_widgets import SettingsTabContainer
 
     labels = [dialog.sidebar.item(i).text() for i in range(dialog.sidebar.count())]
     assert labels == EXPECTED_SIDEBAR
@@ -246,7 +246,7 @@ def test_sidebar_spacing_and_row_height_are_not_squeezed(dialog):
     """
     from PySide6.QtWidgets import QFrame
 
-    from pet.settings_widgets import SIDEBAR_ROW_HEIGHT, SettingsSidebarPane
+    from petwisp.settings_widgets import SIDEBAR_ROW_HEIGHT, SettingsSidebarPane
 
     pane = dialog.findChild(SettingsSidebarPane) or dialog.findChild(QFrame, "sidebarPane")
     assert pane is not None, "侧栏容器没找到"
@@ -258,7 +258,7 @@ def test_sidebar_spacing_and_row_height_are_not_squeezed(dialog):
 
 def test_divination_rows_are_searchable_and_search_switches_to_their_tab(dialog):
     """搜「抽签」/「每日一签」都能到行，且自动切到「抽签」标签（否则结果在视野外）。"""
-    from pet.settings_widgets import SettingsTabContainer
+    from petwisp.settings_widgets import SettingsTabContainer
 
     app = _qapp()
     tabs = _interaction_page(dialog).findChild(SettingsTabContainer, "settingsTaskTabs")
@@ -287,7 +287,7 @@ def test_divination_toggles_take_part_in_the_default_marks_but_the_preview_butto
         assert key in registered, f"{key} 应有可比默认值（进标记覆盖面）"
     assert "divination_preview" not in registered, "按钮行不参与默认值标记"
 
-    from pet.settings_widgets import SettingsTabContainer
+    from petwisp.settings_widgets import SettingsTabContainer
 
     tabs = _interaction_page(dialog).findChild(SettingsTabContainer, "settingsTaskTabs")
     tabs.setCurrentKey("divination")

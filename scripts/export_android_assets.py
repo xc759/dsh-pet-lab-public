@@ -138,8 +138,8 @@ def main() -> int:
     parser.add_argument("--res-output", type=Path)
     args = parser.parse_args()
     sys.path.insert(0, str(ROOT))
-    from pet.config import DEFAULT_SELF_TALK_TEXTS
-    from pet.frameseq_provision import clip_out_dir, convert_clip, hot_webms
+    from petwisp.config import DEFAULT_SELF_TALK_TEXTS
+    from petwisp.frameseq_provision import clip_out_dir, convert_clip, hot_webms
     from scripts.make_icon import prepare_icon_image
 
     started = time.perf_counter()

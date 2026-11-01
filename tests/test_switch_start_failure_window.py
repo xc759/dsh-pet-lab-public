@@ -25,9 +25,9 @@ from PySide6.QtCore import QObject, QRect, Signal
 from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QApplication
 
-from pet import catalog
-from pet.config import Config
-from pet.window import PetWindow
+from petwisp import catalog
+from petwisp.config import Config
+from petwisp.window import PetWindow
 
 NAMES = [
     catalog.IDLE,
@@ -335,7 +335,7 @@ def test_pause_activity_is_noop_after_shutdown(app, tmp_path):
 
 def test_library_pause_warm_cancels_inflight_first_frame_warm(app, tmp_path, monkeypatch):
     """P1-2：pause_warm（隐藏/切角色）必须取消在飞的首帧预热。"""
-    import pet.library as library_mod
+    import petwisp.library as library_mod
 
     class CancelTrackingClip:
         def __init__(self, path, parent=None):

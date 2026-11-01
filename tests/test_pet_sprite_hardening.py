@@ -22,8 +22,8 @@ from PySide6.QtCore import QObject, QPoint, QPointF, QRect, Qt, Signal
 from PySide6.QtGui import QImage, QPainter
 from PySide6.QtWidgets import QApplication
 
-from pet import catalog
-from pet.pet_sprite import PetSprite
+from petwisp import catalog
+from petwisp.pet_sprite import PetSprite
 
 app = QApplication.instance() or QApplication([])
 

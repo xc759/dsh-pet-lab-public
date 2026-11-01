@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""周快照（``pet.growth.snapshot``）：周期计算 + **脱敏红线**。"""
+"""周快照（``petwisp.growth.snapshot``）：周期计算 + **脱敏红线**。"""
 from __future__ import annotations
 
 import json
@@ -10,8 +10,8 @@ import pytest
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
-from pet.growth.schema import default_archive
-from pet.growth.snapshot import (
+from petwisp.growth.schema import default_archive
+from petwisp.growth.snapshot import (
     build_summary,
     emit_if_due,
     list_snapshots,
@@ -19,7 +19,7 @@ from pet.growth.snapshot import (
     snapshot_period,
     write_snapshot,
 )
-from pet.growth.store import GrowthStore
+from petwisp.growth.store import GrowthStore
 
 
 @pytest.fixture()

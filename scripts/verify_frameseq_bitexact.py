@@ -37,7 +37,7 @@ if str(REPO_ROOT) not in sys.path:
 from PIL import Image  # noqa: E402
 from PySide6.QtGui import QGuiApplication, QImage  # noqa: E402
 
-from pet import frameseq_provision as fp  # noqa: E402
+from petwisp import frameseq_provision as fp  # noqa: E402
 
 FRAME_BYTES = fp.CANVAS_BYTES if hasattr(fp, "CANVAS_BYTES") else 640 * 360 * 4
 

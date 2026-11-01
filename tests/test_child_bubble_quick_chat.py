@@ -11,7 +11,7 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from PySide6.QtCore import Qt  # noqa: E402
 
-from pet.sprite_bubble import sprite_anchor_rect_global  # noqa: E402
+from petwisp.sprite_bubble import sprite_anchor_rect_global  # noqa: E402
 from tests.test_overlay_collision_toggle import _make_slot_shell  # noqa: E402
 
 _TRANSPARENT = Qt.WidgetAttribute.WA_TransparentForMouseEvents

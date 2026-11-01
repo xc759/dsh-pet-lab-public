@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """看看屏幕：视觉模型推导 + 截图存档。"""
 
-from pet.chat.models import ProviderConfig
-from pet.vision import resolve_vision_model
+from petwisp.chat.models import ProviderConfig
+from petwisp.vision import resolve_vision_model
 
 
 def _p(model, **kw):
@@ -42,7 +42,7 @@ def test_capture_screen_bytes_in_memory(tmp_path):
     if os.environ.get('QT_QPA_PLATFORM') == 'offscreen':
         import pytest
         pytest.skip('无显示环境下不截屏')
-    from pet.vision import capture_screen_bytes
+    from petwisp.vision import capture_screen_bytes
     data = capture_screen_bytes()
     assert isinstance(data, bytes) and data[:2] == b'\xff\xd8'  # JPEG SOI
     from PIL import Image
@@ -54,25 +54,25 @@ def test_capture_screen_bytes_in_memory(tmp_path):
 
 
 def test_endpoint_glm_v4_base():
-    from pet.chat.providers import normalize_chat_endpoint
+    from petwisp.chat.providers import normalize_chat_endpoint
     assert normalize_chat_endpoint('https://open.bigmodel.cn/api/paas/v4') == \
         'https://open.bigmodel.cn/api/paas/v4/chat/completions'
 
 
 def test_endpoint_openai_v1_base():
-    from pet.chat.providers import normalize_chat_endpoint
+    from petwisp.chat.providers import normalize_chat_endpoint
     assert normalize_chat_endpoint('https://api.openai.com/v1') == \
         'https://api.openai.com/v1/chat/completions'
 
 
 def test_endpoint_full_url_passthrough():
-    from pet.chat.providers import normalize_chat_endpoint
+    from petwisp.chat.providers import normalize_chat_endpoint
     assert normalize_chat_endpoint('https://api.deepseek.com/v1/chat/completions') == \
         'https://api.deepseek.com/v1/chat/completions'
 
 
 def test_endpoint_bare_host_appends_default_path():
-    from pet.chat.providers import normalize_chat_endpoint
+    from petwisp.chat.providers import normalize_chat_endpoint
     assert normalize_chat_endpoint('https://api.deepseek.com') == \
         'https://api.deepseek.com/v1/chat/completions'
 
@@ -80,7 +80,7 @@ def test_endpoint_bare_host_appends_default_path():
 def test_vision_overrides_ignored_when_same_as_chat():
     """同聊天模型时，视觉独立端点/密钥一律不得生效（防残留 GLM 地址配 ds 模型名）。"""
     import inspect
-    from pet import vision
+    from petwisp import vision
     src = inspect.getsource(vision._post_vision_request)
     assert 'if p.vision_same_as_chat' in src
 
@@ -104,8 +104,8 @@ def test_independent_vision_empty_key_never_uses_chat_key(monkeypatch):
     （聊天 Key 因此绝不会被发送到独立视觉端点）。
     """
     import pytest
-    from pet import vision
-    from pet.chat.models import ProviderConfig
+    from petwisp import vision
+    from petwisp.chat.models import ProviderConfig
 
     calls = []
     monkeypatch.setattr("urllib.request.urlopen", lambda *a, **kw: calls.append(a) or _FakeResponse({}))
@@ -127,8 +127,8 @@ def test_independent_vision_empty_key_never_uses_chat_key(monkeypatch):
 
 def test_independent_vision_prefers_own_key_over_chat_key(monkeypatch):
     """独立视觉端点有视觉 Key 时，应携带视觉 Key 而非聊天 Key。"""
-    from pet import vision
-    from pet.chat.models import ProviderConfig
+    from petwisp import vision
+    from petwisp.chat.models import ProviderConfig
 
     called_with = {}
 
@@ -158,8 +158,8 @@ def test_independent_vision_prefers_own_key_over_chat_key(monkeypatch):
 def test_vision_request_includes_self_recognition_hint(monkeypatch):
     """视觉请求 user 文本应携带自我识别提示（认出截图里的桌宠是自己）。"""
     import json
-    from pet import vision
-    from pet.chat.models import ProviderConfig
+    from petwisp import vision
+    from petwisp.chat.models import ProviderConfig
 
     captured = {}
 
@@ -169,18 +169,18 @@ def test_vision_request_includes_self_recognition_hint(monkeypatch):
 
     monkeypatch.setattr("urllib.request.urlopen", fake_urlopen)
     p = ProviderConfig.from_dict("test", {"model": "deepseek-v4-flash", "api_key": "sk-x"})
-    vision._post_vision_request(b"fake-jpeg", "code.exe | t", "sys", p, pet_name="大肥鱼")
+    vision._post_vision_request(b"fake-jpeg", "code.exe | t", "sys", p, pet_name="微光")
     user_msg = captured["body"]["messages"][1]["content"][0]["text"]
-    assert "那就是你自己「大肥鱼」" in user_msg
+    assert "那就是你自己「微光」" in user_msg
     # 系统提示词不被污染：提示只加在 user 文本里
     assert captured["body"]["messages"][0]["content"] == "sys"
 
 
 def test_look_worker_receives_snapshot_and_does_not_mutate_shared_config(monkeypatch):
     """回归测试：看看屏幕 worker 接收快照，不改写主线程 ProviderConfig 共享对象。"""
-    from pet.chat.models import ProviderConfig, ChatSettings
-    from pet.window import PetWindow
-    from pet.config import Config
+    from petwisp.chat.models import ProviderConfig, ChatSettings
+    from petwisp.window import PetWindow
+    from petwisp.config import Config
     from types import SimpleNamespace
 
     shared_provider = ProviderConfig.from_dict("test-p", {
@@ -230,8 +230,8 @@ def test_post_vision_messages_keeps_the_endpoint_and_key_discipline(monkeypatch)
 
     import pytest
 
-    from pet import vision
-    from pet.chat.models import ProviderConfig
+    from petwisp import vision
+    from petwisp.chat.models import ProviderConfig
 
     captured = {}
 

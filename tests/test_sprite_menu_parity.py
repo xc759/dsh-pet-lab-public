@@ -2,7 +2,7 @@
 """overlay 右键菜单 parity：与真实 PetWindow 的现代菜单树逐项一致。
 
 比对基准是**真实 PetWindow**：构造一个 PetWindow，按 ``app.py::_wire_window``
-的原样接线（聊天/余额/看屏/待办/报时/节日/生小肥鱼…）注入回调，再用**同一个
+的原样接线（聊天/余额/看屏/待办/报时/节日/生小宠…）注入回调，再用**同一个
 建造器**（``build_modern_menu``）在同一份 Config、同一平台上建菜单；overlay 侧用
 ``build_sprite_full_menu`` 建。断言 overlay 树**逐项包含**基准树（同一父路径、
 兄弟顺序保持），且多出来的条目只允许 overlay 特有项。
@@ -42,12 +42,12 @@ from PySide6.QtWidgets import QApplication
 import tests.test_context_menu_lifecycle as lc
 import tests.test_overlay_window_capabilities as cap
 import tests.test_sprite_menu_facade as fac
-from pet.catalog import CANVAS_W, SCALE_STEPS
-from pet.config import Config
-from pet.context_menus import build_modern_menu
-from pet.overlay_shell import OverlayShell
-from pet.pet_sprite import PetSprite
-from pet.sprite_menu_facade import SpriteMenuFacade, build_sprite_full_menu
+from petwisp.catalog import CANVAS_W, SCALE_STEPS
+from petwisp.config import Config
+from petwisp.context_menus import build_modern_menu
+from petwisp.overlay_shell import OverlayShell
+from petwisp.pet_sprite import PetSprite
+from petwisp.sprite_menu_facade import SpriteMenuFacade, build_sprite_full_menu
 
 app = QApplication.instance() or QApplication([])
 
@@ -377,7 +377,7 @@ def test_ai_settings_stays_merged_into_pet_settings_entry(tmp_path):
     装回来。设置页内的 AI 能力面由「AI 与对话」域承担（见 test_menu_layout /
     test_settings_ia_first_cut）。
     """
-    from pet.context_menus.registry import MENU_ACTIONS
+    from petwisp.context_menus.registry import MENU_ACTIONS
 
     assert "chat_settings" not in MENU_ACTIONS.ids, (
         "「AI 设置」已并入桌宠设置，不得作为独立菜单项复活")
@@ -399,10 +399,10 @@ def test_music_menu_lyric_align_availability_matches_the_registry(tmp_path):
     """
     from PySide6.QtWidgets import QMenu
 
-    from pet.context_menus.registry import MENU_ACTIONS
-    from pet.context_menus.shared import MUSIC_ALIGN_DISABLED_REASON, add_music_lyric_align
-    from pet.music.lyric import LyricLine
-    from pet.music.lyric_controller import MusicLyricController
+    from petwisp.context_menus.registry import MENU_ACTIONS
+    from petwisp.context_menus.shared import MUSIC_ALIGN_DISABLED_REASON, add_music_lyric_align
+    from petwisp.music.lyric import LyricLine
+    from petwisp.music.lyric_controller import MusicLyricController
 
     config = Config(base=tmp_path)
     config.set("music_lyric_enabled", True)
@@ -449,7 +449,7 @@ def test_capabilities_exposed_in_the_overlay_menu(tmp_path):
                       "拖动物理", "边缘探头", "黄金回旋", "显示本轮消费", "桌宠设置"):
             assert label in labels, f"modern 树缺项：{label}"
         controls = _find(menu, "桌宠控制").menu()
-        assert _find(controls, "生小肥鱼") is not None
+        assert _find(controls, "生小宠") is not None
         tools = _find(menu, "工具与帮助").menu()
         for label in ("DeepSeek Harness", "打开网页版 DeepSeek", "网络信息",
                       "GitHub 项目页"):
@@ -466,7 +466,7 @@ def test_music_submenu_offers_every_player_a_launch_entry(tmp_path):
     注册表漂移，也让四个键的映射抄错时立刻红）；窗口侧同一棵树由
     ``test_menu_tree_matches_reference_petwindow`` 的逐项包含 + 兄弟顺序保证同源。
     """
-    from pet.music import players as music_players
+    from petwisp.music import players as music_players
 
     shell, _instance, _config = _make_overlay(
         tmp_path, values={"music_lyric_enabled": True})
@@ -515,7 +515,7 @@ def test_harness_launcher_gets_widget_dialog_parent(tmp_path, monkeypatch):
     """
     from PySide6.QtWidgets import QWidget
 
-    import pet.context_menus.shared as shared_mod
+    import petwisp.context_menus.shared as shared_mod
 
     shell, _instance, _config = _make_overlay(tmp_path)
     captured: list[tuple] = []
@@ -938,7 +938,7 @@ def test_look_screen_throttles_and_syncs_reply(tmp_path, monkeypatch):
             pass
 
     try:
-        monkeypatch.setattr("pet.overlay_shell.threading.Thread", _Thread)
+        monkeypatch.setattr("petwisp.overlay_shell.threading.Thread", _Thread)
         assert shell.on_look_synced is not None
         shell.show_bubble  # 确保气泡面存在（首次冒泡惰性建气泡）
         shell.look_at_screen()

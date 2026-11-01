@@ -11,7 +11,7 @@ import urllib.error
 
 import pytest
 
-from pet import network_info as ni
+from petwisp import network_info as ni
 
 
 class FakeResponse:

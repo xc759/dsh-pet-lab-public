@@ -27,9 +27,9 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 import pytest  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
-from pet import agent_link, click_sound, harness_launcher  # noqa: E402
-from pet.agent_link import AgentLinkManager, EventIdentityLedger  # noqa: E402
-from pet.config import Config  # noqa: E402
+from petwisp import agent_link, click_sound, harness_launcher  # noqa: E402
+from petwisp.agent_link import AgentLinkManager, EventIdentityLedger  # noqa: E402
+from petwisp.config import Config  # noqa: E402
 
 app = QApplication.instance() or QApplication([])
 

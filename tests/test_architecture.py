@@ -15,7 +15,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-PET_DIR = Path(__file__).resolve().parents[1] / "pet"
+PET_DIR = Path(__file__).resolve().parents[1] / "petwisp"
 
 # window.py 行数预算：合并上游 v4.1.0 后实测 4229，留 ~1.7% 余量。
 # 拆分控制器时本预算应随之下调。
@@ -45,9 +45,9 @@ PET_DIR = Path(__file__).resolve().parents[1] / "pet"
 # 2026-09-08 上调到 4358：批 D 彩蛋（边缘探头被击飞时飞行中整帧旋转跟随速度方向）——
 # window.py 仅保留薄钩子（_tick_throw_physics 调 throw_egg.update、_stop_physics 调
 # throw_egg.end），控制器实现在 throw_egg.py；实测 4358。
-# 2026-09-08 上调到 4369：批 G——change_scale 子肥鱼置位 user_customized（+4）、
-# showEvent 启动即登记 runtime 标记（+7，含 try 兜底，修「退出子肥鱼」漏清未
-# 拖动过的小肥鱼），实测 4369。
+# 2026-09-08 上调到 4369：批 G——change_scale 子宠置位 user_customized（+4）、
+# showEvent 启动即登记 runtime 标记（+7，含 try 兜底，修「退出子宠」漏清未
+# 拖动过的小宠），实测 4369。
 # 2026-09-11 上调到 4373：合入 origin/main（PR76 事件层合并同步）后实测 4373。
 # 增量来自上游侧在 window.py 的气泡/告警触点调整（speech_bubble 拆出
 # speech_bubble_text 后本文件仅保留薄调用）；window.py 分块拆分仍是待办，
@@ -71,7 +71,7 @@ PET_DIR = Path(__file__).resolve().parents[1] / "pet"
 # 两处都是 3 行内联守卫，拆出去会切断 _pause_activity 与 _closing 共享状态流
 # （更关键的是顺序语义：match_shutdown 必须**先**暂停再置 _closing，见
 # pet/window_optional_services.py）；拆分待办不变，预算仍只随实测校准。
-# 2026-09-13 再上调到 4478：肥鱼互撞卡顿修复批（window.py 净 +49，实测 4478）——
+# 2026-09-13 再上调到 4478：桌宠互撞卡顿修复批（window.py 净 +49，实测 4478）——
 # _warm_landing_idles 从 GUI 线程同步 ffmpeg 首帧解码改为 daemon 线程预热
 # （实测定案：碰撞风暴下每次撞飞堵 GUI ~100ms，看门狗连续抓 200ms+ 卡顿），
 # 起飞/落地 pin-unpin 保护落地首帧不在飞行窗口被预热浪涌逐出（8MB 预算不动，
@@ -132,11 +132,11 @@ WINDOW_PY_LINE_BUDGET = 4671
 # （实测 1942），预算随实测校准。
 # 2026-09-08 上调到 1996：新增「随桌宠启动 dsh 服务」开关行（+4，实测 1996）。
 # 2026-09-08 上调到 2000：批 C 落种占位语义在保存路径加 user_customized 置位（+4，实测 2000）。
-# 2026-09-08 上调到 2009：批 E 清除子肥鱼走 shell 已接线回调（+9，实测 2009）——
+# 2026-09-08 上调到 2009：批 E 清除子宠走 shell 已接线回调（+9，实测 2009）——
 # _on_clear_spawned_pets 优先调 win.on_clear_spawned_pets（自带确认框与进程内
 # 子窗前置于关闭），拿不到回调时回退原有确认+直接清理；按文件约定校准预算，
 # 不为达标压缩行宽/合并语句。
-# 2026-09-08 上调到 2018：批 G——「退出子肥鱼」按钮对子肥鱼禁用（+5）+
+# 2026-09-08 上调到 2018：批 G——「退出子宠」按钮对子宠禁用（+5）+
 # _on_clear_spawned_pets 加 instance_id 双保险（+5，含注释折行），实测 2018。
 # 2026-09-15 上调到 2270：语音报时设置页接入（页面实例化/SettingRow 收集/
 # _write_config 写回/试听透传回调）与两开关、音色下拉改造，实测 2255；
@@ -197,11 +197,11 @@ WINDOW_PY_LINE_BUDGET = 4671
 # 靠搬代码而不是压行宽解决预算，正是预算作为「绊线」的预期用法。
 # 2026-09-23 上调到 2357：纯桌宠版岛隐藏死锁修复——新增
 # _chat_feature_available() 构建变体判定助手（+12）并将「隐藏时对话气泡」
-# SettingRow 改为按构建变体条件收录（净 +3，注释另计）：无 pet.chat 的
+# SettingRow 改为按构建变体条件收录（净 +3，注释另计）：无 petwisp.chat 的
 # 打包变体不再展示该死路开关（运行时回退在 pet/dynamic_island.py 的
 # chat_available）。实测 2357；按文件约定只随实测校准，不为达标压行。
-# 2026-09-23 上调到 2377：4.2c 后段 D12「一键退出子肥鱼」按拓扑分流（+20）——
-# overlay 拓扑下子肥鱼是进程内 sprite，跨进程 taskkill 回退（child_pet_cleanup）
+# 2026-09-23 上调到 2377：4.2c 后段 D12「一键退出子宠」按拓扑分流（+20）——
+# overlay 拓扑下子宠是进程内 sprite，跨进程 taskkill 回退（child_pet_cleanup）
 # 找不到目标、按钮静默失效，改为写指令文件由主进程消费；legacy 回退逐行不变。
 # 拓扑判定/写指令/校验的实现全在零 Qt 的 pet/overlay_settings_command.py，
 # 本文件只做一次分支与身份回填（slot_from_instance_id）。
@@ -321,7 +321,7 @@ def test_pure_logic_modules_do_not_import_qt():
     # 把"纯逻辑层零 Qt"从约定升级为机器化守卫；festival_service/festival_settings
     # 不在本列——前者属服务层、后者属 UI 层，本就不受此约束）。
     # 2026-09-23 加入 overlay_settings_command：D12 指令通道的写/读/消费与拓扑门
-    # 必须零 Qt——独立设置进程（pet/__main__.py --settings）禁止导入 pet.app/
+    # 必须零 Qt——独立设置进程（pet/__main__.py --settings）禁止导入 petwisp.app/
     # overlay_shell，env 读取的唯一实现只能落在两侧都能 import 的轻模块里。
     # 2026-10-07 加入 net_monitor：网络信息（issue #172）的采样核心（计数器/
     # 延迟探测/文案）必须零 Qt——它跑在后台采样线程里，GUI 侧只读快照；
@@ -353,7 +353,7 @@ def test_pure_logic_modules_do_not_import_qt():
 
 def test_decode_fanout_does_not_depend_on_window_or_player():
     src = _read("decode_fanout.py")
-    for banned in ("pet.window", "pet.webm_clip", "from .window", "from .webm_clip",
+    for banned in ("petwisp.window", "petwisp.webm_clip", "from .window", "from .webm_clip",
                    "import window", "import webm_clip"):
         assert banned not in src, f"decode_fanout 反向依赖 {banned}，破坏单向依赖"
 
@@ -371,16 +371,16 @@ _PET_TTS_TOP_LEVEL_BANNED = (
 
 def test_tts_providers_keep_top_level_imports_light():
     providers = sorted((PET_DIR / "tts").glob("*.py"))
-    assert providers, "pet/tts/ 下应当有 provider 模块（别把守卫扫空了还不自知）"
+    assert providers, "petwisp/tts/ 下应当有 provider 模块（别把守卫扫空了还不自知）"
     offenders: list[str] = []
     for path in providers:
         for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
             if not line.startswith(("import ", "from ")):
                 continue  # 只扫顶层：函数体内的延迟 import 缩进了，不在此列
             if any(banned in line for banned in _PET_TTS_TOP_LEVEL_BANNED):
-                offenders.append(f"pet/tts/{path.name}:{number}: {line.strip()}")
+                offenders.append(f"petwisp/tts/{path.name}:{number}: {line.strip()}")
     assert not offenders, (
-        "pet/tts/*.py 顶层引入了 Qt 或重量级/可选依赖（见 pet/tts/base.py 的写 provider 红线）：\n"
+        "petwisp/tts/*.py 顶层引入了 Qt 或重量级/可选依赖（见 pet/tts/base.py 的写 provider 红线）：\n"
         + "\n".join(offenders)
     )
 
@@ -414,7 +414,7 @@ def test_pet_tree_has_zero_retired_layer_imports():
     """4.4b 机器化守卫：整个 pet/ 树（含 legacy 路径）零 import 退役层模块。
 
     与上一条互补：文件不存在是"删干净"，本条约住"任何模块都不得再 import"
-    （含函数级延迟 import 与 from pet.xxx 绝对写法）。
+    （含函数级延迟 import 与 from petwisp.xxx 绝对写法）。
     """
     offenders = []
     for path in sorted(PET_DIR.rglob("*.py")):
@@ -427,7 +427,7 @@ def test_pet_tree_has_zero_retired_layer_imports():
                 if re.search(rf"\b{retired}\b", stripped):
                     offenders.append(f"{path.name}:{lineno}: {stripped}")
     assert not offenders, (
-        "pet/ 内仍有 import 多进程多宠退役层（架构倒退）：\n"
+        "petwisp/ 内仍有 import 多进程多宠退役层（架构倒退）：\n"
         + "\n".join(offenders)
     )
 
@@ -461,7 +461,7 @@ def test_pet_tree_has_zero_dead_facade_imports():
                 if re.search(rf"\b{retired}\b", stripped):
                     offenders.append(f"{path.name}:{lineno}: {stripped}")
     assert not offenders, (
-        "pet/ 内仍有 import 死面 facade（2026-10-09 已整层删除）：\n"
+        "petwisp/ 内仍有 import 死面 facade（2026-10-09 已整层删除）：\n"
         + "\n".join(offenders)
     )
 
@@ -495,7 +495,7 @@ RETIRED_LEGACY_MENU_SYMBOLS = (
 )
 #: 已退役的右键菜单模板键：只允许出现在 config.py 的迁移函数里。
 RETIRED_MENU_TEMPLATE_KEY = "context_menu_template"
-RETIRED_MENU_TEMPLATE_MIGRATION = "pet/config.py::_migrate_menu_template_config"
+RETIRED_MENU_TEMPLATE_MIGRATION = "petwisp/config.py::_migrate_menu_template_config"
 
 
 def test_retired_legacy_menu_files_are_gone():
@@ -533,7 +533,7 @@ def test_retired_menu_template_key_confined_to_migration():
                if RETIRED_MENU_TEMPLATE_KEY in line]
     block_start, block_end, _ = _function_block(config_src, "_migrate_menu_template_config")
     offenders = [
-        f"pet/config.py:{no}: 退役键出现在迁移函数之外"
+        f"petwisp/config.py:{no}: 退役键出现在迁移函数之外"
         for no, _line in outside
         if not (block_start + 1 <= no <= block_end)
     ]
@@ -567,7 +567,7 @@ def test_pet_tree_has_zero_retired_legacy_menu_references():
                 if re.search(rf"\b{re.escape(retired)}\b", stripped):
                     offenders.append(f"{path.name}:{lineno}: {stripped}")
     assert not offenders, (
-        "pet/ 内仍有旧版右键菜单退役层引用（架构倒退）：\n"
+        "petwisp/ 内仍有旧版右键菜单退役层引用（架构倒退）：\n"
         + "\n".join(offenders)
     )
 
@@ -654,9 +654,9 @@ def test_modern_settings_dialog_py_line_budget():
 
 
 def test_modern_settings_dialog_no_top_level_chat_import():
-    """no-chat 打包变体 excludes=['pet.chat']：modern_settings_dialog 顶层若直接
-    import pet.chat.*（如 ai_settings_page），产物运行时点「桌宠设置」会在模块
-    导入期抛 ModuleNotFoundError，导致设置界面整体打不开（测试环境因 pet.chat
+    """no-chat 打包变体 excludes=['petwisp.chat']：modern_settings_dialog 顶层若直接
+    import petwisp.chat.*（如 ai_settings_page），产物运行时点「桌宠设置」会在模块
+    导入期抛 ModuleNotFoundError，导致设置界面整体打不开（测试环境因 petwisp.chat
     齐全而全绿，属打包专属回归）。chat 依赖必须延迟到 include_ai 分支内的
     函数级 import，no-chat 时 include_ai=False 不触发。"""
     offenders = []
@@ -665,13 +665,13 @@ def test_modern_settings_dialog_no_top_level_chat_import():
             continue  # 仅检查模块顶层（无缩进）import；函数内延迟 import 合法
         stripped = line.strip()
         if (stripped.startswith("from .chat")
-                or stripped.startswith("from pet.chat")
-                or stripped.startswith("import pet.chat")
+                or stripped.startswith("from petwisp.chat")
+                or stripped.startswith("import petwisp.chat")
                 or stripped == "from . import chat"):
             offenders.append(f"modern_settings_dialog.py:{lineno}: {stripped}")
     assert not offenders, (
-        "modern_settings_dialog 顶层 import pet.chat 回潮：no-chat 打包变体"
-        "（excludes=['pet.chat']）运行时设置界面会打不开。chat 依赖须延迟到"
+        "modern_settings_dialog 顶层 import petwisp.chat 回潮：no-chat 打包变体"
+        "（excludes=['petwisp.chat']）运行时设置界面会打不开。chat 依赖须延迟到"
         " include_ai 分支内的函数级 import。\n" + "\n".join(offenders)
     )
 

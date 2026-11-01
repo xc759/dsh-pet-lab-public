@@ -5,8 +5,8 @@
 它」，**不需要改** `voice_chime.py` / `voice_chime_service.py` / `voice_chime_settings.py`
 （配置键由 provider 自己声明，`config.py` 会自动收编）。
 
-> 代码位置：接口与注册表 `pet/tts/base.py`；内置实现 `pet/tts/edge.py`（edge-tts）、
-> `pet/tts/mimo.py`（小米 MiMo）。契约由 `tests/test_voice_chime_mimo.py::
+> 代码位置：接口与注册表 `petwisp/tts/base.py`；内置实现 `petwisp/tts/edge.py`（edge-tts）、
+> `petwisp/tts/mimo.py`（小米 MiMo）。契约由 `tests/test_voice_chime_mimo.py::
 > test_every_registered_provider_satisfies_the_contract` 机器化守卫。
 
 ---
@@ -56,7 +56,7 @@ class MyTtsProvider(TtsProvider):
 PROVIDER = register(MyTtsProvider())
 ```
 
-### 2. 在 `pet/tts/__init__.py` 里 import 它
+### 2. 在 `petwisp/tts/__init__.py` 里 import 它
 
 ```python
 from . import edge, mimo, mytts  # noqa: F401 —— import 即注册
@@ -65,7 +65,7 @@ from . import edge, mimo, mytts  # noqa: F401 —— import 即注册
 注册顺序决定设置页下拉顺序；被标了 `is_fallback = True` 的会进回退链，
 所以**别把多个后端都标成 fallback**，除非你确实想要一条多级链。
 
-### 3. 在 `pet/config.py` 里什么都不用做
+### 3. 在 `petwisp/config.py` 里什么都不用做
 
 `Config.__init__` 与 `reload()` 会遍历 `tts.providers()` 把每个字段的 `key`
 自动收进默认值与 reload 白名单——只要你按第 2 步 import 了，键就不会漏。
@@ -115,7 +115,7 @@ from . import edge, mimo, mytts  # noqa: F401 —— import 即注册
    用户配的是**当时有效**的值，之后失效时不能只表现为「没声音」。做法：
    ``preflight(values)`` 在 GUI 线程（**不联网**，只看缓存/内置清单）把失效值换成可用的
    并返回一句面向用户的说明；``synth()`` 里再重试 + 退默认值兜一层。范例见
-   ``pet/tts/edge.py``（晓涵等 10 款音色 2026-09-22 被微软下架那次事故）。
+   ``petwisp/tts/edge.py``（晓涵等 10 款音色 2026-09-22 被微软下架那次事故）。
 1. **`pet/tts/*.py` 模块顶层不得 import Qt**，也不得 import 重量级/可选依赖
    （`edge_tts` 这种惰性到 `synth()` 里）——`tests/test_architecture.py::
    test_tts_providers_keep_top_level_imports_light` 会红（只扫顶层；函数体内的

@@ -30,9 +30,9 @@ from PySide6.QtCore import QPointF, QRect, Qt
 from PySide6.QtGui import QRegion
 from PySide6.QtWidgets import QApplication
 
-from pet.overlay_window import OverlayWindow
-from pet.tick_driver import TickDriver
-from pet.tick_governor import (
+from petwisp.overlay_window import OverlayWindow
+from petwisp.tick_driver import TickDriver
+from petwisp.tick_governor import (
     TIER_ACTIVE,
     TIER_IDLE_STILL,
     TIER_INTERVAL_MS,

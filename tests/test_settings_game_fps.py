@@ -27,17 +27,17 @@ from PySide6.QtCore import Qt
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication, QScrollArea
 
-import pet.modern_settings_dialog as settings_mod
-from pet import config as config_mod
-from pet import settings_network
-from pet.config import (
+import petwisp.modern_settings_dialog as settings_mod
+from petwisp import config as config_mod
+from petwisp import settings_network
+from petwisp.config import (
     GAME_FPS_DEFAULT_TARGET_MODE,
     GAME_FPS_PROCESS_MAX_CHARS,
     GAME_FPS_TARGET_MODES,
     Config,
 )
-from pet.island.segments import BUILTIN_SEGMENT_IDS, CPU, FPS, GPU, MEM, NETWORK
-from pet.modern_settings_dialog import SettingRow
+from petwisp.island.segments import BUILTIN_SEGMENT_IDS, CPU, FPS, GPU, MEM, NETWORK
+from petwisp.modern_settings_dialog import SettingRow
 
 app = QApplication.instance() or QApplication([])
 
@@ -503,7 +503,7 @@ def test_row_is_findable_by_fps_and_frame_rate_words(tmp_path, monkeypatch, quer
 
 def test_alias_table_carries_the_spoken_word_frame_count():
     """别名表里有「帧数」→ island_fps（文案里没有这个词，只能靠别名兜）。"""
-    from pet.settings_search import ROW_ALIASES
+    from petwisp.settings_search import ROW_ALIASES
 
     assert ROW_ALIASES["帧数"] == ("island_fps",)
 
@@ -573,7 +573,7 @@ def test_both_keys_are_global_not_per_pet():
     进了每宠集合就会变成"保存进 slot 文件、运行期读主配置"的死开关（2026-10-09 那批
     修的就是这类问题），所以这里把归属钉成机器可检的事实，而不是注释里的承诺。
     """
-    from pet import overlay_spawn_state, pet_profiles
+    from petwisp import overlay_spawn_state, pet_profiles
 
     for key in ("game_fps_target_mode", "game_fps_process"):
         assert key not in pet_profiles.PER_PET_SETTING_KEYS

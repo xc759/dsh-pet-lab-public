@@ -15,9 +15,9 @@ import json
 
 import pytest
 
-from pet import feature_activation as fa
-from pet.config import Config
-from pet.features import FEATURES, MIGRATION_BASELINE
+from petwisp import feature_activation as fa
+from petwisp.config import Config
+from petwisp.features import FEATURES, MIGRATION_BASELINE
 
 
 @pytest.fixture(autouse=True)

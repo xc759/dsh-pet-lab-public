@@ -35,8 +35,8 @@ import pytest
 from PySide6.QtCore import QEvent, QObject, QPoint, QTimer, Qt
 from PySide6.QtWidgets import QApplication, QWidget
 
-from pet import platform_passthrough as pp
-from pet.overlay_window import OverlayWindow
+from petwisp import platform_passthrough as pp
+from petwisp.overlay_window import OverlayWindow
 from tests.test_overlay_window import FakeSprite, _mouse_event
 
 app = QApplication.instance() or QApplication([])
@@ -403,7 +403,7 @@ def test_poll_tiers_match_windows_protocol(monkeypatch):
     ``platform_win`` 直接取常量——该模块 posix 可 import（``tests/test_overlay_hidden_polling.py``
     等文件本就在 Linux/macOS CI 上模块级 import 它）。
     """
-    from pet.platform_win import WindowsPerPixelInputController as WinCtl
+    from petwisp.platform_win import WindowsPerPixelInputController as WinCtl
 
     normal = pp.QtPerPixelInputController.NORMAL_POLL_INTERVAL_MS
     idle = pp.QtPerPixelInputController.IDLE_POLL_INTERVAL_MS
@@ -465,7 +465,7 @@ def test_show_event_creates_qt_controller_off_windows(monkeypatch):
 @pytest.mark.skipif(os.name != "nt", reason="win32 分派要真 user32，仅 Windows 可跑")
 def test_show_event_keeps_windows_controller_on_win32():
     """win32：分配的仍是原 Windows 控制器（Windows 路径一行未改）。"""
-    from pet.platform_win import WindowsPerPixelInputController
+    from petwisp.platform_win import WindowsPerPixelInputController
 
     overlay = OverlayWindow()
     try:
@@ -679,7 +679,7 @@ def test_matches_windows_controller_decisions():
     不碰 user32/扩展样式位），所以 posix 上同样可执行。档位常量对齐在
     ``test_poll_tiers_match_windows_protocol`` 里断言。
     """
-    from pet.platform_win import WindowsPerPixelInputController as WinCtl
+    from petwisp.platform_win import WindowsPerPixelInputController as WinCtl
 
     for mouse_through, press_active, visible, transparent, point, expected in CASES:
         window = _FakeWindow(transparent=transparent, visible=visible)
@@ -702,7 +702,7 @@ def test_macos_same_state_never_resets_window_flags(monkeypatch):
     """issue #314：macOS 读不回穿透标志（flag_ok 恒 False）时，以控制器自记
     落窗状态为准——同目标态的轮询 tick 不许再碰窗口 flags（每碰一次
     QCocoaWindow::setWindowFlags 都会伴随窗口重建并把 App 激活）。"""
-    from pet import platform_passthrough as pp
+    from petwisp import platform_passthrough as pp
 
     monkeypatch.setattr(pp, "_IS_MACOS", True)
     widget = _shown_widget()
@@ -722,7 +722,7 @@ def test_macos_same_state_never_resets_window_flags(monkeypatch):
 
 def test_non_macos_keeps_readback_convergence(monkeypatch):
     """非 macOS 平台保留「读回收敛」：外部把属性写走后，下一拍纠回来。"""
-    from pet import platform_passthrough as pp
+    from petwisp import platform_passthrough as pp
 
     monkeypatch.setattr(pp, "_IS_MACOS", False)
     widget = _shown_widget()

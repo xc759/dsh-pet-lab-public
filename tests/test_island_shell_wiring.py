@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """灵动岛 AppShell 接线测试：碰撞体生命周期/挂起、no-chat 变体守卫。
 
-审查补票（P0-1/P0-2/P1-6）：碰撞体重开必须换新 session；pet.chat 被排除的
+审查补票（P0-1/P0-2/P1-6）：碰撞体重开必须换新 session；petwisp.chat 被排除的
 打包变体不能崩；碰撞体随桌宠可见性挂起。
 """
 from __future__ import annotations
@@ -11,9 +11,9 @@ from pathlib import Path
 
 from PySide6.QtWidgets import QApplication
 
-from pet.app import AppShell
-from pet.chat.service import ChatService
-from pet.config import Config
+from petwisp.app import AppShell
+from petwisp.chat.service import ChatService
+from petwisp.config import Config
 
 
 def _qapp() -> QApplication:
@@ -93,9 +93,9 @@ def test_collision_body_restart_after_disable(tmp_path):
 
 
 def test_island_survives_no_chat_packaging_variant(tmp_path, monkeypatch):
-    """P0-2 回归：pet.chat 被排除的打包变体里创建灵动岛不得抛异常。"""
+    """P0-2 回归：petwisp.chat 被排除的打包变体里创建灵动岛不得抛异常。"""
     app = _qapp()
-    monkeypatch.setitem(sys.modules, "pet.chat.service", None)  # 模拟变体排除
+    monkeypatch.setitem(sys.modules, "petwisp.chat.service", None)  # 模拟变体排除
     shell = _make_shell(tmp_path)
     try:
         shell._sync_dynamic_island()  # 不应抛 ModuleNotFoundError
@@ -258,9 +258,9 @@ class _IslandOverlayHost:
     def __init__(self):
         import types
 
-        from pet.overlay_shell import OverlayShell
-        from pet.overlay_window import OverlayWindow
-        from pet.sprite_collision import SpriteCollisionWorld
+        from petwisp.overlay_shell import OverlayShell
+        from petwisp.overlay_window import OverlayWindow
+        from petwisp.sprite_collision import SpriteCollisionWorld
 
         self.overlay = OverlayWindow()
         self.collision = SpriteCollisionWorld()
@@ -321,7 +321,7 @@ def _teardown_overlay_shell(shell, host) -> None:
 
 def test_overlay_island_wall_follows_collision_switch(tmp_path):
     """G1：岛显示时关掉「岛碰撞」不得挂墙，开/关来回切必须撤墙且不留残留。"""
-    from pet import collision as collision_mod
+    from petwisp import collision as collision_mod
 
     app = _qapp()
     shell, host = _make_overlay_shell(tmp_path, collision_enabled=False)
@@ -367,7 +367,7 @@ def test_overlay_island_wall_follows_collision_switch(tmp_path):
 
 def test_overlay_island_wall_defaults_on_without_key(tmp_path):
     """老配置缺 ``dynamic_island.collision_enabled`` 键 → 按旧契约默认挂墙。"""
-    from pet import collision as collision_mod
+    from petwisp import collision as collision_mod
 
     app = _qapp()
     shell, host = _make_overlay_shell(tmp_path)
@@ -384,7 +384,7 @@ def test_overlay_island_wall_defaults_on_without_key(tmp_path):
 
 def test_overlay_island_wall_withdrawn_on_island_hide(tmp_path):
     """开着开关时：岛 hide 撤墙 / show 复墙（桥既有语义，本修复不得破坏）。"""
-    from pet import collision as collision_mod
+    from petwisp import collision as collision_mod
 
     app = _qapp()
     shell, host = _make_overlay_shell(tmp_path, collision_enabled=True)
@@ -438,8 +438,8 @@ def test_overlay_island_drag_wakes_tick_tier(tmp_path):
     """
     from PySide6.QtCore import QEvent, QPoint
 
-    from pet.tick_driver import TickDriver
-    from pet.tick_governor import TIER_ACTIVE, TIER_IDLE_STILL
+    from petwisp.tick_driver import TickDriver
+    from petwisp.tick_governor import TIER_ACTIVE, TIER_IDLE_STILL
 
     app = _qapp()
     shell, host = _make_overlay_shell(tmp_path)

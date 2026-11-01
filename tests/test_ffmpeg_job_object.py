@@ -45,8 +45,8 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 # lavfi 源限速到 1fps，保证它长期存活且零管道依赖。
 _CHILD_TEMPLATE = r'''
 import json, os, subprocess, sys, time
-sys.path.insert(0, os.environ["DSH_PET_SRC_ROOT"])
-from pet import webm_clip, win_job
+sys.path.insert(0, os.environ["PETWISP_SRC_ROOT"])
+from petwisp import webm_clip, win_job
 import imageio_ffmpeg
 
 webm_clip._PopenCapture._install()  # 与生产同源：读帧路径进入 capture 前必装
@@ -134,7 +134,7 @@ def _wait_pid_alive(pid: int, timeout: float) -> bool:
 
 def _spawn_child(src: str):
     env = os.environ.copy()
-    env['DSH_PET_SRC_ROOT'] = str(REPO_ROOT)
+    env['PETWISP_SRC_ROOT'] = str(REPO_ROOT)
     proc = subprocess.Popen(
         [sys.executable, '-c', src],
         stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
@@ -216,7 +216,7 @@ def test_control_ffmpeg_bypassing_hook_survives_parent_kill():
 # ------------------------------------------------------------ 单元面
 def test_wrapped_popen_adopts_child_into_job(monkeypatch):
     """漏斗接线：``_PopenCapture._wrapped`` 必须把新建进程交给 win_job。"""
-    from pet import webm_clip, win_job
+    from petwisp import webm_clip, win_job
 
     adopted = []
     monkeypatch.setattr(
@@ -234,7 +234,7 @@ def test_wrapped_popen_adopts_child_into_job(monkeypatch):
 
 def test_adopt_is_defensive_and_idempotent():
     """adopt：None/已退出进程/重复调用都不许抛异常，且可重复挂载同一 job。"""
-    from pet import win_job
+    from petwisp import win_job
 
     assert win_job.adopt(None) is False
     dead = subprocess.Popen([sys.executable, '-c', 'pass'])

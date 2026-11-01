@@ -34,12 +34,12 @@ import pytest
 from PySide6.QtCore import QPointF, QRect, Qt
 from PySide6.QtWidgets import QApplication, QDialog, QVBoxLayout, QWidget
 
-from pet import config as config_mod
-from pet import overlay_settings_command as cmd_mod
-from pet import settings_reset_defaults
-from pet import window_placement
-from pet.config import Config
-from pet.modern_settings_dialog import ModernSettingsDialog
+from petwisp import config as config_mod
+from petwisp import overlay_settings_command as cmd_mod
+from petwisp import settings_reset_defaults
+from petwisp import window_placement
+from petwisp.config import Config
+from petwisp.modern_settings_dialog import ModernSettingsDialog
 
 
 @pytest.fixture(scope="session")
@@ -58,7 +58,7 @@ def _no_real_autostart_writes(monkeypatch):
     开机自启时，跑一次用例就会把它关掉。需要断言该行为的用例在用例体内自行覆盖
     （test_reset_syncs_system_autostart_login_item 等已如此）。
     """
-    from pet import autostart as autostart_mod
+    from petwisp import autostart as autostart_mod
 
     monkeypatch.setattr(autostart_mod, "is_enabled", lambda: False)
     monkeypatch.setattr(autostart_mod, "set_enabled", lambda _on: True)
@@ -180,7 +180,7 @@ def test_reset_keeps_custom_provider_credentials_when_keyring_unavailable(
     断言落在**生产读密钥口径**上（``Config.resolve_api_key`` = keyring 优先、
     取不到回落明文），而不是只看配置里的字段。
     """
-    from pet.chat.models import SecretStore
+    from petwisp.chat.models import SecretStore
 
     monkeypatch.setattr(SecretStore, "get", lambda self, ref: "")  # keyring 不可用
 
@@ -217,7 +217,7 @@ def test_reset_does_not_touch_keyring_and_drops_non_credential_fields(tmp_path: 
     重置只写配置文件，**从不**调用 SecretStore：自定义服务商的 keyring 条目原样
     留在系统钥匙串里（删掉才是数据丢失）。
     """
-    from pet.chat.models import SecretStore
+    from petwisp.chat.models import SecretStore
 
     def boom(*_args, **_kwargs):  # pragma: no cover - 只在被调用时触发
         raise AssertionError("重置设置不得触碰系统钥匙串")
@@ -681,7 +681,7 @@ def _stub_instance(cfg, screen, pos):
 
 
 def _stub_shell(instance):
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     shell = AppShell.__new__(AppShell)
     shell.instance = instance
@@ -697,8 +697,8 @@ def test_reload_adopts_reset_position_nulls(tmp_path: Path):
     这三个键的消费者（window_placement.restore_position / overlay 落位）本来就把
     None 当"没有位置记忆"，所以它们进 _NULL_ACCEPTING_KEYS 是同一个口径的延伸。
     """
-    from pet import pet_profiles
-    from pet.settings_slot_config import route_settings_config
+    from petwisp import pet_profiles
+    from petwisp.settings_slot_config import route_settings_config
 
     cfg = _dirty_config(tmp_path / "appdata")
     pet_profiles.write_profile_settings(cfg.dir, 0, {"rx": 0.42, "ry": 0.42, "screen_name": "primary"})
@@ -713,7 +713,7 @@ def test_reload_adopts_reset_position_nulls(tmp_path: Path):
 
 def test_reset_asks_parent_window_to_align_runtime(tmp_path: Path, monkeypatch):
     """进程内设置页：重置后直接调窗口上已接线的回调（不走指令通道），并同步系统项。"""
-    from pet import autostart as autostart_mod
+    from petwisp import autostart as autostart_mod
 
     monkeypatch.setattr(settings_reset_defaults, "confirm_reset", lambda _parent, _scope=None: True)
     calls: list[str] = []
@@ -759,7 +759,7 @@ def test_slot_scope_reset_writes_profile_reset_not_a_reposition_command(
     落位"——与"本宠 reset 保留位置"（规范 §五）直接冲突。这里两端一起钉住：档案里的位置
     原样保留，发出的指令是新的 ``profile_reset``。
     """
-    from pet import pet_profiles, settings_slot_config
+    from petwisp import pet_profiles, settings_slot_config
 
     monkeypatch.setattr(settings_reset_defaults, "confirm_reset", lambda _parent, _scope=None: True)
     monkeypatch.setenv(cmd_mod.ENV_TOPOLOGY, "overlay")
@@ -848,7 +848,7 @@ def test_exit_position_save_after_reset_keeps_default_placement(tmp_path: Path):
     window_placement.save_position(instance.win)   # ← 退出收口（生产路径）
 
     reloaded = Config(base=tmp_path / "appdata")
-    from pet import pet_profiles
+    from petwisp import pet_profiles
 
     assert "rx" not in json.loads(reloaded.path.read_text(encoding="utf8"))
     assert pet_profiles.read_slot_profile(cfg.dir, 0).value("rx") is None
@@ -874,7 +874,7 @@ def test_settings_reset_command_is_consumed_and_aligns_legacy_window(
 
 def test_reset_syncs_system_autostart_login_item(tmp_path: Path, monkeypatch):
     """系统登录项按重置后的值收敛（默认关）；已是目标值时不重复写注册表。"""
-    from pet import autostart as autostart_mod
+    from petwisp import autostart as autostart_mod
 
     calls: list[bool] = []
     monkeypatch.setattr(autostart_mod, "is_enabled", lambda: True)
@@ -900,8 +900,8 @@ def test_reset_leaves_system_autostart_alone_for_child_pet(tmp_path: Path, monke
     进程的"整表身份"，重置它确实会改到 ``autostart_wanted``。产品形态的子宠设置页是
     **装箱后**的路由视图，这里按它来钉。
     """
-    from pet import autostart as autostart_mod
-    from pet.settings_slot_config import route_settings_config
+    from petwisp import autostart as autostart_mod
+    from petwisp.settings_slot_config import route_settings_config
 
     calls: list[bool] = []
     monkeypatch.setattr(autostart_mod, "is_enabled", lambda: True)
@@ -925,8 +925,8 @@ def test_global_reset_from_a_slot_page_syncs_system_autostart(tmp_path: Path, mo
     所以从子宠页点的全局 reset 必须把 OS 侧一起收敛——旧代码按"实例名非空"直接 return，
     那种页面上系统登录项与配置就会长期不一致（配置说关、注册表还开着）。
     """
-    from pet import autostart as autostart_mod
-    from pet.settings_slot_config import route_settings_config
+    from petwisp import autostart as autostart_mod
+    from petwisp.settings_slot_config import route_settings_config
 
     calls: list[bool] = []
     monkeypatch.setattr(autostart_mod, "is_enabled", lambda: True)
@@ -1032,7 +1032,7 @@ def test_overlay_reset_command_reloads_runtime_config_before_alignment(tmp_path:
         assert on_disk.get("no_move") is False
         assert on_disk.get("mouse_through") is False
         assert on_disk.get("self_talk_enabled") is False
-        from pet import pet_profiles
+        from petwisp import pet_profiles
 
         assert "rx" not in json.loads(on_disk.path.read_text(encoding="utf8"))
         assert pet_profiles.read_slot_profile(on_disk.dir, 0).value("rx") is not None
@@ -1050,8 +1050,8 @@ def test_overlay_reset_command_reloads_runtime_config_before_alignment(tmp_path:
 
 def _slot_page_dialog(tmp_path: Path):
     """真设置窗：slot0 页（路由视图），全局侧带脏值。"""
-    from pet import pet_profiles
-    from pet.settings_slot_config import route_settings_config
+    from petwisp import pet_profiles
+    from petwisp.settings_slot_config import route_settings_config
 
     base = tmp_path / "appdata"
     main = Config(base=base)
@@ -1072,7 +1072,7 @@ def _slot_page_dialog(tmp_path: Path):
 def test_slot_page_exposes_both_reset_scopes_and_global_reaches_global_keys(
         qapp, tmp_path: Path, monkeypatch):
     """slot0 页给得出「本宠」与「全局」两个动作，且全局那个真的重置全局面。"""
-    from pet import pet_profiles, settings_slot_config
+    from petwisp import pet_profiles, settings_slot_config
 
     dialog, main = _slot_page_dialog(tmp_path)
     seen: list = []
@@ -1119,7 +1119,7 @@ def test_slot_page_exposes_both_reset_scopes_and_global_reaches_global_keys(
 def test_global_reset_from_a_slot_page_keeps_other_pets_and_the_active_set(
         qapp, tmp_path: Path, monkeypatch):
     """全局 reset 的作用域边界：别的宠档案、活跃集合、本宠位置都原样。"""
-    from pet import pet_profiles
+    from petwisp import pet_profiles
 
     base = tmp_path / "appdata"
     main = Config(base=base)
@@ -1132,7 +1132,7 @@ def test_global_reset_from_a_slot_page_keeps_other_pets_and_the_active_set(
     before_profile = pet_profiles.slot_profile_path(main.dir, 1).read_bytes()
     before_active = pet_profiles.active_set_path(main.dir).read_bytes()
 
-    from pet.settings_slot_config import route_settings_config
+    from petwisp.settings_slot_config import route_settings_config
 
     dialog = ModernSettingsDialog(
         route_settings_config(Config(base=base, instance_id="slot-1")), include_ai=False)

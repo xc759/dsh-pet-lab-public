@@ -16,7 +16,7 @@ import types
 
 from PySide6.QtWidgets import QApplication
 
-import pet.webm_clip as webm_clip
+import petwisp.webm_clip as webm_clip
 
 
 def test_meta_file_cache_shared_across_instances(tmp_path, monkeypatch):
@@ -120,7 +120,7 @@ def test_meta_file_cache_evicts_entries_whose_source_file_is_gone(
     """源文件已不存在的条目在加载/落盘边界被逐出（N3，2026-09-29 审计）。
 
     pytest 临时路径这类条目在源文件删掉后永不失效（key 的 ``(mtime+size)``
-    再无匹配者），跨运行常驻在 ``%TEMP%/dsh-pet-media-meta-cache.json`` 里。
+    再无匹配者），跨运行常驻在 ``%TEMP%/petwisp-media-meta-cache.json`` 里。
     本进程第一次读该文件时做一次全表体检（按父目录分组列名单，比逐条
     ``os.path.exists`` 快一个数量级），逐出的 key 由写路径带出磁盘文件——
     都不进 ``_ensure_meta`` 热路径，条数上限语义不变。

@@ -77,7 +77,7 @@ SOFTWARE.
 - **Package**: [`lunar-python`](https://pypi.org/project/lunar-python/)（import 名 `lunar_python`）
 - **Author**: 6tail
 - **License**: MIT License
-- **Used by**: `pet/festival/calendar.py`（节日提醒的农历/节气计算）
+- **Used by**: `petwisp/festival/calendar.py`（节日提醒的农历/节气计算）
 - **为何选它**：流传更广的 `lunardate` / `zhdate` 均为 **GPL-3.0-or-later**
   （同源于 1988 年 Fung F. Lee / Ricky Yeung 的 GPLv2 `lunar` 项目），与本项目
   的 MIT 许可不兼容，**不可引入**。`lunar-python` 为 MIT、纯 Python、无数据
@@ -87,7 +87,7 @@ SOFTWARE.
 
 ## 4. 节日提醒内置文案（古诗词 / 公有领域引文）
 
-`pet/festival_quotes_cn.py` 与 `pet/festival_quotes_west.py` 内置的文案**全部取自公有领域作品**，
+`petwisp/festival_quotes_cn.py` 与 `petwisp/festival_quotes_west.py` 内置的文案**全部取自公有领域作品**，
 不含任何受版权保护的影视、电视剧、电子游戏台词或现代歌词。
 
 - **中文库（`festival_quotes_cn.py`，199 条）**：中国古典诗词与经典古籍 —《诗经》、
@@ -114,7 +114,7 @@ SOFTWARE.
 > 形式收录，不含完整对白段落；但"内置进分发的软件产物"比单纯的评论引用更强，
 > 若你计划再分发或在其他法域发布，请自行评估。
 
-### 5.1 电影台词 — `pet/festival_quotes_west_movie.py`（35 条）
+### 5.1 电影台词 — `petwisp/festival_quotes_west_movie.py`（35 条）
 
 | 影片 | 条数 |
 |---|---|
@@ -147,7 +147,7 @@ SOFTWARE.
 | The Polar Express (2004) | 1 |
 | Miracle on 34th Street (1947) | 1 |
 
-### 5.2 电子游戏台词 — `pet/festival_quotes_west_game.py`（22 条）
+### 5.2 电子游戏台词 — `petwisp/festival_quotes_west_game.py`（22 条）
 
 | 作品 | 条数 |
 |---|---|
@@ -173,7 +173,7 @@ SOFTWARE.
 > 的交集远小于电影，宁可缺项也不硬塞弱相关句子。缺口由第 4 节公有领域库、
 > 5.1 电影库与 5.3 歌曲库覆盖。
 
-### 5.3 流行歌曲歌词 — `pet/festival_quotes_west_song.py`（10 条）
+### 5.3 流行歌曲歌词 — `petwisp/festival_quotes_west_song.py`（10 条）
 
 | 歌曲 | 词曲作者 | 年份 | 条数 |
 |---|---|---|---|
@@ -193,12 +193,12 @@ SOFTWARE.
 
 ### 5.4 如何剥离这些内容（得到「纯公有领域」版本）
 
-三个受版权模块与公有领域库是**物理隔离**的独立文件，`pet/festival.py` 的取词
+三个受版权模块与公有领域库是**物理隔离**的独立文件，`petwisp/festival.py` 的取词
 处用 `try/except ImportError` 导入它们（且刻意使用真实 `import` 语句而非
 `importlib`，以保证 PyInstaller 静态分析能收集到；已实测确认三个模块均进包）。因此：
 
-1. 删除 `pet/festival_quotes_west_movie.py`、`pet/festival_quotes_west_game.py`
-   与 `pet/festival_quotes_west_song.py`（三者可**任意组合删除**）；
+1. 删除 `petwisp/festival_quotes_west_movie.py`、`petwisp/festival_quotes_west_game.py`
+   与 `petwisp/festival_quotes_west_song.py`（三者可**任意组合删除**）；
 2. 无需改动任何其它代码——取词自动降级，西方节日回退到公有领域引文库与其余留存库。
 
 `tests/test_festival.py` 中有断言守卫这三个库的存在（`test_pop_culture_libraries_are_present_and_non_empty`）；
@@ -216,7 +216,7 @@ SOFTWARE.
   [`v2.6.0`](https://github.com/GameTechDev/PresentMon/releases/tag/v2.6.0)，
   资产 `PresentMon-2.6.0-x64.exe`
 - **License**: MIT License（`Copyright (C) 2017-2024 Intel Corporation`）
-- **Used by**: `pet/island/game_fps.py` 与 `pet/island/fps_monitor.py`——灵动岛「游戏帧率」段的
+- **Used by**: `petwisp/island/game_fps.py` 与 `petwisp/island/fps_monitor.py`——灵动岛「游戏帧率」段的
   数据源（读数口径是**目标应用的 Present 帧率**，来自该程序输出的
   `MsBetweenPresents`）
 - **校验**：exe 的 sha256 `b2a706bc6ad475749e3b7e3409263aa1e6906d45bdcf993f6dbc0f660188f1af`
@@ -232,7 +232,7 @@ SOFTWARE.
   目录），非 Windows 平台上这一段按「不支持」呈现
 - **安装包里的位置**：随 onedir 产物落在 `_internal/resources/presentmon/`，安装器
   整目录拷贝，因此 `LICENSE.txt` 与二进制一同随包分发（MIT 要求的声明随附）
-- **升级路径**：换版本必须同时改 `pet/island/game_fps.py` 的 `BACKEND_EXE_NAME`、
+- **升级路径**：换版本必须同时改 `petwisp/island/game_fps.py` 的 `BACKEND_EXE_NAME`、
   `REQUIRED_SHA256`、`SOURCE_TEXT` 与本文件——文件名带版本号（`PresentMon-2.6.0-x64.exe`）
   就是为了不让"同名不同版"成为静默替换
 
@@ -281,7 +281,7 @@ OR OTHER DEALINGS IN THE SOFTWARE.
   `rapidocr/models/`（本项目钉 `rapidocr>=3.10,<4`，本机 3.10.0）；上游权重来自
   PaddleOCR 官方模型（`PP-OCRv6_small_det` / `PP-OCRv6_small_rec` 与旧版
   `ch_ppocr_mobile_v2.0_cls`），由 RapidOCR 转换为 ONNX 后按 Apache-2.0 分发。
-  取出命令写在 `pet/screen_capture/ocr.py` 的模块说明里；摘要与上游
+  取出命令写在 `petwisp/screen_capture/ocr.py` 的模块说明里；摘要与上游
   `MODEL_LICENSES.md` 第 6 节登记值逐项一致。
 - **License**: **Apache License 2.0**（模型与应用同许可）。权重的版权归
   **Baidu 和/或相应的 PaddleOCR 权利人**；RapidOCR 不主张上游权重所有权。
@@ -291,8 +291,8 @@ OR OTHER DEALINGS IN THE SOFTWARE.
   §4(c)/(d) 的署名与上游声明由 `MODEL_LICENSES.md` 原文满足；§4(b) 的"改动声明"
   不适用——我们没有修改模型文件（原样拷贝，文件名与字节都未变），
   上游对"转换后产物"建议的声明文本随 `NOTICE.md` 一并附上。
-- **Used by**: `pet/screen_capture/ocr.py`（本地 OCR，纯离线）与
-  `pet/screen_capture/actions.py`（「截图 → 提取文字」动作）。
+- **Used by**: `petwisp/screen_capture/ocr.py`（本地 OCR，纯离线）与
+  `petwisp/screen_capture/actions.py`（「截图 → 提取文字」动作）。
   **隐私边界：识别全程在本机内存里完成，不联网、不落盘**——模型与字符表都在
   包里（字符表内嵌在识别模型的 ONNX 元数据里，没有额外的字典文件被下载）；
   加载路径上不存在下载分支（自建 ONNXRuntime 会话注入 rapidocr，短路其"模型路径

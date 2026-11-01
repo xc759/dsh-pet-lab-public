@@ -8,7 +8,7 @@ import sys
 
 
 def test_sanitize_pops_vars_and_is_idempotent(monkeypatch):
-    from pet.qt_plugin_sanitizer import sanitize_plugin_path
+    from petwisp.qt_plugin_sanitizer import sanitize_plugin_path
 
     monkeypatch.setenv("QT_PLUGIN_PATH", "D:/Qt-debug/plugins")
     monkeypatch.setenv("QT_QPA_PLATFORM_PLUGIN_PATH", "D:/Qt-debug/plugins/platforms")
@@ -19,7 +19,7 @@ def test_sanitize_pops_vars_and_is_idempotent(monkeypatch):
 
 
 def test_sanitize_noop_when_clean(monkeypatch):
-    from pet.qt_plugin_sanitizer import sanitize_plugin_path
+    from petwisp.qt_plugin_sanitizer import sanitize_plugin_path
 
     monkeypatch.delenv("QT_PLUGIN_PATH", raising=False)
     monkeypatch.delenv("QT_QPA_PLATFORM_PLUGIN_PATH", raising=False)
@@ -31,7 +31,7 @@ def test_sanitizer_has_no_pyside_dependency():
     import ast
     from pathlib import Path
 
-    tree = ast.parse(Path("pet/qt_plugin_sanitizer.py").read_text(encoding="utf-8"))
+    tree = ast.parse(Path("petwisp/qt_plugin_sanitizer.py").read_text(encoding="utf-8"))
     for node in ast.walk(tree):
         if isinstance(node, (ast.Import, ast.ImportFrom)):
             names = [a.name for a in node.names]
@@ -40,8 +40,8 @@ def test_sanitizer_has_no_pyside_dependency():
 
 
 def test_main_entry_sanitizes_before_pyside(tmp_path):
-    """端到端时序：污染环境变量下 import pet.__main__，变量必须在模块加载即被清除
-    （pet.__main__ 的 sanitize 调用在模块顶部，先于任何 PySide6 导入）。"""
+    """端到端时序：污染环境变量下 import petwisp.__main__，变量必须在模块加载即被清除
+    （petwisp.__main__ 的 sanitize 调用在模块顶部，先于任何 PySide6 导入）。"""
     env = dict(os.environ)
     env["QT_PLUGIN_PATH"] = str(tmp_path / "fake-qt-plugins")
     (tmp_path / "fake-qt-plugins").mkdir()
@@ -49,7 +49,7 @@ def test_main_entry_sanitizes_before_pyside(tmp_path):
     result = subprocess.run(
         [sys.executable, "-c",
          "import os\n"
-         "import pet.__main__  # noqa: F401  # 模块顶部即消毒\n"
+         "import petwisp.__main__  # noqa: F401  # 模块顶部即消毒\n"
          "assert 'QT_PLUGIN_PATH' not in os.environ, os.environ.get('QT_PLUGIN_PATH')\n"
          "print('SANITIZED')"],
         capture_output=True, text=True, env=env, cwd=os.getcwd(), timeout=60)

@@ -9,9 +9,9 @@ from pathlib import Path
 import pytest
 from PySide6.QtWidgets import QApplication
 
-from pet.click_sound import resolve_builtin_sound
-from pet.config import Config
-from pet.modern_settings_dialog import ModernSettingsDialog, SettingRow
+from petwisp.click_sound import resolve_builtin_sound
+from petwisp.config import Config
+from petwisp.modern_settings_dialog import ModernSettingsDialog, SettingRow
 
 
 @pytest.fixture(scope="session")
@@ -49,7 +49,7 @@ def test_modern_settings_dialog_round_trip(qapp, tmp_path: Path):
     """验证现代设置面板：初始化正确读取 Config，修改后 _write_config 写入 Config 并能准确读回。"""
     cfg_root = tmp_path / "appdata"
     # 生产形态：当前宠的设置页拿 slot0 的路由视图（每宠键 → config-slot-0.json）
-    from pet.settings_slot_config import route_settings_config
+    from petwisp.settings_slot_config import route_settings_config
 
     cfg = route_settings_config(Config(cfg_root, instance_id="slot-0"))
 
@@ -160,14 +160,14 @@ def test_import_dialogue_template_reads_entries_and_top_level_phrases(tmp_path, 
 
 
 def test_spawn_size_controls_visibility(qapp, tmp_path: Path):
-    """生小肥鱼继承大小开启时隐藏自定义大小；关闭后显示。"""
+    """生小宠继承大小开启时隐藏自定义大小；关闭后显示。"""
     cfg_root = tmp_path / "appdata"
     cfg = Config(cfg_root)
     dialog = ModernSettingsDialog(cfg, include_ai=False)
     try:
         row = dialog.findChild(SettingRow, "settingRow_spawn_scale")
         assert row is not None
-        assert row.isHidden() is True, "默认继承大小，不应显示自定义小肥鱼大小"
+        assert row.isHidden() is True, "默认继承大小，不应显示自定义小宠大小"
 
         dialog.spawn_inherit_size_check.setChecked(False)
         assert row.isHidden() is False
@@ -213,8 +213,8 @@ def test_dialogue_key_params_match_runtime_call_sites():
 
     上游重构曾让设置页提示与运行时注入漂移；现在 DIALOGUE_KEY_PARAMS 由
     persona_template.PARAMETERS 派生，这里验证派生关系与代表性条目。"""
-    from pet.modern_settings_dialog import DIALOGUE_KEY_PARAMS, DIALOGUE_PARAMS
-    from pet.persona_template import PARAMETERS
+    from petwisp.modern_settings_dialog import DIALOGUE_KEY_PARAMS, DIALOGUE_PARAMS
+    from petwisp.persona_template import PARAMETERS
 
     assert DIALOGUE_KEY_PARAMS == dict(PARAMETERS)
     # 展示名必须覆盖全部宣称的参数（对话框 hint 渲染用 DIALOGUE_PARAMS[item]）
@@ -297,7 +297,7 @@ def test_automation_domain_name_stays_stable(qapp, tmp_path):
     ticket 03（撤销改名）：旧设置回归测试锁定侧边栏文案，域名不改为
     「Agent 联动」——迁移只作用于域内组名（文案风格与模板 / 事件气泡触发概率）。
     """
-    from pet.settings_widgets import SETTINGS_DOMAIN_NAV
+    from petwisp.settings_widgets import SETTINGS_DOMAIN_NAV
 
     labels = [label for label, _ in SETTINGS_DOMAIN_NAV]
     assert "自动化与联动" in labels
@@ -433,7 +433,7 @@ def test_dialogue_agent_scope_restore_and_public_rows_hidden(qapp, tmp_path):
     看不到（显得“设置无效”）；切到 Agent 层时仍列出余额/桥接等公共事件，
     而这些事件运行时并不走 agents 层。
     """
-    from pet.modern_settings_dialog import ModernSettingsDialog, SettingRow
+    from petwisp.modern_settings_dialog import ModernSettingsDialog, SettingRow
 
     cfg = Config(tmp_path / "appdata08")
     cfg.set("dialogue_mode", "custom")
@@ -490,7 +490,7 @@ def test_export_dialogue_template_mentions_agents_separator(qapp, tmp_path):
 
 
 def test_subfish_settings_save_sets_user_customized(qapp, tmp_path: Path):
-    """批 C：子肥鱼自己的设置界面保存会置位 user_customized=True。"""
+    """批 C：子宠自己的设置界面保存会置位 user_customized=True。"""
     cfg_root = tmp_path / "appdata"
     cfg = Config(cfg_root, instance_id="slot-1")
     dialog = ModernSettingsDialog(cfg, include_ai=False)
@@ -505,7 +505,7 @@ def test_subfish_settings_save_sets_user_customized(qapp, tmp_path: Path):
 
 
 def test_main_settings_save_does_not_set_user_customized(qapp, tmp_path: Path):
-    """批 C：主配置（slot 0/主肥鱼）保存不置位 user_customized（保持默认假）。"""
+    """批 C：主配置（slot 0/主桌宠）保存不置位 user_customized（保持默认假）。"""
     cfg_root = tmp_path / "appdata"
     cfg = Config(cfg_root)
     dialog = ModernSettingsDialog(cfg, include_ai=False)
@@ -567,7 +567,7 @@ def test_clear_spawned_pets_button_falls_back_without_callback(
     统一走 D12 指令通道——写指令文件由主进程消费，不再直接文件级清理。"""
     from PySide6.QtWidgets import QMessageBox
 
-    from pet import overlay_settings_command as cmd
+    from petwisp import overlay_settings_command as cmd
 
     cfg = Config(tmp_path / "appdata")
     monkeypatch.setattr(
@@ -582,7 +582,7 @@ def test_clear_spawned_pets_button_falls_back_without_callback(
         command = cmd.read_command(cfg.dir)
         assert command is not None, "回退路径必须写下 D12 指令"
         assert command["command"] == cmd.CMD_EXIT_SPAWNED_PETS
-        assert command["target"] is None           # 主身份 = 全部子肥鱼
+        assert command["target"] is None           # 主身份 = 全部子宠
         assert infos == [], "批 I：结果弹窗已移除（结果写日志）"
     finally:
         dialog.deleteLater()
@@ -598,8 +598,8 @@ def test_clear_spawned_pets_targets_all_for_slot0_identity(qapp, tmp_path: Path)
     target 当**子槽**去 ``_spawned`` 里找（主 sprite 不在其中）→ 按钮看着能用、点下去
     静默 no-op。判据必须是"是不是主身份"，不是身份字符串的真值。
     """
-    from pet import overlay_settings_command as cmd
-    from pet.settings_slot_config import is_main_identity
+    from petwisp import overlay_settings_command as cmd
+    from petwisp.settings_slot_config import is_main_identity
 
     for instance_id in ("", "slot-0"):
         assert is_main_identity(instance_id) is True, instance_id
@@ -616,7 +616,7 @@ def test_clear_spawned_pets_targets_all_for_slot0_identity(qapp, tmp_path: Path)
         assert command is not None
         assert command["command"] == cmd.CMD_EXIT_SPAWNED_PETS
         assert command["target"] is None, (
-            f"{instance_id!r} 的「一键退出子肥鱼」必须发全局动作（target=None）")
+            f"{instance_id!r} 的「一键退出子宠」必须发全局动作（target=None）")
         cmd.command_path(cfg.dir).unlink(missing_ok=True)
 
 
@@ -624,8 +624,8 @@ def test_clear_spawned_pets_stays_disabled_with_a_reachable_hint_on_a_child_page
         qapp, tmp_path: Path):
     """子宠页：动作仍不可用，但提示必须指向**真实可达**的地方（终审 A04-c）。
 
-    「退出全部子肥鱼」是全局动作，子宠页里没有"子肥鱼"这个对象可管；旧 tooltip
-    "请在主肥鱼的设置里操作"在主宠页自己也被置灰时指向了一个不存在的入口。
+    「退出全部子宠」是全局动作，子宠页里没有"子宠"这个对象可管；旧 tooltip
+    "请在主桌宠的设置里操作"在主宠页自己也被置灰时指向了一个不存在的入口。
     """
     cfg = Config(tmp_path / "appdata", instance_id="slot-3")
     dialog = ModernSettingsDialog(cfg, include_ai=False)
@@ -640,7 +640,7 @@ def test_clear_spawned_pets_stays_disabled_with_a_reachable_hint_on_a_child_page
 
 def test_clear_spawned_pets_row_copy_does_not_promise_data_deletion(qapp, tmp_path: Path):
     """行文案与实现一致：只关宠物，档案/会话/待办全部保留（终审 A04-c）。"""
-    from pet.modern_settings_dialog import SettingRow
+    from petwisp.modern_settings_dialog import SettingRow
 
     cfg = Config(tmp_path / "appdata")
     dialog = ModernSettingsDialog(cfg, include_ai=False)
@@ -659,7 +659,7 @@ def test_clear_spawned_pets_button_fallback_runs_without_dialogs(
     """批 I：回退路径无确认框无结果框，一键直接静默执行。"""
     from PySide6.QtWidgets import QMessageBox
 
-    from pet import overlay_settings_command as cmd
+    from petwisp import overlay_settings_command as cmd
 
     cfg = Config(tmp_path / "appdata")
     questions = []
@@ -683,8 +683,8 @@ def test_clear_spawned_pets_button_fallback_runs_without_dialogs(
 
 
 def test_clear_spawned_pets_button_disabled_for_child_config(qapp, tmp_path):
-    """批 G：子肥鱼（slot-N）的设置对话框禁用「一键退出」按钮——该操作只对
-    主肥鱼开放（子鱼进程执行会把主鱼当子鱼杀掉）。"""
+    """批 G：子宠（slot-N）的设置对话框禁用「一键退出」按钮——该操作只对
+    主桌宠开放（子鱼进程执行会把主鱼当子鱼杀掉）。"""
     cfg = Config(tmp_path / "appdata", instance_id="slot-1")
     dialog = ModernSettingsDialog(cfg, include_ai=False)
     try:

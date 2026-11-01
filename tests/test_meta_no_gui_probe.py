@@ -16,8 +16,8 @@ import time
 import pytest
 from PySide6.QtWidgets import QApplication
 
-import pet.webm_clip as webm_clip_mod
-from pet.webm_clip import WebMClip
+import petwisp.webm_clip as webm_clip_mod
+from petwisp.webm_clip import WebMClip
 
 
 @pytest.fixture

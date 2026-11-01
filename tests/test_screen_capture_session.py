@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import pytest
 
-from pet.screen_capture.session import (
+from petwisp.screen_capture.session import (
     CapturePhase,
     CaptureSession,
     IllegalTransition,

@@ -2,7 +2,7 @@
 """「快速识屏」本地 OCR 契约（offscreen 可跑）。
 
 切片 5 起一次识别 = 一个识别子进程（``pet/screen_capture/ocr_worker.py``；源码态
-``python -m pet.screen_capture.ocr_worker``，冻结态 ``<exe> --ocr-worker``）：像素从
+``python -m petwisp.screen_capture.ocr_worker``，冻结态 ``<exe> --ocr-worker``）：像素从
 stdin 管道进、结果从 stdout 一行 JSON 出、日志走 stderr，认完即退出。**进程退出是
 "内存用完真归零"的唯一实现**——进程内 ``unload()`` 实测只回吐约 30 MB / 108 MB。
 
@@ -43,8 +43,8 @@ pytest.importorskip("PySide6")
 from PySide6.QtGui import QColor, QFont, QFontDatabase, QImage, QPainter  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
-from pet.screen_capture import ocr, ocr_worker  # noqa: E402
-from pet.screen_capture.ocr import (  # noqa: E402
+from petwisp.screen_capture import ocr, ocr_worker  # noqa: E402
+from petwisp.screen_capture.ocr import (  # noqa: E402
     OcrEngine,
     OcrError,
     OcrLoadError,
@@ -695,15 +695,15 @@ def test_worker_command_uses_the_module_in_source_mode(monkeypatch):
 def test_worker_command_uses_the_internal_flag_when_frozen(monkeypatch):
     """冻结包里没有可用的 python：exe 自己就是解释器，走 --ocr-worker 子命令。"""
     monkeypatch.setattr(sys, "frozen", True, raising=False)
-    monkeypatch.setattr(sys, "executable", "C:/fake/dsh-pet-standalone.exe")
+    monkeypatch.setattr(sys, "executable", "C:/fake/petwisp.exe")
 
-    assert ocr.worker_command() == ["C:/fake/dsh-pet-standalone.exe", ocr.OCR_WORKER_FLAG]
+    assert ocr.worker_command() == ["C:/fake/petwisp.exe", ocr.OCR_WORKER_FLAG]
 
 
 def test_the_package_entry_serves_the_worker_flag():
-    """源码态路由：``python -m pet --ocr-worker`` 必须真的进工作端（冻结入口同形）。"""
+    """源码态路由：``python -m petwisp --ocr-worker`` 必须真的进工作端（冻结入口同形）。"""
     process = subprocess.run(
-        [sys.executable, "-m", "pet", ocr.OCR_WORKER_FLAG],
+        [sys.executable, "-m", "petwisp", ocr.OCR_WORKER_FLAG],
         input=b"not-a-frame", capture_output=True, cwd=REPO, timeout=120,
     )
 
@@ -727,7 +727,7 @@ def test_the_worker_module_never_imports_pyside():
         "            raise ImportError('PySide6 must not be imported by the OCR worker')\n"
         "        return None\n"
         "sys.meta_path.insert(0, Blocker())\n"
-        "import pet.screen_capture.ocr_worker\n"
+        "import petwisp.screen_capture.ocr_worker\n"
         "leaked = [m for m in sys.modules if m == 'PySide6' or m.startswith('PySide6.')]\n"
         "print('LEAK' if leaked else 'CLEAN')\n"
     )
@@ -942,7 +942,7 @@ def test_the_real_worker_recognizes_with_the_network_blocked():
         "socket.socket.connect = _forbidden\n"
         "socket.socket.connect_ex = _forbidden\n"
         "import runpy\n"
-        "runpy.run_module('pet.screen_capture.ocr_worker', run_name='__main__')\n"
+        "runpy.run_module('petwisp.screen_capture.ocr_worker', run_name='__main__')\n"
     )
     image = _blank(320, 120)
     process = subprocess.run(

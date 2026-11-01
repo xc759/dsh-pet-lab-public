@@ -12,9 +12,9 @@ from PySide6.QtCore import QRect
 from PySide6.QtGui import QFontMetrics, QGuiApplication
 from PySide6.QtWidgets import QApplication, QWidget
 
-from pet.island import balance as balance_mod
-from pet.app import _show_balance_payload
-from pet.speech_bubble import PetSpeechBubble
+from petwisp.island import balance as balance_mod
+from petwisp.app import _show_balance_payload
+from petwisp.speech_bubble import PetSpeechBubble
 
 _WORD_JOINER = "\u2060"
 _INFO = {"is_available": True, "total": "12.34", "granted": "2.34", "topped_up": "10.00"}
@@ -198,8 +198,8 @@ def test_elide_joined_tail_never_drops_tail_silently():
     后续正文（PR #329 审查 F1——修复前该分支 return token，赠送金额整条消失）。"""
     from PySide6.QtGui import QFont, QFontMetrics
 
-    from pet.island.balance import format_balance_display
-    from pet.speech_bubble_text import _elide_joined_tail
+    from petwisp.island.balance import format_balance_display
+    from petwisp.speech_bubble_text import _elide_joined_tail
 
     metrics = QFontMetrics(QFont("Microsoft YaHei UI", 13))
     text = format_balance_display("余额 ¥12.34（充值 ¥10.00 / 赠送 ¥2.34）")
@@ -216,8 +216,8 @@ def test_elide_joined_tail_never_drops_tail_silently():
 def test_canvas_width_budget_ignores_word_joiners():
     """吐气水泡画布宽度档按可见字符数（去标记）——U+2060 连接符不可见，
     数进长度气泡会无端变宽（PR #329 审查 F2）。"""
-    from pet.island.balance import format_balance_display
-    from pet.speech_bubble_text import _budget_length, normalize_bubble_text
+    from petwisp.island.balance import format_balance_display
+    from petwisp.speech_bubble_text import _budget_length, normalize_bubble_text
 
     plain = "余额 ¥12.34（充值 ¥10.00 / 赠送 ¥2.34）"
     marked = format_balance_display(plain)

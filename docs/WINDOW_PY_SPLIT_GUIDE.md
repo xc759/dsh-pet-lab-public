@@ -5,7 +5,7 @@
 测试套件 + ruff）；`tests/test_architecture.py` 保留依赖方向与窗口私有面
 边界检查。
 
-**适用范围**：`pet/window.py`（`PetWindow`）及其后续演进。
+**适用范围**：`petwisp/window.py`（`PetWindow`）及其后续演进。
 
 **版本**：2026-09-03，对应分支 `perf/stage-1`。
 
@@ -172,7 +172,7 @@
 而 `platform_win.py` 等窗口的近邻控制器目前仍
 按既有约定访问窗口私有成员（属当前事实而非违规），
 `agent_link.py` 也保留了一处有注释登记的例外
-（`win._bubble_busy_until`，见 `pet/agent_link.py:3820`）。新拆控制器时建议优先走公开 seam；确实
+（`win._bubble_busy_until`，见 `petwisp/agent_link.py:3820`）。新拆控制器时建议优先走公开 seam；确实
 需要近邻访问时，参照这些既有模块保持克制并在注释中说明。
 
 ## 6. 生命周期边界补充

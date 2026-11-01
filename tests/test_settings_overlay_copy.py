@@ -58,8 +58,8 @@ def _dialog(tmp_path, monkeypatch, *, topology: str = "overlay", instance_id: st
     平台固定 win32：T3 的 ``cursor_hidden_passthrough`` / ``auto_hide_fullscreen``
     与 T2 的 ``stream_capture`` 都只在 Windows 建控件。
     """
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     monkeypatch.setattr(settings_mod.sys, "platform", "win32")
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -75,7 +75,7 @@ def _close(dialog):
 
 
 def _hint(dialog, setting_id: str) -> str:
-    import pet.modern_settings_dialog as settings_mod
+    import petwisp.modern_settings_dialog as settings_mod
 
     row = dialog.findChild(settings_mod.SettingRow, f"settingRow_{setting_id}")
     assert row is not None, f"设置页必须有 {setting_id} 行"
@@ -83,7 +83,7 @@ def _hint(dialog, setting_id: str) -> str:
 
 
 def _row(dialog, setting_id: str):
-    import pet.modern_settings_dialog as settings_mod
+    import petwisp.modern_settings_dialog as settings_mod
 
     row = dialog.findChild(settings_mod.SettingRow, f"settingRow_{setting_id}")
     assert row is not None, f"设置页必须有 {setting_id} 行"
@@ -202,7 +202,7 @@ def test_main_page_shows_scope_note(tmp_path, monkeypatch, setting_id):
     视角页，不加注记"）已作废，这里与 ``test_child_page_marks_window_scope_keys_as_global``
     断言同一条注记；注记本体的措辞由产品常量 ``ALL_PETS_SCOPE_NOTE`` 提供。
     """
-    from pet.settings_pet_controls import ALL_PETS_SCOPE_NOTE
+    from petwisp.settings_pet_controls import ALL_PETS_SCOPE_NOTE
 
     dialog = _dialog(tmp_path, monkeypatch)
     try:

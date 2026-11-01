@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""pet/island_bridge.py 的 offscreen 测试（4.3 前段：岛桥迁入 pet/ + 产品化）。
+"""petwisp/island_bridge.py 的 offscreen 测试（4.3 前段：岛桥迁入 pet/ + 产品化）。
 
 覆盖：
 - 核心桥 ``IslandCollisionBridge``（零 Qt，几何经参数喂入）：attach 注册 /
@@ -30,13 +30,13 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 from PySide6.QtCore import QPoint, QRect
 from PySide6.QtWidgets import QApplication, QWidget
 
-from pet import collision as collision_mod
-from pet.island import bridge as island_bridge_mod
-from pet.config import Config
-from pet.island.dynamic_island import DynamicIsland
-from pet.island.bridge import IslandCollisionBridge, IslandWindowBridge
-from pet.overlay_window import OverlayWindow
-from pet.sprite_collision import (
+from petwisp import collision as collision_mod
+from petwisp.island import bridge as island_bridge_mod
+from petwisp.config import Config
+from petwisp.island.dynamic_island import DynamicIsland
+from petwisp.island.bridge import IslandCollisionBridge, IslandWindowBridge
+from petwisp.overlay_window import OverlayWindow
+from petwisp.sprite_collision import (
     STATIC_HIT_MIN_DV,
     CollisionEvent,
     SpriteCollisionWorld,
@@ -727,7 +727,7 @@ def test_window_bridge_warns_when_replacing_foreign_geometry_callback(caplog):
     world = RecordingWorld()
     island = StubIsland()
     island.on_geometry_changed = lambda: None  # 模拟旧 island_collision 路径已占用
-    with caplog.at_level(logging.WARNING, logger="pet.island.bridge"):
+    with caplog.at_level(logging.WARNING, logger="petwisp.island.bridge"):
         bridge = IslandWindowBridge(island, world)
     try:
         assert any("on_geometry_changed" in record.message for record in caplog.records)

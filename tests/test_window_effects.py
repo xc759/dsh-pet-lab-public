@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from PySide6.QtCore import QRect
 
-from pet.window_effects import rotated_region_bounds
+from petwisp.window_effects import rotated_region_bounds
 
 
 def test_rotated_region_bounds_zero_angle_returns_copy():

@@ -20,15 +20,15 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 import pytest
 from PySide6.QtWidgets import QApplication, QMenu
 
-from pet import network_info_dialog as dialog_mod
-from pet.config import Config
-from pet.context_menus import registry as registry_mod
-from pet.context_menus.shared import (
+from petwisp import network_info_dialog as dialog_mod
+from petwisp.config import Config
+from petwisp.context_menus import registry as registry_mod
+from petwisp.context_menus.shared import (
     NETWORK_INFO_DISABLED_REASON,
     add_network_info,
     network_info_menu_enabled,
 )
-from pet.menu_layout import load_default_menu_layout
+from petwisp.menu_layout import load_default_menu_layout
 
 app = QApplication.instance() or QApplication([])
 
@@ -185,7 +185,7 @@ def test_modern_registry_renders_entry_disabled_with_reason():
 
 
 def test_add_network_info_uses_semantic_vector_icon():
-    from pet.context_menus.icons import vector_menu_icon
+    from petwisp.context_menus.icons import vector_menu_icon
 
     pet = _Pet()
     menu = QMenu()
@@ -217,7 +217,7 @@ def quiet_dialog(monkeypatch):
 
 
 def test_wire_window_injects_network_info_callback(tmp_path, quiet_dialog):
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     shell = AppShell(app, Config(tmp_path))
 
@@ -230,7 +230,7 @@ def test_wire_window_injects_network_info_callback(tmp_path, quiet_dialog):
 
 
 def test_open_network_info_is_single_process_level_dialog(tmp_path, quiet_dialog):
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     shell = AppShell(app, Config(tmp_path))
     try:
@@ -254,7 +254,7 @@ def test_open_network_info_recovers_after_dialog_destroyed_with_parent(tmp_path,
     """
     import shiboken6
 
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     shell = AppShell(app, Config(tmp_path))
     try:
@@ -279,7 +279,7 @@ def test_open_network_info_replaces_singleton_that_was_destroyed_silently(
     """收口信号没到（例如别的线程/时序缝隙销毁）时，复用前自查失效对象，不得抛。"""
     import shiboken6
 
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     shell = AppShell(app, Config(tmp_path))
     try:
@@ -301,7 +301,7 @@ def test_stale_destroyed_signal_does_not_clear_new_dialog(tmp_path, quiet_dialog
     """旧窗晚到的 destroyed 不得清掉新实例（对象身份核对）。"""
     import shiboken6
 
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     shell = AppShell(app, Config(tmp_path))
     try:

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""周快照外发（``pet.growth.sync``）：只发快照、只碰 snapshots/、失败不抛。
+"""周快照外发（``petwisp.growth.sync``）：只发快照、只碰 snapshots/、失败不抛。
 
 git 一律用假 runner，跑测试不依赖本机装没装 git，也不会真去 push。
 """
@@ -8,9 +8,9 @@ from __future__ import annotations
 import json
 import subprocess
 
-from pet.growth import snapshot as snapshot_mod
-from pet.growth import sync as sync_mod
-from pet.growth.service import GrowthService
+from petwisp.growth import snapshot as snapshot_mod
+from petwisp.growth import sync as sync_mod
+from petwisp.growth.service import GrowthService
 
 
 class _Cfg:

@@ -14,8 +14,8 @@ import pytest
 
 pytest.importorskip("PySide6")
 
-from pet import feature_activation as fa
-from pet.features import MIGRATION_BASELINE
+from petwisp import feature_activation as fa
+from petwisp.features import MIGRATION_BASELINE
 
 
 @pytest.fixture(autouse=True)
@@ -44,8 +44,8 @@ def _freeze_all_but(*excluded: str):
 
 
 def _build_dialog(tmp_path, monkeypatch):
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = _qapp()
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -55,7 +55,7 @@ def _build_dialog(tmp_path, monkeypatch):
 
 def test_pure_core_save_and_reenable_chat_works(tmp_path, monkeypatch):
     """纯核心（全模块关）：设置能保存，且能在功能页启用 chat 后再次保存。"""
-    from pet.config import Config
+    from petwisp.config import Config
 
     seeded = Config(tmp_path)
     assert fa.write_enabled(seeded, [])  # 已判定的纯核心（盘上 enabled=[]）
@@ -102,7 +102,7 @@ def test_rebuild_after_external_disable_then_save_and_search(tmp_path, monkeypat
 
 def test_search_index_excludes_unmounted_rows(tmp_path, monkeypatch):
     """未激活模块的行不进搜索索引（挂载行才入）。"""
-    from pet.modern_settings_dialog import SettingRow
+    from petwisp.modern_settings_dialog import SettingRow
 
     _freeze_all_but("dynamic_island")
     app, dlg = _build_dialog(tmp_path, monkeypatch)
@@ -118,8 +118,8 @@ def test_search_index_excludes_unmounted_rows(tmp_path, monkeypatch):
 def test_updater_uses_build_capability_not_module_gate(tmp_path, monkeypatch):
     """更新器吃构建变体真值：chat 模块关（include_ai=False）但完整版构建时，
     include_chat 仍是 True；缺省不传时回落 include_ai（旧语义）。"""
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = _qapp()
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -144,7 +144,7 @@ def test_no_floating_unmounted_controls_in_any_mode(tmp_path, monkeypatch):
     全模块/纯核心/部分停用三种模式都查）。"""
     from PySide6.QtWidgets import QWidget
 
-    from pet.config import Config
+    from petwisp.config import Config
 
     modes = [
         ("all", None),  # 不冻结：未冻结态 is_active 恒真（升级用户默认）

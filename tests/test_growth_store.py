@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""成长档案存储（``pet.growth.store``）：创建 / 自愈 / 坏文件备份 / 并发合并。"""
+"""成长档案存储（``petwisp.growth.store``）：创建 / 自愈 / 坏文件备份 / 并发合并。"""
 from __future__ import annotations
 
 import json
@@ -11,8 +11,8 @@ import pytest
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
-from pet.growth.schema import SCHEMA_VERSION, archive_path, normalize_archive
-from pet.growth.store import GrowthStore
+from petwisp.growth.schema import SCHEMA_VERSION, archive_path, normalize_archive
+from petwisp.growth.store import GrowthStore
 
 
 @pytest.fixture()

@@ -13,7 +13,7 @@ import test from "node:test";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const bridgeDir = path.resolve(here, "../integrations/dsh-pet-bridge");
+const bridgeDir = path.resolve(here, "../integrations/petwisp-bridge");
 
 let inst;
 let applyPlugin;

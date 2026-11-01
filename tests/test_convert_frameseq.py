@@ -27,7 +27,7 @@ from PySide6.QtGui import QImage
 from PySide6.QtWidgets import QApplication
 
 from tools.convert_frameseq import clip_out_dir, convert_clip
-from pet.frameseq_provision import ENCODER_DESC, UNBLEND_MARK, source_sha256
+from petwisp.frameseq_provision import ENCODER_DESC, UNBLEND_MARK, source_sha256
 
 app = QApplication.instance() or QApplication([])
 

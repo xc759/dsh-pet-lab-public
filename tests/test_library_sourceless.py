@@ -14,10 +14,10 @@ import pytest
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QImage
 
-from pet import character_pack as cp
-from pet import frameseq_provision
-from pet.frameseq_clip import FrameSeqClip
-from pet.library import MovieLibrary
+from petwisp import character_pack as cp
+from petwisp import frameseq_provision
+from petwisp.frameseq_clip import FrameSeqClip
+from petwisp.library import MovieLibrary
 
 SHA = "b" * 64
 
@@ -30,7 +30,7 @@ def _make_frames(dir_path: Path, count: int = 4, size: tuple[int, int] = (32, 24
         img.fill(Qt.GlobalColor.transparent)
         img.setPixel(0, 0, (0xFF << 24) | ((i * 40) << 8) | 0x33)
         assert img.save(str(dir_path / f"f_{i + 1:04d}.webp"), "webp", 100)
-    from pet import pack_download as _pd
+    from petwisp import pack_download as _pd
     (dir_path / "meta.json").write_text(
         json.dumps({"fps": 24.0, "frames": count,
                     "encoder": frameseq_provision.ENCODER_DESC,
@@ -52,7 +52,7 @@ def _sourceless_pack(tmp_path: Path, *, frames: int = 4) -> Path:
         "clips": [{
             "name": "待机", "category": "idle", "dir": "anim/idle/待机",
             "frames": frames, "key_every": 12, "part": "core",
-            "content_sha": __import__("pet.pack_download", fromlist=["x"]).frame_digest(clip_dir),
+            "content_sha": __import__("petwisp.pack_download", fromlist=["x"]).frame_digest(clip_dir),
             "bytes": 100,
         }],
     }
@@ -201,7 +201,7 @@ def test_startup_recovery_commits_crashed_install(tmp_path):
     """
     import json as _json
 
-    from pet import pack_download as _pd
+    from petwisp import pack_download as _pd
 
     root = _sourceless_pack(tmp_path)
     extra = root / "anim" / "random" / "新段"
@@ -232,8 +232,8 @@ def test_first_install_crash_is_recovered_before_discovery(tmp_path, monkeypatch
     """
     import json as _json
 
-    from pet import catalog as _catalog
-    from pet import pack_download as _pd
+    from petwisp import catalog as _catalog
+    from petwisp import pack_download as _pd
 
     root = _sourceless_pack(tmp_path)
     extra = root / "anim" / "random" / "新段"

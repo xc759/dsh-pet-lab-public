@@ -16,9 +16,9 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from PySide6.QtWidgets import QApplication
 
-from pet import hotkey_spec as spec
-from pet import hotkeys
-from pet.hotkeys import GlobalHotkeyService
+from petwisp import hotkey_spec as spec
+from petwisp import hotkeys
+from petwisp.hotkeys import GlobalHotkeyService
 
 
 @pytest.fixture
@@ -161,7 +161,7 @@ def test_chord_to_text_requires_a_modifier_and_known_key():
     """录入控件只收「修饰键 + 白名单按键」，其余返回空串（= 不绑）。"""
     from PySide6.QtGui import QKeySequence
 
-    from pet import settings_hotkeys
+    from petwisp import settings_hotkeys
 
     assert settings_hotkeys.chord_to_text(QKeySequence("Ctrl+Alt+P")) == "Ctrl+Alt+P"
     assert settings_hotkeys.chord_to_text(QKeySequence("Alt+F9")) == "Alt+F9"
@@ -173,9 +173,9 @@ def test_hotkey_rows_exist_and_save_round_trips(tmp_path, monkeypatch):
     """「互动 · 快捷键」三行确实在页里，保存能把录入值写进配置。"""
     from PySide6.QtWidgets import QApplication
 
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog
-    from pet import hotkey_spec as spec
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
+    from petwisp import hotkey_spec as spec
 
     qapp = QApplication.instance() or QApplication([])
     config = Config(base=tmp_path)
@@ -187,7 +187,7 @@ def test_hotkey_rows_exist_and_save_round_trips(tmp_path, monkeypatch):
 
         dialog._hotkey_values = {"open_chat": "Ctrl+Alt+P",
                                  "look_screen": "", "screen_capture": ""}
-        from pet import settings_hotkeys
+        from petwisp import settings_hotkeys
 
         settings_hotkeys.save_hotkey_settings(dialog)
         # 设置页用的是 SlotRoutedConfig（全局键最终落主 config.json）
@@ -216,7 +216,7 @@ def test_parse_never_raises_on_non_ascii_single_characters(text):
 
 def test_config_survives_a_unicode_hotkey_value(tmp_path):
     """手写一个非法热键进配置文件，Config 必须能构造出来并清空它。"""
-    from pet.config import Config
+    from petwisp.config import Config
 
     payload = tmp_path / "config.json"
     payload.write_text('{"hotkey_open_chat": "Ctrl+ß"}', encoding="utf-8")
@@ -234,7 +234,7 @@ def test_our_notation_round_trips_through_the_edit_widget(text):
     """
     from PySide6.QtWidgets import QApplication
 
-    from pet import settings_hotkeys
+    from petwisp import settings_hotkeys
 
     qapp = QApplication.instance() or QApplication([])
     sequence = settings_hotkeys.text_to_sequence(text)
@@ -266,7 +266,7 @@ def test_second_service_instance_is_reported(qapp_, caplog):
     """进程内出现第二个服务实例要告警（热键 id 是进程级的，会互相顶掉）。"""
     import logging as _logging
 
-    from pet import hotkeys as hk
+    from petwisp import hotkeys as hk
 
     user32 = _FakeUser32()
     first = GlobalHotkeyService(app=qapp_, user32=user32, install_native_filter=False,
@@ -294,7 +294,7 @@ def test_numpad_and_lock_keys_round_trip(text):
     """
     from PySide6.QtWidgets import QApplication
 
-    from pet import settings_hotkeys
+    from petwisp import settings_hotkeys
 
     qapp = QApplication.instance() or QApplication([])
     sequence = settings_hotkeys.text_to_sequence(text)

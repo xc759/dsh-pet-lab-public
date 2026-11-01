@@ -4,7 +4,7 @@ import test from "node:test";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 // 回归：bridge 硬失败判定（execution/failed）不再误报。
-// 规则（与 integrations/dsh-pet-bridge/index.js 的 __hardFailureTest 对齐）：
+// 规则（与 integrations/petwisp-bridge/index.js 的 __hardFailureTest 对齐）：
 //   - turn/end 只有 reason.kind === "error" 才可能判硬失败；
 //     completed/aborted/blocked/max-tokens/缺失 → 一律不写。
 //   - 重试计数「恢复即清零」：assistant/message、tool/call、成功的 tool/result
@@ -15,7 +15,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 // recovery / noteToolResult / decideTurnEnd）驱动单个 turn 统计对象。
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const bridgeDir = path.resolve(here, "../integrations/dsh-pet-bridge");
+const bridgeDir = path.resolve(here, "../integrations/petwisp-bridge");
 
 let hard;
 test.before(async () => {

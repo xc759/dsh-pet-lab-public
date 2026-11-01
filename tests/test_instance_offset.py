@@ -8,8 +8,8 @@ import os
 import pytest
 from PySide6.QtWidgets import QApplication
 
-from pet.config import Config
-from pet.window import PetWindow
+from petwisp.config import Config
+from petwisp.window import PetWindow
 
 from .test_window_pause import FakeLibrary
 
@@ -68,12 +68,12 @@ def test_character_alias_roundtrip(tmp_path):
     cfg = Config(base=tmp_path)
     assert cfg.character_alias("demo") == ""
 
-    cfg.set_character_alias("demo", "大肥鱼")
-    assert cfg.character_alias("demo") == "大肥鱼"
+    cfg.set_character_alias("demo", "微光")
+    assert cfg.character_alias("demo") == "微光"
 
     # 重新加载同一配置文件，别名仍在
     cfg2 = Config(base=tmp_path)
-    assert cfg2.character_alias("demo") == "大肥鱼"
+    assert cfg2.character_alias("demo") == "微光"
 
     # 空名 = 恢复默认
     cfg2.set_character_alias("demo", "")
@@ -86,7 +86,7 @@ def test_character_alias_roundtrip(tmp_path):
 
 def test_character_display_name_prefers_alias(tmp_path):
     """显示名统一解析：用户别名优先，未设置时回退目录显示名（识屏身份提示同源）。"""
-    from pet import catalog
+    from petwisp import catalog
 
     cfg = Config(base=tmp_path)
     assert cfg.character_display_name("demo") == catalog.character_display_name("demo")

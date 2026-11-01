@@ -7,8 +7,8 @@ _discover_click_names 必须走 catalog.resolve_character_video_dir（外部 DLC
 """
 from __future__ import annotations
 
-from pet import catalog
-from pet.click_talk_dialog import _discover_click_names
+from petwisp import catalog
+from petwisp.click_talk_dialog import _discover_click_names
 
 
 def test_discovers_from_external_dlc_dir(tmp_path, monkeypatch):

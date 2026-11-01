@@ -13,7 +13,7 @@ from __future__ import annotations
 import pytest
 from PySide6.QtWidgets import QApplication, QMenu
 
-from pet.context_menus import registry as registry_mod
+from petwisp.context_menus import registry as registry_mod
 
 
 @pytest.fixture

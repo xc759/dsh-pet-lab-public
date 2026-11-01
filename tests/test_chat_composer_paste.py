@@ -20,7 +20,7 @@ from PySide6.QtCore import QMimeData, QUrl
 from PySide6.QtGui import QColor, QImage
 from PySide6.QtWidgets import QApplication
 
-from pet.chat.widgets import (
+from petwisp.chat.widgets import (
     AttachmentTextEdit,
     ChatComposer,
     _is_clipboard_cache_file,

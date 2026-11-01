@@ -11,7 +11,7 @@ import json
 import re
 from pathlib import Path
 
-from pet.persona_phrases import (
+from petwisp.persona_phrases import (
     PhrasePicker,
     builtin_phrases,
     load_builtin_presets,
@@ -19,7 +19,7 @@ from pet.persona_phrases import (
     reload_builtin_presets,
 )
 
-PRESET_DIR = Path(__file__).resolve().parents[1] / "pet" / "persona_presets"
+PRESET_DIR = Path(__file__).resolve().parents[1] / "petwisp" / "persona_presets"
 BUILTIN_MODES = ("legacy", "whale_maid")
 
 
@@ -90,7 +90,7 @@ def test_persona_text_custom_missing_key_formats_fallback():
     """
     import types
 
-    from pet import app as app_mod
+    from petwisp import app as app_mod
 
     cfg = {"dialogue_mode": "custom", "dialogue_phrases": {}}
     win = types.SimpleNamespace(cfg=types.SimpleNamespace(get=lambda k, d=None: cfg.get(k, d)))
@@ -102,7 +102,7 @@ def test_persona_text_custom_missing_key_formats_fallback():
 
 
 def test_default_phrases_prefer_legacy_first_variant():
-    from pet.persona_phrases import default_phrases
+    from petwisp.persona_phrases import default_phrases
 
     defaults = default_phrases()
     assert set(defaults) == set(phrase_keys())
@@ -118,7 +118,7 @@ def test_preset_placeholders_stay_within_the_rendering_contract():
 
     越界字段在运行时永远得不到替换、会原样露出 {xxx}，属数据缺陷。
     """
-    from pet.persona_template import PARAMETERS
+    from petwisp.persona_template import PARAMETERS
 
     pattern = re.compile(r"\{([A-Za-z_][A-Za-z0-9_]*)(?:[.:\[][^}]*)?\}")
     for mode in BUILTIN_MODES:
@@ -139,7 +139,7 @@ def test_event_descriptions_cover_all_keys():
     回归（ticket 08）：entries[].description 曾等于 key，AI 会把 failure.tool
     （工具执行失败=出错）误读成“工具执行中”。描述需逐 key 存在、非空、非占位。
     """
-    from pet.persona_template import EVENT_DESCRIPTIONS
+    from petwisp.persona_template import EVENT_DESCRIPTIONS
 
     assert set(EVENT_DESCRIPTIONS) == set(phrase_keys())
     for key, text in EVENT_DESCRIPTIONS.items():

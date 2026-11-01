@@ -5,7 +5,7 @@ import json
 import os
 from types import SimpleNamespace
 
-from pet import updater
+from petwisp import updater
 
 
 def _ns_shim(real, **overrides):
@@ -99,7 +99,7 @@ def test_latest_release_all_sources_fail(monkeypatch):
 
 def test_config_persists_auto_hide(tmp_path):
     """全屏自动隐藏开关必须能持久化（回归：_load 白名单漏键）。"""
-    from pet.config import Config
+    from petwisp.config import Config
 
     cfg = Config(tmp_path)
     assert cfg.get("auto_hide_fullscreen", True) is True  # 默认开启
@@ -115,8 +115,8 @@ def test_config_persists_click_behavior_keys(tmp_path):
 
     三键都是**每宠键**：真值在 ``config-slot-0.json``，生产里由 slot0 的路由视图读写。
     """
-    from pet.config import Config
-    from pet.settings_slot_config import route_settings_config
+    from petwisp.config import Config
+    from petwisp.settings_slot_config import route_settings_config
 
     def slot0():
         return route_settings_config(Config(base=tmp_path, instance_id="slot-0"))
@@ -142,11 +142,11 @@ def test_structured_manifest_keeps_mirrors_and_integrity_fields(monkeypatch):
         body = json.dumps({
             "version": "4.3.0",
             "assets": {
-                "dsh-pet-standalone-webm-chat-setup.exe": {
-                    "fileName": "dsh-pet-standalone-webm-chat-setup.exe",
+                "petwisp-webm-chat-setup.exe": {
+                    "fileName": "petwisp-webm-chat-setup.exe",
                     "urls": [
-                        "https://github.com/MerZlin/dsh-pet-indesktop/releases/download/v4.3.0/a.exe",
-                        "https://cdn.jsdelivr.net/gh/MerZlin/dsh-pet-indesktop@v4.3.0/a.exe",
+                        "https://github.com/MerZlin/petwisp-indesktop/releases/download/v4.3.0/a.exe",
+                        "https://cdn.jsdelivr.net/gh/MerZlin/petwisp-indesktop@v4.3.0/a.exe",
                     ],
                     "size": 123,
                     "sha256": "A" * 64,
@@ -159,7 +159,7 @@ def test_structured_manifest_keeps_mirrors_and_integrity_fields(monkeypatch):
 
     monkeypatch.setattr(updater, "trusted_urlopen", fake_ok)
     release = updater.latest_release()
-    detail = release["asset_details"]["dsh-pet-standalone-webm-chat-setup.exe"]
+    detail = release["asset_details"]["petwisp-webm-chat-setup.exe"]
     assert detail["urls"][1].startswith("https://cdn.jsdelivr.net")
     assert detail["size"] == 123
     assert detail["sha256"] == "a" * 64
@@ -192,8 +192,8 @@ def test_download_asset_verifies_size_and_sha256(tmp_path, monkeypatch):
     )
     path = updater.download_asset(
         {
-            "name": "dsh-pet-standalone-webm-chat-setup.exe",
-            "urls": ["https://github.com/MerZlin/dsh-pet-indesktop/releases/download/v4.3.0/a.exe"],
+            "name": "petwisp-webm-chat-setup.exe",
+            "urls": ["https://github.com/MerZlin/petwisp-indesktop/releases/download/v4.3.0/a.exe"],
             "size": len(b"installer-payload"),
             "sha256": digest,
         },
@@ -215,9 +215,9 @@ def test_download_asset_rejects_untrusted_origin(tmp_path):
 def test_select_windows_installer_supports_legacy_and_structured_assets(monkeypatch):
     monkeypatch.setattr(updater, "os", _ns_shim(os, name="nt"))
     release = {
-        "assets": {"dsh-pet-standalone-webm-setup.exe": "https://github.com/MerZlin/dsh-pet-indesktop/releases/download/v4.3.0/a.exe"},
+        "assets": {"petwisp-webm-setup.exe": "https://github.com/MerZlin/petwisp-indesktop/releases/download/v4.3.0/a.exe"},
         "asset_details": {},
     }
     asset = updater.select_windows_installer(release, include_chat=False)
-    assert asset["name"] == "dsh-pet-standalone-webm-setup.exe"
+    assert asset["name"] == "petwisp-webm-setup.exe"
     assert asset["urls"]

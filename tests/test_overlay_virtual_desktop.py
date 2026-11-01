@@ -303,7 +303,7 @@ def test_probe_pose_target_keeps_part_of_the_body_on_screen(tmp_path, monkeypatc
     露出量由 ``(1 - exposure) * 投影宽度`` 算，而投影（±45° 姿态）比身体宽——
     两处口径任一错位都会把整只推到没有显示器的地方（实机反馈：整只露在屏幕外）。
     """
-    from pet.sprite_edge_probe import probe_target_x
+    from petwisp.sprite_edge_probe import probe_target_x
 
     main, left = _stacked_screens()
     _install_screens(monkeypatch, main, left)

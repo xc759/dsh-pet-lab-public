@@ -28,10 +28,10 @@ from PySide6.QtCore import QObject, QPoint, QPointF, QRect, Qt, Signal
 from PySide6.QtGui import QCloseEvent, QImage, QMouseEvent, QRegion
 from PySide6.QtWidgets import QApplication
 
-import pet.overlay_window as overlay_window
-from pet.overlay_window import OverlayWindow
-from pet.pet_sprite import INTERACTION_DRAG, INTERACTION_NORMAL, PetSprite
-from pet.sprite_behavior import BehaviorController
+import petwisp.overlay_window as overlay_window
+from petwisp.overlay_window import OverlayWindow
+from petwisp.pet_sprite import INTERACTION_DRAG, INTERACTION_NORMAL, PetSprite
+from petwisp.sprite_behavior import BehaviorController
 
 app = QApplication.instance() or QApplication([])
 

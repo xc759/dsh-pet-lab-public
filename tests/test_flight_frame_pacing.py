@@ -37,11 +37,11 @@ from PySide6.QtCore import QEventLoop, Qt, QTimer
 from PySide6.QtGui import QImage
 from PySide6.QtWidgets import QApplication
 
-from pet import frameseq_provision
-from pet import physics as physics_mod
-from pet.frameseq_clip import FrameSeqClip
-from pet.pet_sprite import PetSprite
-from pet.webm_clip import WebMClip
+from petwisp import frameseq_provision
+from petwisp import physics as physics_mod
+from petwisp.frameseq_clip import FrameSeqClip
+from petwisp.pet_sprite import PetSprite
+from petwisp.webm_clip import WebMClip
 
 app = QApplication.instance() or QApplication([])
 

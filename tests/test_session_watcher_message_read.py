@@ -17,7 +17,7 @@ import ctypes
 import timeit
 from ctypes import wintypes
 
-from pet import session_watcher as session_watcher_mod
+from petwisp import session_watcher as session_watcher_mod
 
 WM_PAINT = 0x000F
 

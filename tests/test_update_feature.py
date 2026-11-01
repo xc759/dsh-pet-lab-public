@@ -15,8 +15,8 @@ def _qapp():
 
 
 def test_settings_has_version_footer_and_update_page(tmp_path, monkeypatch):
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     _qapp()
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -35,16 +35,16 @@ def test_settings_has_version_footer_and_update_page(tmp_path, monkeypatch):
 
 
 def test_settings_update_page_does_not_write_config(tmp_path, monkeypatch):
-    from pet import updater
-    from pet.config import Config
-    from pet.update_settings import UpdatePage
+    from petwisp import updater
+    from petwisp.config import Config
+    from petwisp.update_settings import UpdatePage
 
     _qapp()
     config = Config(tmp_path)
     before = config.path.read_bytes() if config.path.exists() else None
     page = UpdatePage(config, include_chat=False)
     # 模拟版本必须比当前 __version__ 新（版本号会随发布上涨，写死必腐坏）
-    from pet import __version__ as _cur
+    from petwisp import __version__ as _cur
     _parts = [int(x) for x in _cur.split(".")]
     _parts[-1] += 1
     newer = ".".join(str(x) for x in _parts)
@@ -53,7 +53,7 @@ def test_settings_update_page_does_not_write_config(tmp_path, monkeypatch):
         "notes": "notes",
         "assets": {},
         "asset_details": {},
-        "html_url": "https://github.com/MerZlin/dsh-pet-indesktop/releases",
+        "html_url": "https://github.com/MerZlin/petwisp-indesktop/releases",
     }
     page._on_check_finished(release)
     assert page.status_label.text().startswith(f"发现 v{newer}")
@@ -63,8 +63,8 @@ def test_settings_update_page_does_not_write_config(tmp_path, monkeypatch):
 
 
 def test_settings_process_page_deep_link_is_passed(tmp_path, monkeypatch):
-    from pet.app import AppShell
-    from pet.config import Config
+    from petwisp.app import AppShell
+    from petwisp.config import Config
 
     shell = AppShell.__new__(AppShell)
     shell.config = Config(tmp_path)

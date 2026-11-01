@@ -25,15 +25,15 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 import pytest  # noqa: E402
 from PySide6.QtWidgets import QApplication, QLabel, QWidget  # noqa: E402
 
-import pet.modern_settings_dialog as settings_mod  # noqa: E402
-from pet.config import Config  # noqa: E402
-from pet.modern_settings_dialog import SettingRow  # noqa: E402
-from pet.settings_pet_controls import (  # noqa: E402
+import petwisp.modern_settings_dialog as settings_mod  # noqa: E402
+from petwisp.config import Config  # noqa: E402
+from petwisp.modern_settings_dialog import SettingRow  # noqa: E402
+from petwisp.settings_pet_controls import (  # noqa: E402
     ALL_PETS_SCOPE_NOTE,
     GLOBAL_SCOPE_NOTE,
     _apply_window_scope_rows,
 )
-from pet.settings_widgets import ToggleSwitch  # noqa: E402
+from petwisp.settings_widgets import ToggleSwitch  # noqa: E402
 
 app = QApplication.instance() or QApplication([])
 
@@ -136,7 +136,7 @@ def test_global_rows_carry_the_annotation_and_not_the_hint_tail(
 
 def test_window_level_injection_is_not_lost_on_a_pet_page(tmp_path, monkeypatch):
     """窗口级原注入（overlay 一窗多宠）不许漏：七行都挂上标注。"""
-    from pet.settings_pet_controls import OVERLAY_WINDOW_SCOPE_IDS
+    from petwisp.settings_pet_controls import OVERLAY_WINDOW_SCOPE_IDS
 
     monkeypatch.setenv("PET_RENDER_TOPOLOGY", "overlay")
     dialog = _dialog(tmp_path, monkeypatch, instance_id="slot-1")
@@ -155,7 +155,7 @@ def test_window_level_injection_is_not_lost_on_a_pet_page(tmp_path, monkeypatch)
 
 def test_the_scope_pass_leaves_rows_alone_when_it_is_not_applicable(tmp_path, monkeypatch):
     """legacy 拓扑：窗口级键不加（每宠独立窗口，键确实只作用于自己）——重跑也不加。"""
-    from pet.settings_pet_controls import OVERLAY_WINDOW_SCOPE_IDS
+    from petwisp.settings_pet_controls import OVERLAY_WINDOW_SCOPE_IDS
 
     monkeypatch.setenv("PET_RENDER_TOPOLOGY", "legacy")
     dialog = _dialog(tmp_path, monkeypatch, instance_id="slot-1")

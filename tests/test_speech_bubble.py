@@ -9,8 +9,8 @@ from PySide6.QtGui import QFont, QFontMetrics
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication, QWidget
 
-import pet.speech_bubble as speech_bubble_module
-from pet.speech_bubble import (
+import petwisp.speech_bubble as speech_bubble_module
+from petwisp.speech_bubble import (
     BUBBLE_TEXT_COLUMN,
     BUBBLE_TEXT_COLUMN_MAX,
     BUBBLE_TEXT_SLACK,
@@ -417,7 +417,7 @@ CLIPPING_TEXTS = [
     "主人～ DSH 开始干活啦，人家会帮您盯着它的～",
     "主人～DSH开始干活啦，人家会帮您盯 着它的～",
     "主人～DSH开始干活啦，人家会帮您盯着它 的～",
-    "主人，DSH 正在读取 dsh-pet-indesktop/pet/speech_bubble.py，人家也帮您瞄两眼～",
+    "主人，DSH 正在读取 petwisp-indesktop/pet/speech_bubble.py，人家也帮您瞄两眼～",
 ]
 
 
@@ -794,7 +794,7 @@ def test_bubble_reshow_after_dismiss_not_dragged_back():
     # 隐藏中残留动画仍在跑；重显示必须停表并直接落位
     bubble.show_text("第三句", QRect(100, 600, 120, 120), 5000)
     assert bubble._pos_anim.state() == QPropertyAnimation.State.Stopped
-    from pet.speech_bubble_text import bubble_rect_for_anchor
+    from petwisp.speech_bubble_text import bubble_rect_for_anchor
     # 位置就是 C 的落点，不再回 B
     QTest.qWait(350)
     assert bubble._pos_anim.state() == QPropertyAnimation.State.Stopped
@@ -958,7 +958,7 @@ def test_bubble_follows_host_on_top_flag():
 
 def test_pet_window_on_top_propagates_to_bubble(tmp_path):
     """接线：PetWindow.set_on_top 必须同步气泡；初始 on_top=False 时气泡出生即不置顶。"""
-    from pet.config import Config
+    from petwisp.config import Config
     from tests.pet_window_fakes import make_pet_window
 
     _get_app()
@@ -1021,7 +1021,7 @@ def test_balance_chunks_stay_together_when_they_fit():
 
     宽度取真实 advance。金额短语自己放得下时，整段必须留在同一行。
     """
-    from pet.island.balance import format_balance_display
+    from petwisp.island.balance import format_balance_display
 
     metrics = _body_metrics()
     plain = "测" * 12 + "余额 ¥5.99（充值 ¥10.00 / 赠送 ¥2.34）"
@@ -1055,7 +1055,7 @@ def test_balance_chunks_stay_together_when_they_fit():
 
 def test_joined_runs_keep_pagination_elision_and_explicit_breaks():
     """连接段参与分页、省略、标点和强制换行；放得下的段不拆，字符顺序保留。"""
-    from pet.speech_bubble_text import LINE_START_FORBIDDEN
+    from petwisp.speech_bubble_text import LINE_START_FORBIDDEN
 
     metrics = _body_metrics()
     gift = "赠送 ¥2.34"
@@ -1113,7 +1113,7 @@ def test_joined_runs_keep_pagination_elision_and_explicit_breaks():
 
 
 def test_overlong_joined_token_wraps_at_start_and_after_explicit_break():
-    from pet.island.balance import format_balance_display
+    from petwisp.island.balance import format_balance_display
 
     metrics = _body_metrics()
     amount = "余额 ¥123456789012345678901234567890.99（充值 ¥10.00）"

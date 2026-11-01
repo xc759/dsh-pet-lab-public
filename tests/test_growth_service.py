@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""成长档案服务（``pet.growth.service``）与一次性迁移。
+"""成长档案服务（``petwisp.growth.service``）与一次性迁移。
 
 刻意不依赖 Qt：用例直接构造 ``GrowthService``，不需要 QApplication。
 """
@@ -13,9 +13,9 @@ import pytest
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
-from pet.growth import migrate as migrate_mod
-from pet.growth.service import GrowthService
-from pet.growth.store import GrowthStore
+from petwisp.growth import migrate as migrate_mod
+from petwisp.growth.service import GrowthService
+from petwisp.growth.store import GrowthStore
 
 
 class _FakeConfig:
@@ -203,7 +203,7 @@ def test_legacy_session_root_matches_session_store():
     """旧会话目录口径必须与 SessionStore 逐字一致（slot-0 不加后缀）。"""
     from pathlib import Path
 
-    from pet.chat.session_store import SessionStore
+    from petwisp.chat.session_store import SessionStore
 
     base = Path("C:/cfg")
     for instance_id in ("", "slot-0", "slot-1", "abc"):

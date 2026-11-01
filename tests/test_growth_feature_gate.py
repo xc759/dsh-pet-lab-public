@@ -9,8 +9,8 @@ from __future__ import annotations
 
 import pytest
 
-from pet import feature_activation as fa
-from pet.features import FEATURES, MIGRATION_BASELINE
+from petwisp import feature_activation as fa
+from petwisp.features import FEATURES, MIGRATION_BASELINE
 
 _GROWTH_CONFIG_KEYS = {
     "growth_nudge_enabled",
@@ -40,7 +40,7 @@ def _clean_activation():
 
 def _shell(tmp_path):
     """裸 AppShell：只放门控用得到的那几个属性，方法解析走类。"""
-    import pet.app as app_mod
+    import petwisp.app as app_mod
 
     shell = object.__new__(app_mod.AppShell)
     shell.config = _Cfg(tmp_path)

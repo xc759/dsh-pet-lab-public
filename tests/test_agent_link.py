@@ -23,10 +23,10 @@ from pathlib import Path
 import pytest
 from PySide6.QtWidgets import QApplication, QMessageBox
 
-import pet.agent_link as agent_link
-from pet import click_sound, harness_launcher
-from pet.agent_link.dsh_state import DshState, SCOPE_REJECT_LOG_EVERY
-from pet.agent_link import (
+import petwisp.agent_link as agent_link
+from petwisp import click_sound, harness_launcher
+from petwisp.agent_link.dsh_state import DshState, SCOPE_REJECT_LOG_EVERY
+from petwisp.agent_link import (
     AgentLinkManager,
     AgentEvent,
     BaseAgentMonitor,
@@ -39,9 +39,9 @@ from pet.agent_link import (
     normalize_event_state,
     opencode_event_state,
 )
-from pet.config import Config
-from pet.config import _clean_agent_link_data, _clean_custom_agents
-from pet.persona_phrases import PUBLIC_DIALOGUE_EVENTS, phrase_keys
+from petwisp.config import Config
+from petwisp.config import _clean_agent_link_data, _clean_custom_agents
+from petwisp.persona_phrases import PUBLIC_DIALOGUE_EVENTS, phrase_keys
 
 
 class TestMainlineAgentLinkHardening:
@@ -349,7 +349,7 @@ class TestDirGlobTailer:
     def test_scan_keeps_active_file_when_stale_names_fill_the_budget(self, tmp_path):
         """候选集按 **mtime 倒序** 取前 max_files：活会话不得被陈旧文件挤出。
 
-        实机（2026-09-27）：%APPDATA%/dsh-pet-bridge 积了 172 个 09-09 起的陈旧
+        实机（2026-09-27）：%APPDATA%/petwisp-bridge 积了 172 个 09-09 起的陈旧
         ``dsh-*.jsonl``，旧实现按文件名字典序取前 64 名——活会话文件
         ``dsh-<大 pid>.jsonl`` 排在 64 名外，每拍白刷 64 个死文件，活的反而读不到。
         本用例的陈旧文件名（零填充小 pid）名字序全部靠前，只有 mtime 序能把活文件
@@ -879,7 +879,7 @@ class TestClaudeHooksFormat:
 
         data = json.loads(settings.read_text(encoding="utf-8"))
         entries = data["hooks"]["PreToolUse"]
-        ours = [g for g in entries if g.get("x-dsh-pet") is True]
+        ours = [g for g in entries if g.get("x-petwisp") is True]
         theirs1 = [g for g in entries if "my-own-hook" in json.dumps(g)]
         theirs2 = [g for g in entries if "custom_claude_event_hook_run" in json.dumps(g)]
         assert len(ours) == 1  # 幂等
@@ -905,7 +905,7 @@ class TestClaudeHooksFormat:
 
         data = json.loads(settings.read_text(encoding="utf-8"))
         stop_entries = data["hooks"]["Stop"]
-        assert all(g.get("x-dsh-pet") is not True for g in stop_entries)
+        assert all(g.get("x-petwisp") is not True for g in stop_entries)
         assert any("user-cmd" in json.dumps(g) for g in stop_entries)
         assert any("user_claude_event_hook_cmd" in json.dumps(g) for g in stop_entries)
         # 我们独占的事件键整个移除
@@ -1006,8 +1006,8 @@ class TestAgentMenuRebound:
     def test_decline_rolls_back_checkbox(self, tmp_path, monkeypatch):
         """用户拒绝授权后，菜单勾选态必须回滚，不允许 UI 骗人。"""
         from PySide6.QtWidgets import QApplication
-        from pet.window import PetWindow
-        from pet.library import MovieLibrary
+        from petwisp.window import PetWindow
+        from petwisp.library import MovieLibrary
 
         app = QApplication.instance() or QApplication([])
         monkeypatch.setattr(QMessageBox, "question", lambda *a, **kw: QMessageBox.StandardButton.No)
@@ -1058,7 +1058,7 @@ class TestAgentMenuRebound:
 # ============================================================================
 class TestRealFormatMappers:
     def test_cursor_role_based(self):
-        from pet.agent_link import cursor_line_state
+        from petwisp.agent_link import cursor_line_state
         assert cursor_line_state({"role": "user", "message": {"content": [{"type": "text", "text": "hi"}]}}) == "thinking"
         assert cursor_line_state({"role": "assistant", "message": {"content": [{"type": "tool_use", "name": "Shell"}]}}) == "working"
         assert cursor_line_state({"role": "assistant", "message": {"content": [{"type": "text", "text": "done"}]}}) == "idle"
@@ -1066,7 +1066,7 @@ class TestRealFormatMappers:
 
 
     def test_opencode_event_types(self):
-        from pet.agent_link import opencode_event_state
+        from petwisp.agent_link import opencode_event_state
         import json as j
         assert opencode_event_state("message.updated.1", j.dumps({"info": {"role": "user"}})) == "thinking"
         assert opencode_event_state("message.updated.1", j.dumps({"info": {"role": "assistant"}})) == ""
@@ -1082,7 +1082,7 @@ class TestOpenCodeSqliteTail:
         """OpenCode 监视器：自建 sqlite event 表，验证 backfill 防护 + 增量轮询。"""
         import sqlite3
         from PySide6.QtWidgets import QApplication
-        from pet.agent_link import OpenCodeMonitor
+        from petwisp.agent_link import OpenCodeMonitor
 
         app = QApplication.instance() or QApplication([])
 
@@ -1117,7 +1117,7 @@ class TestOpenCodeSqliteTail:
         """OpenCode 重建数据库后不沿用旧 rowid，也不重放新库历史行。"""
         import os
         import sqlite3
-        from pet.agent_link import OpenCodeMonitor
+        from petwisp.agent_link import OpenCodeMonitor
 
         db_path = tmp_path / "opencode.db"
 
@@ -1160,7 +1160,7 @@ class TestCooldownUnits:
     def test_seconds_and_minutes_conversion(self, tmp_path):
         """冷却间隔秒/分钟双单位：45 秒应存为 0.75 分钟。"""
         from PySide6.QtWidgets import QApplication
-        from pet.modern_settings_dialog import ModernSettingsDialog
+        from petwisp.modern_settings_dialog import ModernSettingsDialog
 
         app = QApplication.instance() or QApplication([])
         cfg = Config(base=tmp_path)
@@ -1191,7 +1191,7 @@ class TestCooldownUnits:
 class TestMultiInstanceGlobalState:
     def test_disable_skips_uninstall_when_other_instance_enabled(self, tmp_path, monkeypatch):
         """其他实例仍开启某 Agent 联动时，本实例关闭不得卸载全局 hooks/插件。"""
-        from pet.agent_link import AgentLinkManager, ClaudeCodeMonitor
+        from petwisp.agent_link import AgentLinkManager, ClaudeCodeMonitor
 
         cfg = Config(base=tmp_path)
         mgr = AgentLinkManager(None, cfg)
@@ -1219,8 +1219,8 @@ class TestModernSettingsProactivePage:
             import pytest
             pytest.skip("主动识屏页仅 Windows")
         from PySide6.QtWidgets import QApplication
-        from pet.modern_settings_dialog import ModernSettingsDialog
-        import pet.modern_settings_dialog as settings_mod
+        from petwisp.modern_settings_dialog import ModernSettingsDialog
+        import petwisp.modern_settings_dialog as settings_mod
 
         app = QApplication.instance() or QApplication([])
         monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -1342,7 +1342,7 @@ class TestAgentLinkBubbles:
         mgr_on, win_on, bubbles_on, clock_on = self._make_mgr(tmp_path)
         mgr_on._on_agent_state("dsh", "thinking")
         assert len(bubbles_on) == 1
-        # legacy 内置预设 thinking 首句（此前为 DSH 专属原文案「大肥鱼正在深度思考」）
+        # legacy 内置预设 thinking 首句（此前为 DSH 专属原文案「微光正在深度思考」）
         assert "DSH 正在思考" in bubbles_on[0]
 
         clock_on[0] += 3.0
@@ -1389,7 +1389,7 @@ class TestAgentLinkBubbles:
         cfg.data["dialogue_phrases"] = {
             "global": {"thinking": ["{name} 全局思考……"]},
             "agents": {
-                "dsh": {"thinking": ["{name} 大肥鱼深度思考中……"]},
+                "dsh": {"thinking": ["{name} 微光深度思考中……"]},
                 "claude": {},
             },
         }
@@ -1397,7 +1397,7 @@ class TestAgentLinkBubbles:
 
         mgr._on_agent_state("dsh", "thinking")
         assert len(bubbles) == 1
-        assert "大肥鱼深度思考中" in bubbles[0]
+        assert "微光深度思考中" in bubbles[0]
         assert "全局思考" not in bubbles[0]
 
         # claude 无 agents 覆盖 → 回退 global
@@ -1785,7 +1785,7 @@ class TestAgentLinkSounds:
 
 class TestInstallErrorSummary:
     def test_install_bridge_auto_installs_pnpm(self, tmp_path, monkeypatch):
-        plugin = tmp_path / "dsh-pet-bridge"
+        plugin = tmp_path / "petwisp-bridge"
         plugin.mkdir()
         profile = tmp_path / "profiles" / "default"
         profile.mkdir(parents=True)
@@ -1905,14 +1905,14 @@ class TestUninstallBridgeWithoutPnpm:
 
     def test_no_pnpm_removes_manifest_entries_with_backup(self, tmp_path, monkeypatch):
         """无 pnpm：备份 → 删依赖条目 → 清 bundles → 删链接 → 返回 True。"""
-        plugin = tmp_path / "old-build" / "dsh-pet-bridge"
+        plugin = tmp_path / "old-build" / "petwisp-bridge"
         plugin.mkdir(parents=True)
         profile = self._profile(
             tmp_path,
             deps={agent_link.DSH_PLUGIN_NAME: f"link:{plugin}", "keep-me": "^1.0.0"},
             bundles=[agent_link.DSH_PLUGIN_NAME, "other-bundle"],
         )
-        linked = profile / "node_modules" / "@dsh-pet" / "bridge"
+        linked = profile / "node_modules" / "@petwisp" / "bridge"
         linked.mkdir(parents=True)
         monkeypatch.setattr(agent_link, "DSH_PROFILE_HOME", tmp_path)
         monkeypatch.setattr(agent_link, "_pnpm_command", lambda: None)
@@ -1962,7 +1962,7 @@ class TestUninstallBridgeWithoutPnpm:
 
     def test_with_pnpm_still_uses_pnpm_remove(self, tmp_path, monkeypatch):
         """有 pnpm 时保持现状：走 pnpm remove，再清 bundles，不做 JSON 手改备份。"""
-        plugin = tmp_path / "current-build" / "dsh-pet-bridge"
+        plugin = tmp_path / "current-build" / "petwisp-bridge"
         plugin.mkdir(parents=True)
         profile = self._profile(
             tmp_path,
@@ -2190,8 +2190,8 @@ class TestAgentLinkChainingAndActivity:
         再测：待机中（win.anim 在 win.idles 里）request_link_anim 立即切换。
         request_link_idle 在一次性动作播放中不切回待机（anim 不变、pending 清空）。"""
         from PySide6.QtWidgets import QApplication
-        from pet.window import PetWindow
-        from pet.library import MovieLibrary
+        from petwisp.window import PetWindow
+        from petwisp.library import MovieLibrary
 
         app = QApplication.instance() or QApplication([])
         cfg = Config(base=tmp_path)
@@ -2238,8 +2238,8 @@ class TestAgentLinkChainingAndActivity:
         win._link_next_provider=lambda: '吃Token'，调 win._on_anim_ended('写代码') → anim=='吃Token'；
         provider 返回 None 时走正常动画链（不抛异常即可）。"""
         from PySide6.QtWidgets import QApplication
-        from pet.window import PetWindow
-        from pet.library import MovieLibrary
+        from petwisp.window import PetWindow
+        from petwisp.library import MovieLibrary
 
         app = QApplication.instance() or QApplication([])
         cfg = Config(base=tmp_path)
@@ -2387,7 +2387,7 @@ class TestOpenCodeSubagentFilter:
         """子代理（parent_id 非空）会话的 step-start/step-finish/工具事件全部忽略。"""
         import sqlite3
         from PySide6.QtWidgets import QApplication
-        from pet.agent_link import OpenCodeMonitor
+        from petwisp.agent_link import OpenCodeMonitor
 
         app = QApplication.instance() or QApplication([])
         db_path = self._make_db(tmp_path)
@@ -2426,7 +2426,7 @@ class TestOpenCodeSubagentFilter:
         """老库没有 session 表：不过滤（保守不丢事件）。"""
         import sqlite3
         from PySide6.QtWidgets import QApplication
-        from pet.agent_link import OpenCodeMonitor
+        from petwisp.agent_link import OpenCodeMonitor
 
         app = QApplication.instance() or QApplication([])
         db_path = tmp_path / "opencode.db"
@@ -2656,7 +2656,7 @@ class TestCustomAgentMenu:
     def test_menu_lists_custom_agent_and_toggle_routes(self, tmp_path):
         """右键菜单动态渲染自定义 Agent（收进「自定义联动 Agent」三级子菜单），勾选走通用 _toggle_agent_link。"""
         from PySide6.QtWidgets import QMenu
-        from pet.context_menus.shared import add_agent_link_menu
+        from petwisp.context_menus.shared import add_agent_link_menu
 
         app = QApplication.instance() or QApplication([])
         cfg = Config(base=tmp_path)
@@ -3548,7 +3548,7 @@ class TestModelAccessStreakCleanup:
 
     @staticmethod
     def _retry():
-        from pet.agent_event_normalizer import normalize_event
+        from petwisp.agent_event_normalizer import normalize_event
         return normalize_event({"event": "llm/retry", "agent": "dsh", "sessionId": "s-1",
                                 "errorCode": "RATE_LIMIT", "errorMessage": "429 too many requests"})
 
@@ -4139,7 +4139,7 @@ class TestDshTurnEndSuccessCompletion:
         """真 manager（含真 DshMonitor，worker 不启动，手动驱动 _poll）+ 假窗口。
 
         事件目录按 ``Config(base=tmp_path/"cfg")`` 的不变量落在
-        ``tmp_path/dsh-pet-bridge``（与减法测试的 live manager 同构）。
+        ``tmp_path/petwisp-bridge``（与减法测试的 live manager 同构）。
         """
         app = QApplication.instance() or QApplication([])
         bubbles, sounds = [], []
@@ -4951,7 +4951,7 @@ class TestDshDisableResetsPresentationState:
             self, tmp_path, monkeypatch):
         import threading
 
-        from pet.agent_link import AgentLinkManager, DshMonitor
+        from petwisp.agent_link import AgentLinkManager, DshMonitor
 
         app = QApplication.instance() or QApplication([])
         bubbles = []
@@ -5005,7 +5005,7 @@ class TestDshLateQueuedSignalsAreIsolated:
     def test_queued_stale_signal_after_disable_is_dropped(self, tmp_path, monkeypatch):
         from PySide6.QtCore import QTimer
 
-        from pet.agent_link import AgentLinkManager, DshMonitor
+        from petwisp.agent_link import AgentLinkManager, DshMonitor
 
         app = QApplication.instance() or QApplication([])
         cfg = Config(base=tmp_path)
@@ -5043,7 +5043,7 @@ class TestDshLateQueuedSignalsAreIsolated:
 
     def test_offline_from_a_running_monitor_still_passes(self, tmp_path, monkeypatch):
         """闸门不误伤：监视器在跑时的真 offline（DSH 断线）照常收敛。"""
-        from pet.agent_link import AgentLinkManager
+        from petwisp.agent_link import AgentLinkManager
 
         app = QApplication.instance() or QApplication([])
         cfg = Config(base=tmp_path)

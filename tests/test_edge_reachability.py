@@ -18,9 +18,9 @@ from __future__ import annotations
 import pytest
 from PySide6.QtCore import QPoint, QRect
 
-import pet.catalog as catalog
-from pet import window_placement
-from pet.window import PetWindow, _content_frame_rect
+import petwisp.catalog as catalog
+from petwisp import window_placement
+from petwisp.window import PetWindow, _content_frame_rect
 
 # demo manifest 声明的身体框（源像素，640×360 画布，已镜像对称化；
 # alpha≥128 紧致口径，与用户视觉感知的"角色边缘"一致）
@@ -219,7 +219,7 @@ def test_fallback_character_behaves_like_full_canvas(no_body_box):
 def test_edge_side_at_rest_uses_body_rect(body_box):
     """贴边判定用稳定身体框：mask 像素口径会被素材羽化边缘（alpha 16..128
     不进 mask）留出十几像素间隙，导致探头在 GNOME 上永远判不上。"""
-    from pet.edge_probe import edge_side_at_rest
+    from petwisp.edge_probe import edge_side_at_rest
 
     pet = FakePet()
     # 模拟羽化：mask 可见区左缘离窗口左缘还有 22px（alpha≥128 口径）
@@ -234,7 +234,7 @@ def test_edge_side_at_rest_uses_body_rect(body_box):
 
 def test_edge_side_at_rest_legacy_stub_falls_back_to_mask(no_body_box):
     """无身体框接口的轻量桩：回退 mask 像素口径（旧行为不变）。"""
-    from pet.edge_probe import edge_side_at_rest
+    from petwisp.edge_probe import edge_side_at_rest
 
     class StubWin:
         def character_local_region(self):

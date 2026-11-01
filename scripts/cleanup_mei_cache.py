@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """检查或清理本产品 PyInstaller onefile 遗留的 _MEI* 临时目录。
 
-**归属是删除的前提**：只有带本产品归属标记（``pet.runtime_cleanup.OWNER_MARKER_NAME``）
+**归属是删除的前提**：只有带本产品归属标记（``petwisp.runtime_cleanup.OWNER_MARKER_NAME``）
 的运行目录才会成为候选；没有标记的 ``_MEI*`` 目录（别的 PyInstaller 应用的解包目录、
 本产品修复前留下的旧目录）一律保留，既不列出也不删除——目录名与年龄只是筛选条件。
 默认是预览模式；只有明确传入 --delete 才会删除超过年龄阈值的候选目录。
@@ -27,7 +27,7 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from pet.runtime_cleanup import (  # noqa: E402
+from petwisp.runtime_cleanup import (  # noqa: E402
     DEFAULT_STALE_AGE_SECONDS,
     OWNER_MARKER_NAME,
     cleanup_stale_runtime_dirs,

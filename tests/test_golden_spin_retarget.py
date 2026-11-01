@@ -20,7 +20,7 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 from PySide6.QtCore import QEvent, QPointF
 from PySide6.QtWidgets import QApplication
 
-from pet.golden_spin import GOLDEN_SPIN_DURATION_MS
+from petwisp.golden_spin import GOLDEN_SPIN_DURATION_MS
 from tests.test_overlay_dead_switches import (
     _hit_pos,
     _make_shell,

@@ -8,14 +8,14 @@ from pathlib import Path
 
 import pytest
 
-from pet import config as config_mod
-from pet import config_write_lock as cwl
-from pet.config import Config
+from petwisp import config as config_mod
+from petwisp import config_write_lock as cwl
+from petwisp.config import Config
 
 
 _CHILD = """
 import json, sys
-from pet.config import Config
+from petwisp.config import Config
 cfg = Config(base=sys.argv[1])
 print('ready', flush=True)
 for line in sys.stdin:
@@ -49,7 +49,7 @@ def writers(tmp_path):
     def start():
         process = subprocess.Popen(
             [sys.executable, '-u', '-c', _CHILD, str(tmp_path)],
-            cwd=Path(__file__).resolve().parents[1], env={**os.environ, 'DSH_PET_INSTANCE': ''},
+            cwd=Path(__file__).resolve().parents[1], env={**os.environ, 'PETWISP_INSTANCE': ''},
             stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             text=True, encoding='utf-8',
         )
@@ -224,7 +224,7 @@ def test_legacy_schema_migration_still_persists(tmp_path):
     assert cfg.save()
     raw = _disk(cfg)
     assert raw['version'] == 4
-    from pet import pet_profiles
+    from petwisp import pet_profiles
 
     assert 'scale' not in raw
     assert pet_profiles.read_slot_profile(cfg.dir, 0).value('scale') == cfg.get('scale')
@@ -237,7 +237,7 @@ def test_real_subprocess_lock_timeout_preserves_dirty(writers):
     cfg, _start = writers
     script = """
 import sys
-from pet.config_write_lock import config_write_lock
+from petwisp.config_write_lock import config_write_lock
 with config_write_lock(sys.argv[1]):
     print('locked', flush=True)
     sys.stdin.readline()
@@ -365,7 +365,7 @@ def test_click_sound_legacy_path_save_reload_preserves_custom_pack(tmp_path):
     expected = {'kind': 'file', 'id': 'custom', 'path': 'custom.wav'}
     assert cfg.get('click_sound_pack') == expected
     assert cfg.save()
-    from pet.settings_slot_config import route_settings_config
+    from petwisp.settings_slot_config import route_settings_config
 
     assert route_settings_config(Config(base=tmp_path, instance_id='slot-0')).get('click_sound_pack') == expected
     assert 'click_sound_path' not in _disk(cfg)
@@ -378,7 +378,7 @@ def test_provider_ref_migration_persists_without_plaintext(tmp_path, monkeypatch
 
         def set(self, ref, value):
             return True
-    monkeypatch.setattr('pet.chat.models.SecretStore', Store)
+    monkeypatch.setattr('petwisp.chat.models.SecretStore', Store)
     cfg = Config(base=tmp_path)
     cfg.dir.mkdir(parents=True)
     cfg.path.write_text(json.dumps({'version': 4, 'chat': {'providers': {

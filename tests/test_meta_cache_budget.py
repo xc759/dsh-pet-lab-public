@@ -21,8 +21,8 @@ import types
 
 from PySide6.QtWidgets import QApplication
 
-import pet.webm_clip as webm_clip
-from pet.frame_cache import ByteBudgetLru
+import petwisp.webm_clip as webm_clip
+from petwisp.frame_cache import ByteBudgetLru
 
 
 def _qapp() -> QApplication:

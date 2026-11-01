@@ -1,4 +1,4 @@
-from pet.menu_layout import (
+from petwisp.menu_layout import (
     load_default_menu_layout,
     materialize_implicit_separators,
     resolve_menu_layout,
@@ -185,7 +185,7 @@ def test_layout_preserves_alias_icon_and_explicit_separator_nodes():
 
 
 def test_runtime_feature_state_does_not_filter_menu_layout_actions():
-    from pet.context_menus.registry import MENU_ACTIONS
+    from petwisp.context_menus.registry import MENU_ACTIONS
 
     class Config:
         def get(self, key, default=None):
@@ -212,7 +212,7 @@ def test_runtime_feature_state_does_not_filter_menu_layout_actions():
 def test_runtime_menu_renders_alias_icon_separator_and_disabled_item():
     from PySide6.QtWidgets import QApplication, QMenu
 
-    from pet.context_menus.registry import MENU_ACTIONS
+    from petwisp.context_menus.registry import MENU_ACTIONS
 
     class Config:
         def get(self, key, default=None):
@@ -248,8 +248,8 @@ def test_runtime_menu_renders_alias_icon_separator_and_disabled_item():
 def test_menu_editor_customizes_alias_icon_separator_and_shows_runtime_state():
     from PySide6.QtWidgets import QApplication
 
-    from pet.context_menus.registry import MENU_ACTIONS
-    from pet.modern_settings_dialog import MenuLayoutEditor
+    from petwisp.context_menus.registry import MENU_ACTIONS
+    from petwisp.modern_settings_dialog import MenuLayoutEditor
 
     app = QApplication.instance() or QApplication([])
     editor = MenuLayoutEditor(
@@ -404,7 +404,7 @@ def test_missing_user_layout_resolves_versioned_default():
 
 
 def test_config_persists_menu_layout_override_without_copying_default(tmp_path):
-    from pet.config import Config
+    from petwisp.config import Config
 
     config = Config(tmp_path)
     assert config.get("context_menu_layout") is None
@@ -431,7 +431,7 @@ def test_saved_layout_drops_removed_mouse_through_action(tmp_path):
     操作，会把残留节点按「此平台不可用」一直回存下去；入口收敛必须在配置层收口，
     否则旧布局里会永久留着一条幽灵菜单项。
     """
-    from pet.config import Config
+    from petwisp.config import Config
 
     config = Config(tmp_path)
     config.set("context_menu_layout", {
@@ -458,7 +458,7 @@ def test_saved_layout_drops_removed_mouse_through_action(tmp_path):
 
 def test_menu_registry_no_longer_registers_mouse_through():
     """入口收敛：右键菜单注册表里不再有「鼠标穿透」，开关只留在设置页与托盘菜单。"""
-    from pet.context_menus.registry import MENU_ACTIONS, ACTION_ICONS, ACTION_LABELS
+    from petwisp.context_menus.registry import MENU_ACTIONS, ACTION_ICONS, ACTION_LABELS
 
     assert "mouse_through" not in MENU_ACTIONS.ids
     assert "mouse_through" not in ACTION_LABELS
@@ -486,9 +486,9 @@ def test_default_layout_populates_real_qmenu_hierarchy(monkeypatch):
     from PySide6.QtGui import QPixmap
     from PySide6.QtWidgets import QApplication, QMenu
 
-    from pet import catalog
-    from pet.context_menu import populate_context_menu
-    from pet.context_menus import shared
+    from petwisp import catalog
+    from petwisp.context_menu import populate_context_menu
+    from petwisp.context_menus import shared
 
     class FakeConfig:
         values = {
@@ -598,8 +598,8 @@ def test_default_layout_populates_real_qmenu_hierarchy(monkeypatch):
         "开机自启",
         "回到右下角",
         "隐藏桌宠",
-        "生小肥鱼",
-        "退出子肥鱼",
+        "生小宠",
+        "退出子宠",
         "显示本轮消费",
         "黄金回旋",
         "边缘探头",
@@ -655,10 +655,10 @@ def test_settings_menu_editor_commits_visibility_draft(tmp_path, monkeypatch):
     from PySide6.QtCore import Qt
     from PySide6.QtWidgets import QApplication
 
-    from pet import modern_settings_dialog as settings_mod
-    from pet.config import Config
-    from pet.context_menus.registry import MENU_ACTIONS
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp import modern_settings_dialog as settings_mod
+    from petwisp.config import Config
+    from petwisp.context_menus.registry import MENU_ACTIONS
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -686,9 +686,9 @@ def test_settings_menu_editor_commits_visibility_draft(tmp_path, monkeypatch):
 def test_settings_menu_editor_moves_action_into_submenu_without_dragging(tmp_path, monkeypatch):
     from PySide6.QtWidgets import QApplication
 
-    from pet import modern_settings_dialog as settings_mod
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp import modern_settings_dialog as settings_mod
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -708,7 +708,7 @@ def test_settings_menu_editor_moves_action_into_submenu_without_dragging(tmp_pat
 def test_menu_editor_reorders_and_promotes_actions_with_button_controls():
     from PySide6.QtWidgets import QApplication
 
-    from pet.modern_settings_dialog import MenuLayoutEditor
+    from petwisp.modern_settings_dialog import MenuLayoutEditor
 
     app = QApplication.instance() or QApplication([])
     editor = MenuLayoutEditor(None)
@@ -735,7 +735,7 @@ def test_menu_editor_reset_restores_the_versioned_default():
     from PySide6.QtCore import Qt
     from PySide6.QtWidgets import QApplication
 
-    from pet.modern_settings_dialog import MenuLayoutEditor
+    from petwisp.modern_settings_dialog import MenuLayoutEditor
 
     app = QApplication.instance() or QApplication([])
     editor = MenuLayoutEditor(None)
@@ -754,9 +754,9 @@ def test_menu_editor_reset_restores_the_versioned_default():
 def test_settings_menu_editor_creates_named_submenu(tmp_path, monkeypatch):
     from PySide6.QtWidgets import QApplication, QInputDialog
 
-    from pet import modern_settings_dialog as settings_mod
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp import modern_settings_dialog as settings_mod
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -779,8 +779,8 @@ def test_settings_menu_editor_creates_named_submenu(tmp_path, monkeypatch):
 def test_menu_editor_confirms_before_deleting_submenu_and_preserves_children(monkeypatch):
     from PySide6.QtWidgets import QApplication, QMessageBox
 
-    from pet.menu_layout import load_default_menu_layout
-    from pet.modern_settings_dialog import MenuLayoutEditor
+    from petwisp.menu_layout import load_default_menu_layout
+    from petwisp.modern_settings_dialog import MenuLayoutEditor
 
     app = QApplication.instance() or QApplication([])
     layout = load_default_menu_layout()
@@ -816,8 +816,8 @@ def test_menu_editor_confirms_before_deleting_submenu_and_preserves_children(mon
 def test_menu_editor_removes_submenu_after_its_last_item_moves_out():
     from PySide6.QtWidgets import QApplication
 
-    from pet.menu_layout import load_default_menu_layout
-    from pet.modern_settings_dialog import MenuLayoutEditor
+    from petwisp.menu_layout import load_default_menu_layout
+    from petwisp.modern_settings_dialog import MenuLayoutEditor
 
     app = QApplication.instance() or QApplication([])
     layout = load_default_menu_layout()
@@ -846,8 +846,8 @@ def test_menu_editor_removes_submenu_after_its_last_item_moves_out():
 def test_menu_editor_drag_model_cleanup_removes_the_emptied_source_submenu():
     from PySide6.QtWidgets import QApplication
 
-    from pet.menu_layout import load_default_menu_layout
-    from pet.modern_settings_dialog import MenuLayoutEditor
+    from petwisp.menu_layout import load_default_menu_layout
+    from petwisp.modern_settings_dialog import MenuLayoutEditor
 
     app = QApplication.instance() or QApplication([])
     layout = load_default_menu_layout()
@@ -902,9 +902,9 @@ def test_user_layout_rejects_nested_submenus_beyond_one_level():
 def test_settings_sidebar_uses_stable_domains_and_owns_representative_rows(tmp_path, monkeypatch):
     from PySide6.QtWidgets import QApplication
 
-    from pet import modern_settings_dialog as settings_mod
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog, SettingRow
+    from petwisp import modern_settings_dialog as settings_mod
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog, SettingRow
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -948,9 +948,9 @@ def test_voice_chime_rows_live_only_in_their_own_sidebar_domain(tmp_path, monkey
     """
     from PySide6.QtWidgets import QApplication
 
-    from pet import modern_settings_dialog as settings_mod
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog, SettingRow
+    from petwisp import modern_settings_dialog as settings_mod
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog, SettingRow
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -992,9 +992,9 @@ def test_voice_chime_search_jumps_to_its_own_sidebar_domain(tmp_path, monkeypatc
     """搜索命中语音报时行时，侧边栏应跳到「语音」总域。"""
     from PySide6.QtWidgets import QApplication
 
-    from pet import modern_settings_dialog as settings_mod
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp import modern_settings_dialog as settings_mod
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -1011,7 +1011,7 @@ def test_voice_chime_search_jumps_to_its_own_sidebar_domain(tmp_path, monkeypatc
 
 def _section_of(dialog, settings_mod, setting_id):
     """返回某个设置行所属的 SettingsSection（域重构后行会被 reparent 进共享卡片）。"""
-    from pet.modern_settings_dialog import SettingRow
+    from petwisp.modern_settings_dialog import SettingRow
 
     row = dialog.findChild(SettingRow, f"settingRow_{setting_id}")
     assert row is not None, f"{setting_id} 行必须存在"
@@ -1025,7 +1025,7 @@ def _section_of(dialog, settings_mod, setting_id):
 def _section_title(section) -> str:
     if section.toggle is not None:  # 高级组（默认收起）标题在 disclosure 按钮上
         return section.toggle.text()
-    from pet import modern_settings_dialog as settings_mod
+    from petwisp import modern_settings_dialog as settings_mod
 
     label = section.findChild(settings_mod.QLabel, "sectionTitle")
     assert label is not None
@@ -1041,9 +1041,9 @@ def test_voice_domain_owns_only_tts_rows(tmp_path, monkeypatch):
     """
     from PySide6.QtWidgets import QApplication
 
-    from pet import modern_settings_dialog as settings_mod
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog, SettingRow
+    from petwisp import modern_settings_dialog as settings_mod
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog, SettingRow
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -1059,7 +1059,7 @@ def test_voice_domain_owns_only_tts_rows(tmp_path, monkeypatch):
         # 语音报时与节日提醒的行**整组都在**：锁「一个不漏、也不留在自动化与联动」。
         # 行数不再写死（2026-10-14 provider 化后语音报时多了引擎与四家后端的字段行），
         # 改为与两页自己卡片里的行数对齐——本用例要钉的是「归属」，不是「行数」。
-        from pet.settings_widgets import SettingsSection  # noqa: PLC0415
+        from petwisp.settings_widgets import SettingsSection  # noqa: PLC0415
 
         def _card(title: str):
             """标题为 ``title`` 的那张卡（找不到返回 None，交给断言报出来）。"""
@@ -1135,9 +1135,9 @@ def test_click_sound_rows_return_to_interaction_click_feedback(tmp_path, monkeyp
     """
     from PySide6.QtWidgets import QApplication
 
-    from pet import modern_settings_dialog as settings_mod
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp import modern_settings_dialog as settings_mod
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -1177,9 +1177,9 @@ def test_collision_sound_rows_return_to_pet_collision_groups(tmp_path, monkeypat
     「碰撞参数（高级）」；「语音」域不再持有。"""
     from PySide6.QtWidgets import QApplication
 
-    from pet import modern_settings_dialog as settings_mod
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp import modern_settings_dialog as settings_mod
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -1219,9 +1219,9 @@ def test_agent_sound_rows_stay_in_agent_link_fold(tmp_path, monkeypatch):
     不随「语音」域搬家。"""
     from PySide6.QtWidgets import QApplication
 
-    from pet import modern_settings_dialog as settings_mod
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog, SettingRow
+    from petwisp import modern_settings_dialog as settings_mod
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog, SettingRow
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -1264,9 +1264,9 @@ def test_sound_and_festival_search_jump_to_owning_domains(tmp_path, monkeypatch)
     节日提醒 / 语音报时 → 语音、Agent 提示音 → 自动化与联动。"""
     from PySide6.QtWidgets import QApplication
 
-    from pet import modern_settings_dialog as settings_mod
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp import modern_settings_dialog as settings_mod
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -1312,9 +1312,9 @@ def test_sound_and_festival_search_jump_to_owning_domains(tmp_path, monkeypatch)
 def test_menu_domain_uses_in_page_task_tabs_without_changing_sidebar(tmp_path, monkeypatch):
     from PySide6.QtWidgets import QApplication
 
-    from pet import modern_settings_dialog as settings_mod
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog, SettingRow, SettingsTabContainer
+    from petwisp import modern_settings_dialog as settings_mod
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog, SettingRow, SettingsTabContainer
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -1350,9 +1350,9 @@ def test_network_info_entry_status_follows_its_setting(tmp_path, monkeypatch):
     """
     from PySide6.QtWidgets import QApplication
 
-    from pet import modern_settings_dialog as settings_mod
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp import modern_settings_dialog as settings_mod
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -1391,9 +1391,9 @@ def test_network_info_entry_status_follows_its_setting(tmp_path, monkeypatch):
 def test_runtime_toggles_refresh_menu_status_without_rewriting_tree(tmp_path, monkeypatch):
     from PySide6.QtWidgets import QApplication
 
-    from pet import modern_settings_dialog as settings_mod
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp import modern_settings_dialog as settings_mod
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -1415,9 +1415,9 @@ def test_runtime_toggles_refresh_menu_status_without_rewriting_tree(tmp_path, mo
 def test_advanced_setting_groups_use_single_collapsed_disclosure_layer(tmp_path, monkeypatch):
     from PySide6.QtWidgets import QApplication, QToolButton
 
-    from pet import modern_settings_dialog as settings_mod
-    from pet.config import Config
-    from pet.modern_settings_dialog import (
+    from petwisp import modern_settings_dialog as settings_mod
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import (
         ModernSettingsDialog,
         SettingsDisclosureHeader,
         SettingsSection,
@@ -1455,10 +1455,10 @@ def test_ai_settings_content_expands_to_the_shared_page_width(tmp_path, monkeypa
     """
     from PySide6.QtWidgets import QApplication
 
-    from pet import modern_settings_dialog as settings_mod
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog
-    from pet.settings_widgets import CONTENT_READING_MAX_WIDTH
+    from petwisp import modern_settings_dialog as settings_mod
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
+    from petwisp.settings_widgets import CONTENT_READING_MAX_WIDTH
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -1486,9 +1486,9 @@ def test_settings_visual_hierarchy_uses_shared_product_tokens(tmp_path, monkeypa
     from PySide6.QtCore import QSize
     from PySide6.QtWidgets import QApplication
 
-    from pet import modern_settings_dialog as settings_mod
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog, SettingRow
+    from petwisp import modern_settings_dialog as settings_mod
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog, SettingRow
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -1523,9 +1523,9 @@ def test_wide_settings_title_tracks_the_centered_page_content(tmp_path, monkeypa
     from PySide6.QtCore import QPoint
     from PySide6.QtWidgets import QApplication, QScrollArea
 
-    from pet import modern_settings_dialog as settings_mod
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp import modern_settings_dialog as settings_mod
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -1556,9 +1556,9 @@ def test_wide_settings_title_tracks_the_centered_page_content(tmp_path, monkeypa
 def test_setting_rows_name_and_describe_their_controls_for_accessibility(tmp_path, monkeypatch):
     from PySide6.QtWidgets import QApplication
 
-    from pet import modern_settings_dialog as settings_mod
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog, SettingRow
+    from petwisp import modern_settings_dialog as settings_mod
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog, SettingRow
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -1582,7 +1582,7 @@ def test_setting_rows_name_and_describe_their_controls_for_accessibility(tmp_pat
 def test_setting_row_stacks_a_wide_control_before_copy_becomes_unreadable():
     from PySide6.QtWidgets import QApplication, QPushButton
 
-    from pet.modern_settings_dialog import SettingRow
+    from petwisp.modern_settings_dialog import SettingRow
 
     app = QApplication.instance() or QApplication([])
     control = QPushButton("宽控件")
@@ -1613,9 +1613,9 @@ def test_compact_ai_provider_controls_stay_inside_their_setting_row(tmp_path, mo
     from PySide6.QtCore import QPoint
     from PySide6.QtWidgets import QApplication, QScrollArea
 
-    from pet import modern_settings_dialog as settings_mod
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog, SettingRow
+    from petwisp import modern_settings_dialog as settings_mod
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog, SettingRow
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -1657,7 +1657,7 @@ def test_compact_ai_provider_controls_stay_inside_their_setting_row(tmp_path, mo
 def test_responsive_action_row_can_stack_wide_actions_vertically():
     from PySide6.QtWidgets import QApplication, QPushButton
 
-    from pet.modern_settings_dialog import ModernSelect, ResponsiveActionRow
+    from petwisp.modern_settings_dialog import ModernSelect, ResponsiveActionRow
 
     app = QApplication.instance() or QApplication([])
     primary = ModernSelect(width=230)
@@ -1683,7 +1683,7 @@ def test_responsive_action_row_can_stack_wide_actions_vertically():
 def test_responsive_action_row_inline_mode_does_not_reserve_compact_height():
     from PySide6.QtWidgets import QApplication, QPushButton
 
-    from pet.modern_settings_dialog import ModernSelect, ResponsiveActionRow
+    from petwisp.modern_settings_dialog import ModernSelect, ResponsiveActionRow
 
     app = QApplication.instance() or QApplication([])
     primary = ModernSelect(width=230)
@@ -1708,9 +1708,9 @@ def test_compact_agent_sound_controls_reflow_inside_their_setting_row(tmp_path, 
     from PySide6.QtCore import QPoint
     from PySide6.QtWidgets import QApplication, QScrollArea
 
-    from pet import modern_settings_dialog as settings_mod
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog, SettingRow
+    from petwisp import modern_settings_dialog as settings_mod
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog, SettingRow
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -1760,7 +1760,7 @@ def test_compact_agent_sound_controls_reflow_inside_their_setting_row(tmp_path, 
 
 
 def test_settings_domains_use_semantic_sidebar_icons():
-    from pet.modern_settings_dialog import SETTINGS_DOMAIN_NAV
+    from petwisp.modern_settings_dialog import SETTINGS_DOMAIN_NAV
 
     assert SETTINGS_DOMAIN_NAV == (
         ("常规", "settings"),
@@ -1786,9 +1786,9 @@ def test_settings_menu_page_has_no_menu_version_selector(tmp_path, monkeypatch):
     """
     from PySide6.QtWidgets import QApplication
 
-    from pet import modern_settings_dialog as settings_mod
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp import modern_settings_dialog as settings_mod
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -1806,9 +1806,9 @@ def test_settings_menu_page_has_no_menu_version_selector(tmp_path, monkeypatch):
 def test_saving_unchanged_default_menu_keeps_layout_override_empty(tmp_path, monkeypatch):
     from PySide6.QtWidgets import QApplication
 
-    from pet import modern_settings_dialog as settings_mod
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp import modern_settings_dialog as settings_mod
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -1821,7 +1821,7 @@ def test_saving_unchanged_default_menu_keeps_layout_override_empty(tmp_path, mon
 
 
 def test_missing_default_resource_returns_minimum_safe_menu(monkeypatch):
-    import pet.menu_layout as layout_mod
+    import petwisp.menu_layout as layout_mod
 
     monkeypatch.setattr(
         layout_mod,
@@ -1844,9 +1844,9 @@ def test_menu_preview_uses_resolver_and_omits_empty_submenu(tmp_path, monkeypatc
     from PySide6.QtCore import Qt
     from PySide6.QtWidgets import QApplication
 
-    from pet import modern_settings_dialog as settings_mod
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp import modern_settings_dialog as settings_mod
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -1873,7 +1873,7 @@ def test_menu_preview_refreshes_after_tree_shape_changes():
     from PySide6.QtCore import Qt
     from PySide6.QtWidgets import QApplication
 
-    from pet.modern_settings_dialog import MenuLayoutEditor
+    from petwisp.modern_settings_dialog import MenuLayoutEditor
 
     app = QApplication.instance() or QApplication([])
     editor = MenuLayoutEditor(None)
@@ -1911,9 +1911,9 @@ def test_menu_preview_and_runtime_qmenu_share_the_same_layout_structure():
 
     from PySide6.QtWidgets import QApplication, QMenu
 
-    from pet.context_menus.modern import build_modern_menu
-    from pet.context_menus.registry import MENU_ACTIONS
-    from pet.modern_settings_dialog import MenuLayoutEditor
+    from petwisp.context_menus.modern import build_modern_menu
+    from petwisp.context_menus.registry import MENU_ACTIONS
+    from petwisp.modern_settings_dialog import MenuLayoutEditor
 
     layout = deepcopy(load_default_menu_layout())
     layout["layout_id"] = "user"
@@ -1987,7 +1987,7 @@ def test_menu_editor_switches_between_stacked_and_split_layouts():
     from PySide6.QtCore import Qt
     from PySide6.QtWidgets import QApplication
 
-    from pet.modern_settings_dialog import MenuLayoutEditor
+    from petwisp.modern_settings_dialog import MenuLayoutEditor
 
     app = QApplication.instance() or QApplication([])
     editor = MenuLayoutEditor(None)
@@ -2008,7 +2008,7 @@ def test_menu_editor_switches_between_stacked_and_split_layouts():
 def test_menu_editor_uses_settings_cards_instead_of_native_table_chrome():
     from PySide6.QtWidgets import QApplication, QHeaderView
 
-    from pet.modern_settings_dialog import MenuLayoutEditor
+    from petwisp.modern_settings_dialog import MenuLayoutEditor
 
     app = QApplication.instance() or QApplication([])
     editor = MenuLayoutEditor(None)
@@ -2039,9 +2039,9 @@ def test_menu_editor_uses_settings_cards_instead_of_native_table_chrome():
 def test_wide_menu_editor_expands_and_groups_commands_into_dropdowns(tmp_path, monkeypatch):
     from PySide6.QtWidgets import QApplication
 
-    from pet import modern_settings_dialog as settings_mod
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp import modern_settings_dialog as settings_mod
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -2081,7 +2081,7 @@ def test_menu_editor_compact_action_bar_keeps_every_button_reachable():
     from PySide6.QtCore import QPoint
     from PySide6.QtWidgets import QApplication
 
-    from pet.modern_settings_dialog import MenuLayoutEditor
+    from petwisp.modern_settings_dialog import MenuLayoutEditor
 
     app = QApplication.instance() or QApplication([])
     editor = MenuLayoutEditor(None)
@@ -2112,9 +2112,9 @@ def test_non_windows_settings_does_not_create_orphan_windows_control(tmp_path, m
 
     from PySide6.QtWidgets import QApplication
 
-    from pet import modern_settings_dialog as settings_mod
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp import modern_settings_dialog as settings_mod
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     if sys.platform == "win32":
         return
@@ -2131,9 +2131,9 @@ def test_compact_settings_menu_action_bar_fits_scroll_viewport(tmp_path, monkeyp
     from PySide6.QtCore import QPoint
     from PySide6.QtWidgets import QApplication, QScrollArea
 
-    from pet import modern_settings_dialog as settings_mod
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp import modern_settings_dialog as settings_mod
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -2172,9 +2172,9 @@ def test_menu_editor_retains_but_marks_platform_unavailable_action(tmp_path, mon
     from PySide6.QtCore import Qt
     from PySide6.QtWidgets import QApplication
 
-    from pet import modern_settings_dialog as settings_mod
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp import modern_settings_dialog as settings_mod
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     if sys.platform == "win32":
         return
@@ -2198,9 +2198,9 @@ def test_menu_editor_keeps_recovery_actions_visible_but_movable(tmp_path, monkey
     from PySide6.QtCore import Qt
     from PySide6.QtWidgets import QApplication
 
-    from pet import modern_settings_dialog as settings_mod
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp import modern_settings_dialog as settings_mod
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -2218,7 +2218,7 @@ def test_menu_editor_actions_cannot_accept_dropped_children():
     from PySide6.QtCore import Qt
     from PySide6.QtWidgets import QApplication
 
-    from pet.modern_settings_dialog import MenuLayoutEditor
+    from petwisp.modern_settings_dialog import MenuLayoutEditor
 
     app = QApplication.instance() or QApplication([])
     editor = MenuLayoutEditor(None)
@@ -2235,7 +2235,7 @@ def test_menu_editor_refuses_to_nest_one_submenu_inside_another():
     from PySide6.QtCore import Qt
     from PySide6.QtWidgets import QApplication
 
-    from pet.modern_settings_dialog import MenuLayoutEditor
+    from petwisp.modern_settings_dialog import MenuLayoutEditor
 
     app = QApplication.instance() or QApplication([])
     editor = MenuLayoutEditor(None)
@@ -2278,7 +2278,7 @@ def test_removed_action_is_ignored_with_migration_diagnostic():
 def test_user_layout_gains_future_default_action_without_losing_custom_order(
     monkeypatch,
 ):
-    import pet.menu_layout as layout_mod
+    import petwisp.menu_layout as layout_mod
 
     monkeypatch.setattr(
         layout_mod,
@@ -2351,8 +2351,8 @@ def test_user_layout_gains_future_default_action_without_losing_custom_order(
 def test_menu_editor_exposes_future_default_action_for_customization(monkeypatch):
     from PySide6.QtWidgets import QApplication
 
-    import pet.menu_layout as layout_mod
-    from pet.modern_settings_dialog import MenuLayoutEditor
+    import petwisp.menu_layout as layout_mod
+    from petwisp.modern_settings_dialog import MenuLayoutEditor
 
     monkeypatch.setattr(
         layout_mod,
@@ -2397,10 +2397,10 @@ def test_settings_rejects_invalid_nested_menu_draft_before_writing(tmp_path, mon
     from PySide6.QtCore import Qt
     from PySide6.QtWidgets import QApplication, QTreeWidgetItem
 
-    from pet import modern_settings_dialog as settings_mod
-    from pet import settings_close_flow
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp import modern_settings_dialog as settings_mod
+    from petwisp import settings_close_flow
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -2442,8 +2442,8 @@ def test_settings_rejects_invalid_nested_menu_draft_before_writing(tmp_path, mon
 def test_settings_action_popups_share_the_modern_select_visual_tokens():
     from PySide6.QtWidgets import QApplication
 
-    from pet.context_menus.registry import MENU_ACTIONS
-    from pet.modern_settings_dialog import MenuLayoutEditor, QuickLaunchEditor
+    from petwisp.context_menus.registry import MENU_ACTIONS
+    from petwisp.modern_settings_dialog import MenuLayoutEditor, QuickLaunchEditor
 
     app = QApplication.instance() or QApplication([])
     editor = MenuLayoutEditor(None, available_actions=MENU_ACTIONS.ids)
@@ -2464,8 +2464,8 @@ def test_settings_action_popups_share_the_modern_select_visual_tokens():
 def test_action_popups_use_the_exact_same_popup_surface_as_menu_mode():
     from PySide6.QtWidgets import QApplication
 
-    from pet.context_menus.registry import MENU_ACTIONS
-    from pet.modern_settings_dialog import MenuLayoutEditor, ModernSelect, QuickLaunchEditor
+    from petwisp.context_menus.registry import MENU_ACTIONS
+    from petwisp.modern_settings_dialog import MenuLayoutEditor, ModernSelect, QuickLaunchEditor
 
     app = QApplication.instance() or QApplication([])
     select = ModernSelect(width=156)
@@ -2494,7 +2494,7 @@ def test_action_popups_use_the_exact_same_popup_surface_as_menu_mode():
 def test_menu_editor_header_columns_are_user_resizable():
     from PySide6.QtWidgets import QApplication, QHeaderView
 
-    from pet.modern_settings_dialog import MenuLayoutEditor
+    from petwisp.modern_settings_dialog import MenuLayoutEditor
 
     app = QApplication.instance() or QApplication([])
     editor = MenuLayoutEditor(None)
@@ -2521,7 +2521,7 @@ def test_settings_tabs_are_compact_left_aligned_plugin_style_navigation():
     from PySide6.QtCore import Qt
     from PySide6.QtWidgets import QApplication, QSizePolicy, QWidget
 
-    from pet.modern_settings_dialog import SettingsTabContainer
+    from petwisp.modern_settings_dialog import SettingsTabContainer
 
     app = QApplication.instance() or QApplication([])
     tabs = SettingsTabContainer()
@@ -2543,7 +2543,7 @@ def test_action_menu_button_matches_selector_popup_geometry_and_anchor():
     from PySide6.QtCore import QPoint
     from PySide6.QtWidgets import QApplication, QWidgetAction
 
-    from pet.modern_settings_dialog import MenuLayoutEditor, ModernSelect, SettingsMenuButton
+    from petwisp.modern_settings_dialog import MenuLayoutEditor, ModernSelect, SettingsMenuButton
 
     app = QApplication.instance() or QApplication([])
     select = ModernSelect(width=240)
@@ -2585,7 +2585,7 @@ def test_menu_editor_uses_three_responsive_toolbar_and_panel_modes():
     from PySide6.QtCore import Qt
     from PySide6.QtWidgets import QApplication
 
-    from pet.modern_settings_dialog import MenuLayoutEditor
+    from petwisp.modern_settings_dialog import MenuLayoutEditor
 
     app = QApplication.instance() or QApplication([])
     editor = MenuLayoutEditor(None)
@@ -2618,8 +2618,8 @@ def test_menu_editor_uses_three_responsive_toolbar_and_panel_modes():
 def test_alias_keeps_original_name_in_editor_but_runtime_uses_alias_only():
     from PySide6.QtWidgets import QApplication, QMenu
 
-    from pet.context_menus.registry import MENU_ACTIONS
-    from pet.modern_settings_dialog import MenuLayoutEditor
+    from petwisp.context_menus.registry import MENU_ACTIONS
+    from petwisp.modern_settings_dialog import MenuLayoutEditor
 
     class Pet:
         on_open_chat = lambda self: None
@@ -2653,10 +2653,10 @@ def test_custom_file_icon_is_validated_persisted_and_supports_fit_modes(tmp_path
     from PIL import Image
     from PySide6.QtWidgets import QApplication, QMenu
 
-    from pet.context_menus.icons import custom_file_menu_icon
-    from pet.context_menus.registry import MENU_ACTIONS
-    from pet.menu_layout import resolve_menu_layout
-    from pet.modern_settings_dialog import MenuLayoutEditor, custom_icon_file_error
+    from petwisp.context_menus.icons import custom_file_menu_icon
+    from petwisp.context_menus.registry import MENU_ACTIONS
+    from petwisp.menu_layout import resolve_menu_layout
+    from petwisp.modern_settings_dialog import MenuLayoutEditor, custom_icon_file_error
 
     icon_path = tmp_path / "wide icon.png"
     Image.new("RGBA", (80, 32), (20, 120, 220, 255)).save(icon_path)
@@ -2713,7 +2713,7 @@ def test_pending_preview_refresh_is_cancelled_when_editor_destroyed():
     import shiboken6
     from PySide6.QtWidgets import QApplication
 
-    from pet.modern_settings_dialog import MenuLayoutEditor
+    from petwisp.modern_settings_dialog import MenuLayoutEditor
 
     app = QApplication.instance() or QApplication([])
     editor = MenuLayoutEditor(None)
@@ -2733,10 +2733,10 @@ def test_music_align_ready_and_callback_routing(monkeypatch):
     from PySide6.QtCore import QObject
     from PySide6.QtWidgets import QApplication
 
-    from pet.context_menus import registry as registry_mod
-    from pet.context_menus import shared as shared_mod
-    from pet.music.lyric import LyricLine
-    from pet.music.lyric_controller import MusicLyricController
+    from petwisp.context_menus import registry as registry_mod
+    from petwisp.context_menus import shared as shared_mod
+    from petwisp.music.lyric import LyricLine
+    from petwisp.music.lyric_controller import MusicLyricController
 
     app = QApplication.instance() or QApplication([])
 
@@ -2819,8 +2819,8 @@ def test_system_font_stack_matches_platform():
     单族但不存在（或覆盖不了中文）三种写法都会触发，所以这里只允许单族。
     """
     import sys
-    from pet.context_menus.menu_styles.common import SYSTEM_FONT_STACK
-    from pet.context_menus.menu_styles.modern import modern_menu_stylesheet
+    from petwisp.context_menus.menu_styles.common import SYSTEM_FONT_STACK
+    from petwisp.context_menus.menu_styles.modern import modern_menu_stylesheet
 
     sheet = modern_menu_stylesheet({"theme": "light"})
     assert SYSTEM_FONT_STACK in sheet
@@ -2847,8 +2847,8 @@ def test_screen_capture_menu_entry_keeps_shared_vector_icon():
 
     QApplication.instance() or QApplication([])
 
-    from pet.context_menus.icons import vector_menu_icon
-    from pet.context_menus.shared import add_screen_capture_menu
+    from petwisp.context_menus.icons import vector_menu_icon
+    from petwisp.context_menus.shared import add_screen_capture_menu
 
     class _Pet:
         def on_screen_capture(self):
@@ -2877,7 +2877,7 @@ _PLAYER_KEYS = ("netease", "qqmusic", "kugou", "soda")
 
 def _player_entry_labels() -> dict[str, str]:
     """播放器键 → 菜单项文案（文案取自 ``music_players`` 注册表的显示名）。"""
-    from pet.music import players as music_players
+    from petwisp.music import players as music_players
 
     return {
         key: f"打开{music_players.player_label(key)}给主人放歌"
@@ -2931,9 +2931,9 @@ def _build_full_menu(monkeypatch, pet):
     """按默认布局建一棵真实菜单（窗口侧与 overlay 侧共用这一条路径）。"""
     from PySide6.QtWidgets import QApplication, QMenu
 
-    from pet import catalog
-    from pet.context_menu import populate_context_menu
-    from pet.context_menus import shared
+    from petwisp import catalog
+    from petwisp.context_menu import populate_context_menu
+    from petwisp.context_menus import shared
 
     monkeypatch.setattr(shared.autostart_mod, "is_enabled", lambda: False)
     monkeypatch.setattr(catalog, "list_available_characters", lambda: ["demo"])
@@ -2962,7 +2962,7 @@ def _wait_until(predicate, *, timeout: float = 15.0) -> bool:
 
 
 def _save_player_cache():
-    from pet.music import players as music_players
+    from petwisp.music import players as music_players
 
     saved = dict(music_players._cache)
     with music_players._warm_lock:
@@ -2972,7 +2972,7 @@ def _save_player_cache():
 
 
 def _restore_player_cache(saved) -> None:
-    from pet.music import players as music_players
+    from petwisp.music import players as music_players
 
     cache, inflight = saved
     music_players.clear_cache()
@@ -2990,8 +2990,8 @@ def test_music_submenu_registers_and_places_every_known_player():
     能不能渲染——只补注册表就是"老用户永远看不到"，只补模板则节点被当
     unknown-action 丢掉（旧版扁平菜单绕开注册表的历史形态）。
     """
-    from pet.music import players as music_players
-    from pet.context_menus.registry import ACTION_ICONS, ACTION_LABELS, MENU_ACTIONS
+    from petwisp.music import players as music_players
+    from petwisp.context_menus.registry import ACTION_ICONS, ACTION_LABELS, MENU_ACTIONS
 
     # 注册表里登记过的播放器都必须有菜单入口：后端再加播放器时不会漏掉菜单一侧。
     assert {
@@ -3030,8 +3030,8 @@ def test_new_player_entries_click_routes_its_own_key_through_the_shared_worker(m
     """
     from PySide6.QtWidgets import QApplication
 
-    from pet.music import players as music_players, now_playing
-    from pet.context_menus import shared
+    from petwisp.music import players as music_players, now_playing
+    from petwisp.context_menus import shared
 
     monkeypatch.setattr(music_players, "warm_cache_async", lambda key, manual="": True)
     monkeypatch.setattr(
@@ -3076,7 +3076,7 @@ def test_new_player_entry_labels_follow_the_player_registry(monkeypatch):
     注入受控注册表（而不是依赖本机装了哪个播放器）：四个入口的文案一一对应各自的
     key，抄错 key 或写死显示名都会红。
     """
-    from pet.music import players as music_players
+    from petwisp.music import players as music_players
 
     controlled = dict(music_players.PLAYERS)
     controlled["kugou"] = ("酷狗音乐", "KuGou.exe", ("KuGou",))
@@ -3096,7 +3096,7 @@ def test_new_player_entry_labels_follow_the_player_registry(monkeypatch):
 
 def test_cold_cache_keeps_all_four_entries_optimistic_and_warms_each_once(monkeypatch):
     """冷缓存：四个入口乐观启用（不置灰），并各自幂等触发一次后台预热。"""
-    from pet.music import players as music_players
+    from petwisp.music import players as music_players
 
     saved = _save_player_cache()
     warms: list[str] = []
@@ -3119,7 +3119,7 @@ def test_cold_cache_keeps_all_four_entries_optimistic_and_warms_each_once(monkey
 
 def test_inflight_warm_keeps_entry_enabled_and_stays_idempotent(monkeypatch):
     """预热在途：入口保持乐观启用，且再次开菜单不会重复起一条扫描。"""
-    from pet.music import players as music_players
+    from petwisp.music import players as music_players
 
     saved = _save_player_cache()
     real_warm = music_players.warm_cache_async
@@ -3144,7 +3144,7 @@ def test_inflight_warm_keeps_entry_enabled_and_stays_idempotent(monkeypatch):
 
 def test_negative_cache_greys_the_new_entry_with_settings_hint(monkeypatch):
     """负缓存命中（扫过、本机没有）：置灰 + 保留说明，且不再重扫。"""
-    from pet.music import players as music_players
+    from petwisp.music import players as music_players
 
     saved = _save_player_cache()
     music_players._cache["kugou"] = None
@@ -3168,7 +3168,7 @@ def test_negative_cache_greys_the_new_entry_with_settings_hint(monkeypatch):
 
 def test_manual_player_path_is_authoritative_for_the_new_entry(tmp_path, monkeypatch):
     """手填路径就是权威：命中启用；文件不存在时置灰并指向设置页（不静默回退）。"""
-    from pet.music import players as music_players
+    from petwisp.music import players as music_players
 
     exe = tmp_path / "KuGou.exe"
     exe.write_bytes(b"")
@@ -3195,7 +3195,7 @@ def test_saved_user_layout_gains_the_new_player_entries_beside_their_siblings():
     插错父节点（比如掉到根菜单）时老用户会看到两条孤零零的菜单项，而那类错误只有拿
     真实模板跑一遍才看得见。顺序也要保持——新入口跟同组的两条排在一起。
     """
-    from pet.context_menus.registry import MENU_ACTIONS
+    from petwisp.context_menus.registry import MENU_ACTIONS
 
     result = resolve_menu_layout(
         {

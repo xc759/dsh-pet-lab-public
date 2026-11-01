@@ -1,8 +1,8 @@
 import json
 
-from pet.config import APP_DIR_NAME, Config
-from pet import pet_profiles as profiles
-from pet.settings_slot_config import SlotRoutedConfig, route_settings_config
+from petwisp.config import APP_DIR_NAME, Config
+from petwisp import pet_profiles as profiles
+from petwisp.settings_slot_config import SlotRoutedConfig, route_settings_config
 
 
 def test_migration_cleans_source_and_normalizes(tmp_path):
@@ -20,7 +20,7 @@ def test_migration_cleans_source_and_normalizes(tmp_path):
 
 
 def test_explicit_global_ignores_instance_environment(tmp_path, monkeypatch):
-    monkeypatch.setenv('DSH_PET_INSTANCE', 'slot-128')
+    monkeypatch.setenv('PETWISP_INSTANCE', 'slot-128')
     assert Config(base=tmp_path, instance_id='').path.name == 'config.json'
 
 
@@ -65,7 +65,7 @@ def test_raw_slot_config_cannot_write(tmp_path):
 
 
 def test_partial_reset_blocks_new_reader_save(tmp_path, monkeypatch):
-    from pet import config_write_lock as cwl
+    from petwisp import config_write_lock as cwl
     directory = tmp_path / APP_DIR_NAME
     profiles.write_profile_settings(directory, 0, {'scale': 1.2})
     real = cwl.atomic_write_json

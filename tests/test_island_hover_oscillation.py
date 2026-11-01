@@ -38,8 +38,8 @@ from PySide6.QtCore import QEvent, QPoint, QPointF, QRect, Qt
 from PySide6.QtGui import QCursor, QGuiApplication, QMouseEvent
 from PySide6.QtWidgets import QApplication
 
-from pet.config import Config
-from pet.island.dynamic_island import (
+from petwisp.config import Config
+from petwisp.island.dynamic_island import (
     DynamicIsland,
     _CAPSULE_HEIGHT,
     _STRIP_SIDE,

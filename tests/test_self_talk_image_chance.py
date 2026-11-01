@@ -6,7 +6,7 @@
 再在对应池里等权选一条。
 """
 
-from pet import window_alerts as alerts
+from petwisp import window_alerts as alerts
 
 TEXTS = ["好女孩……", "再陪你一会儿。"]
 IMAGES = ["a.jpg", "b.png"]
@@ -73,8 +73,8 @@ def test_image_chance_reads_config_with_safe_fallback():
 
 def test_config_default_clamps_and_persists(tmp_path):
     """默认 30%、越界钳位到 0~100、能落盘回读（每宠键：真值在 slot0 档案）。"""
-    from pet.config import Config
-    from pet.settings_slot_config import route_settings_config
+    from petwisp.config import Config
+    from petwisp.settings_slot_config import route_settings_config
 
     def slot0():
         return route_settings_config(Config(base=tmp_path, instance_id="slot-0"))
@@ -95,9 +95,9 @@ def test_settings_page_row_round_trip(tmp_path):
     """设置页「配图概率」行存在、初值跟配置、改完能落盘。"""
     from PySide6.QtWidgets import QApplication
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
-    from pet.settings_slot_config import route_settings_config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
+    from petwisp.settings_slot_config import route_settings_config
 
     def slot0():
         return route_settings_config(Config(base=tmp_path, instance_id="slot-0"))

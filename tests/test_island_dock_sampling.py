@@ -27,13 +27,13 @@ from PySide6.QtCore import QEvent, QPointF, QRect, Qt
 from PySide6.QtGui import QGuiApplication, QMouseEvent
 from PySide6.QtWidgets import QApplication
 
-import pet.island.dynamic_island as island_mod
-from pet.island import segments as isl
-from pet import net_monitor as nm
-from pet import sys_monitor as sm
-from pet.config import Config
-from pet.island.dynamic_island import DynamicIsland
-from pet.island.segments import CPU, MEM, NETWORK
+import petwisp.island.dynamic_island as island_mod
+from petwisp.island import segments as isl
+from petwisp import net_monitor as nm
+from petwisp import sys_monitor as sm
+from petwisp.config import Config
+from petwisp.island.dynamic_island import DynamicIsland
+from petwisp.island.segments import CPU, MEM, NETWORK
 
 app = QApplication.instance() or QApplication([])
 

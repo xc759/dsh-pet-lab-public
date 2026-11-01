@@ -19,11 +19,11 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from PySide6.QtWidgets import QApplication
 
-import pet.modern_settings_dialog as settings_mod
-from pet.island import extension_host as host
-from pet import net_monitor
-from pet.config import Config
-from pet.island.segments import CPU, GPU, MEM, NETWORK
+import petwisp.modern_settings_dialog as settings_mod
+from petwisp.island import extension_host as host
+from petwisp import net_monitor
+from petwisp.config import Config
+from petwisp.island.segments import CPU, GPU, MEM, NETWORK
 from tests.test_island_extension_host import MANIFEST, _write_component
 
 app = QApplication.instance() or QApplication([])

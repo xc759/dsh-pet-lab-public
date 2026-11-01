@@ -11,8 +11,8 @@ import pytest
 from PySide6.QtCore import QObject, QRect
 from PySide6.QtWidgets import QApplication
 
-from pet.edge_probe import PEEKING, EdgeProbeController
-from pet.throw_egg import THROW_EGG_RECOVER_SPEED, ThrowEggController
+from petwisp.edge_probe import PEEKING, EdgeProbeController
+from petwisp.throw_egg import THROW_EGG_RECOVER_SPEED, ThrowEggController
 
 
 def _qapp():
@@ -274,8 +274,8 @@ def test_stop_physics_backstop_ends_egg(tmp_path):
     """落地停稳兜底：window._stop_physics 无条件调用 throw_egg.end()。"""
     from tests.pet_window_fakes import FakeLibrary
 
-    from pet.config import Config
-    from pet.window import PetWindow
+    from petwisp.config import Config
+    from petwisp.window import PetWindow
 
     app = _qapp()
     cfg = Config(str(tmp_path / "cfg.json"))

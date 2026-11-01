@@ -9,7 +9,7 @@
    第二个完整实例被拒；4.4a 起 main() 不再抢 slot 文件锁（`--slot` 兼容解析保留）；
 5. 启动链接线：双开在 slot 竞争之前被拒 + 留痕 + 静默退出码；
    正常退出（main finally）与会话结束（_on_session_end）两条路径都释放门；
-6. 真进程/真 QApplication 端到端双开（子进程跑 `python -m pet`）。
+6. 真进程/真 QApplication 端到端双开（子进程跑 `python -m petwisp`）。
 
 时序纪律：子进程就绪用「标记文件 + 宽预算轮询」（同 tests/test_slot_and_memory.py
 的持锁 worker 范式），不赌固定 sleep。env 一律经 monkeypatch 隔离。
@@ -27,9 +27,9 @@ from pathlib import Path
 
 import pytest
 
-from pet import overlay_instance_gate as gate_mod
-from pet.config import APP_DIR_NAME
-from pet.slot_manager import pid_alive
+from petwisp import overlay_instance_gate as gate_mod
+from petwisp.config import APP_DIR_NAME
+from petwisp.slot_manager import pid_alive
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
 
@@ -40,7 +40,7 @@ _GATE_HOLDER = """
 import os, sys, time
 from pathlib import Path
 
-from pet.overlay_instance_gate import OverlayInstanceGate
+from petwisp.overlay_instance_gate import OverlayInstanceGate
 
 gate = OverlayInstanceGate(sys.argv[1])
 ok = gate.acquire()
@@ -300,7 +300,7 @@ def test_overlay_topology_creates_gate_and_refuses_second(tmp_path, monkeypatch)
 # ---------------------------------------------------------------- app 启动链接线
 def test_main_refuses_second_overlay_instance_before_slot(tmp_path, monkeypatch, caplog):
     """overlay 双开：拒绝先于 slot 竞争（不建 slots/、不落种 slot 配置）+ 留痕。"""
-    from pet import app as app_mod
+    from petwisp import app as app_mod
 
     monkeypatch.setenv("PET_RENDER_TOPOLOGY", "overlay")
     monkeypatch.setattr(app_mod, "_default_base", lambda: tmp_path)
@@ -311,7 +311,7 @@ def test_main_refuses_second_overlay_instance_before_slot(tmp_path, monkeypatch,
     assert holder.acquire() is True
     try:
         with caplog.at_level(logging.WARNING):
-            code = app_mod.main(["dsh-pet"])
+            code = app_mod.main(["petwisp"])
         assert code == gate_mod.DUPLICATE_EXIT_CODE == 0
     finally:
         holder.release()
@@ -331,11 +331,11 @@ def test_main_legacy_topology_also_takes_gate_and_does_not_take_slot_lock(
     实例），启动链其余部分逐行不变。`--slot N` 兼容解析保留：合法值只用于选
     config-slot-N.json 身份，不再有任何跨进程竞争副作用（不建 slots/、不落种）。
     """
-    from pet import app as app_mod
-    from pet.config import Config as RealConfig
+    from petwisp import app as app_mod
+    from petwisp.config import Config as RealConfig
 
     monkeypatch.setenv("PET_RENDER_TOPOLOGY", "legacy")
-    monkeypatch.delenv("DSH_PET_INSTANCE", raising=False)
+    monkeypatch.delenv("PETWISP_INSTANCE", raising=False)
     monkeypatch.setattr(app_mod, "_default_base", lambda: tmp_path)
     monkeypatch.setattr(app_mod, "QApplication", _FakeQApplication)
     monkeypatch.setattr(app_mod, "Config", lambda *a, **k: RealConfig(base=tmp_path))
@@ -356,13 +356,13 @@ def test_main_legacy_topology_also_takes_gate_and_does_not_take_slot_lock(
 
     monkeypatch.setattr(app_mod, "AppShell", _StubShell)
 
-    assert app_mod.main(["dsh-pet", "--slot", "3"]) == 0
+    assert app_mod.main(["petwisp", "--slot", "3"]) == 0
     config_dir = tmp_path / APP_DIR_NAME
     assert started and started[0]["slot_id"] == 3          # 身份照旧按 --slot 选
     # G1 身份口径：``--slot N`` 只作为**实例身份**显式传给 AppShell；进程级
-    # ``DSH_PET_INSTANCE`` 固定空串——它代表"全局配置身份"，不再被 --slot 污染
+    # ``PETWISP_INSTANCE`` 固定空串——它代表"全局配置身份"，不再被 --slot 污染
     #（否则 ``Config(instance_id=None)`` 会去读 config-slot-N.json，全局与档案重合）。
-    assert os.environ["DSH_PET_INSTANCE"] == ""
+    assert os.environ["PETWISP_INSTANCE"] == ""
     assert not (config_dir / "slots").exists()              # 不抢锁 = 不建 slots/
     assert not list(config_dir.glob("config-slot-*.json"))
     # 门真被抢过（留痕），且正常退出已释放（锁文件不残留）
@@ -372,7 +372,7 @@ def test_main_legacy_topology_also_takes_gate_and_does_not_take_slot_lock(
 
 def test_main_legacy_topology_refuses_second_instance(tmp_path, monkeypatch, caplog):
     """捕获模式形态（legacy 单窗）下双击起第二个完整实例：拒绝且零副作用。"""
-    from pet import app as app_mod
+    from petwisp import app as app_mod
 
     monkeypatch.setenv("PET_RENDER_TOPOLOGY", "legacy")
     monkeypatch.setattr(app_mod, "_default_base", lambda: tmp_path)
@@ -389,7 +389,7 @@ def test_main_legacy_topology_refuses_second_instance(tmp_path, monkeypatch, cap
     monkeypatch.setattr(app_mod, "AppShell", _ForbiddenShell)
     try:
         with caplog.at_level(logging.WARNING):
-            code = app_mod.main(["dsh-pet"])
+            code = app_mod.main(["petwisp"])
     finally:
         holder.release()
 
@@ -400,8 +400,8 @@ def test_main_legacy_topology_refuses_second_instance(tmp_path, monkeypatch, cap
 
 def test_main_releases_gate_when_startup_fails(tmp_path, monkeypatch):
     """正常退出链：main 的 finally 释放门（启动失败与事件循环结束共用此出口）。"""
-    from pet import app as app_mod
-    from pet.config import Config as RealConfig
+    from petwisp import app as app_mod
+    from petwisp.config import Config as RealConfig
 
     monkeypatch.setenv("PET_RENDER_TOPOLOGY", "overlay")
     monkeypatch.setattr(app_mod, "_default_base", lambda: tmp_path)
@@ -425,14 +425,14 @@ def test_main_releases_gate_when_startup_fails(tmp_path, monkeypatch):
 
     monkeypatch.setattr(app_mod, "AppShell", _BoomShell)
 
-    assert app_mod.main(["dsh-pet"]) == 1
+    assert app_mod.main(["petwisp"]) == 1
     assert gate.held is False
     assert gate.path.exists() is False
 
 
 def test_session_end_releases_gate(tmp_path, monkeypatch):
     """会话结束链：_on_session_end 释放门（幂等）；未注入门时 release 为 no-op。"""
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     gate = gate_mod.OverlayInstanceGate(tmp_path)
     assert gate.acquire() is True
@@ -464,7 +464,7 @@ def _child_base(tmp_path: Path) -> Path:
 
 
 def test_real_second_process_refused_on_overlay_topology(tmp_path):
-    """真 Qt + 真进程：第二实例跑 `python -m pet` 被门拒绝并静默退出。"""
+    """真 Qt + 真进程：第二实例跑 `python -m petwisp` 被门拒绝并静默退出。"""
     config_dir = _child_base(tmp_path) / APP_DIR_NAME
     holder = gate_mod.OverlayInstanceGate(config_dir)
     assert holder.acquire() is True
@@ -478,7 +478,7 @@ def test_real_second_process_refused_on_overlay_topology(tmp_path):
         env["HOME"] = str(tmp_path)
     try:
         proc = subprocess.run(
-            [sys.executable, "-m", "pet"], cwd=str(_REPO_ROOT), env=env,
+            [sys.executable, "-m", "petwisp"], cwd=str(_REPO_ROOT), env=env,
             capture_output=True, text=True, timeout=180,
         )
     finally:

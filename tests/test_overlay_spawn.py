@@ -22,11 +22,11 @@ from PySide6.QtWidgets import QApplication
 
 import tests.test_overlay_window_capabilities as cap
 import tests.test_sprite_menu_facade as fac
-from pet import overlay_spawn_state as ovs
-from pet.config import APP_DIR_NAME, Config
-from pet.overlay_shell import OverlayShell
-from pet.pet_sprite import PetSprite
-from pet.sprite_menu_facade import build_sprite_full_menu
+from petwisp import overlay_spawn_state as ovs
+from petwisp.config import APP_DIR_NAME, Config
+from petwisp.overlay_shell import OverlayShell
+from petwisp.pet_sprite import PetSprite
+from petwisp.sprite_menu_facade import build_sprite_full_menu
 
 app = QApplication.instance() or QApplication([])
 
@@ -184,8 +184,8 @@ def test_menu_has_spawn_entries(tmp_path):
     try:
         menu = build_sprite_full_menu(shell)
         labels = _recursive_labels(menu)
-        assert "生小肥鱼" in labels
-        assert "退出子肥鱼" in labels
+        assert "生小宠" in labels
+        assert "退出子宠" in labels
     finally:
         shell._delete_runtime_marker()
 
@@ -233,7 +233,7 @@ def test_spawn_reuses_retired_identity_when_history_is_full(tmp_path, caplog):
     """B01：128 个历史身份占满目录时仍能生（复用最小退役身份，记 warning）。
 
     普通用户反复生/退累计 128 次后目录里全是历史 ``config-slot-N.json``；旧实现
-    直接抛 ``SpawnStateError``，UI 也只写日志 → 「生小肥鱼」永久静默失效。
+    直接抛 ``SpawnStateError``，UI 也只写日志 → 「生小宠」永久静默失效。
     """
     config_dir = tmp_path / APP_DIR_NAME
     config_dir.mkdir(parents=True, exist_ok=True)
@@ -242,7 +242,7 @@ def test_spawn_reuses_retired_identity_when_history_is_full(tmp_path, caplog):
             json.dumps({"version": 4}), encoding="utf-8")
     shell, _ = _make_persistent_shell(tmp_path)
     try:
-        with caplog.at_level(logging.WARNING, logger="pet.overlay_spawn_state"):
+        with caplog.at_level(logging.WARNING, logger="petwisp.overlay_spawn_state"):
             shell.spawn_pet()
         assert [shell._spawned_slots[s] for s in shell._spawned] == [1]
         assert ovs.load_active_slots(config_dir) == [0, 1]
@@ -265,13 +265,13 @@ def test_spawn_exhausted_identities_reports_bubble(tmp_path, monkeypatch):
         assert shell._spawned == []                       # 不留半只 sprite
         assert shell.overlay.sprites == [shell.sprite]
         assert len(said) == 1, "耗尽路径必须走壳上气泡通道告知用户"
-        assert "生小肥鱼失败" in said[0] and "128" in said[0]
+        assert "生小宠失败" in said[0] and "128" in said[0]
     finally:
         shell._delete_runtime_marker()
 
 
 def test_clear_spawned_pets_does_not_revive_after_restart(tmp_path):
-    """退出子肥鱼 = 出清单：配置保留但重启不再出现（D5 铁律）。"""
+    """退出子宠 = 出清单：配置保留但重启不再出现（D5 铁律）。"""
     shell, _ = _make_persistent_shell(tmp_path)
     shell.spawn_pet()
     shell.spawn_pet()
@@ -337,7 +337,7 @@ def test_restart_revives_active_pets_with_their_own_positions(tmp_path):
 
 
 def test_revive_uses_each_slot_scale(tmp_path):
-    """每只子肥鱼按各自 slot 身份恢复尺寸（不是跟随主宠当前尺寸）。"""
+    """每只子宠按各自 slot 身份恢复尺寸（不是跟随主宠当前尺寸）。"""
     config_dir = tmp_path / APP_DIR_NAME
     config_dir.mkdir(parents=True, exist_ok=True)
     ovs.save_active_slots(config_dir, [1, 2])

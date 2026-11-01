@@ -85,7 +85,7 @@ class TestCodeConstantScan:
 
     def test_zip_scan_handles_compressed_members(self, checker, tmp_path):
         pyz = tmp_path / "app.pyz"
-        _write_pyz(pyz, {"pet/catalog.pyc": _make_pyc_bytes(_make_module_code("原地敲击桌面互动"))})
+        _write_pyz(pyz, {"petwisp/catalog.pyc": _make_pyc_bytes(_make_module_code("原地敲击桌面互动"))})
         found = checker.scan_zip_code_constants(pyz, ["原地敲击桌面互动", "写代码"])
         assert "原地敲击桌面互动" in found
         assert "写代码" not in found  # 不存在的字面量不会被误报为存在
@@ -99,10 +99,10 @@ class TestBundleChecks:
         literals = _CHECKER.EXPECTED_CODE_LITERALS
         _write_pyz(
             internal / "app.pyz",
-            {"pet/catalog.pyc": _make_pyc_bytes(_make_catalog_code(literals, garble_code))},
+            {"petwisp/catalog.pyc": _make_pyc_bytes(_make_catalog_code(literals, garble_code))},
         )
         # 文本资源：正常 UTF-8 或 GBK 转码后的坏字节
-        menu = internal / "pet" / "menu_templates"
+        menu = internal / "petwisp" / "menu_templates"
         menu.mkdir(parents=True)
         if garble_text:
             (menu / "modern.json").write_bytes("新版菜单".encode("gbk"))
@@ -147,7 +147,7 @@ class TestBundleChecks:
 
 # Linux 回归：Fcitx 会话必须保留 fcitx 输入法上下文，供随包的匹配 Qt 插件加载。
 def test_linux_fcitx_session_preserves_fcitx_input_context(monkeypatch):
-    from pet import app as app_mod
+    from petwisp import app as app_mod
 
     monkeypatch.setattr(app_mod.sys, "platform", "linux")
     monkeypatch.setenv("XMODIFIERS", "@im=fcitx")

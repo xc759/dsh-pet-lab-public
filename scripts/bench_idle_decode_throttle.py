@@ -28,7 +28,7 @@ from PySide6.QtWidgets import QApplication
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from pet.webm_clip import WebMClip  # noqa: E402
+from petwisp.webm_clip import WebMClip  # noqa: E402
 
 DEFAULT_WEBM = Path("assets/characters/demo/videos/idle/待机呼吸休闲.webm")
 

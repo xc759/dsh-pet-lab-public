@@ -30,10 +30,10 @@ from PySide6.QtCore import QEvent, Qt  # noqa: E402
 from PySide6.QtGui import QColor, QImage, QKeyEvent, QPainter  # noqa: E402
 from PySide6.QtWidgets import QApplication, QLabel  # noqa: E402
 
-from pet.chat.models import ProviderConfig  # noqa: E402
-from pet.screen_capture.ask_dialog import ScreenAskDialog, _Bubble  # noqa: E402
-from pet.screen_capture.session import SelectionRect  # noqa: E402
-from pet.screen_capture.vision_bridge import VisionConversation  # noqa: E402
+from petwisp.chat.models import ProviderConfig  # noqa: E402
+from petwisp.screen_capture.ask_dialog import ScreenAskDialog, _Bubble  # noqa: E402
+from petwisp.screen_capture.session import SelectionRect  # noqa: E402
+from petwisp.screen_capture.vision_bridge import VisionConversation  # noqa: E402
 
 #: 等待预算（秒）：后台线程 + CI 慢 runner 给足，靠事件同步醒，不靠 sleep 猜。
 _BUDGET = 10.0
@@ -183,7 +183,7 @@ def test_opening_the_dialog_puts_nothing_on_the_wire(qapp, monkeypatch):
     换成了浮窗本身——图就摆在输入栏上方，发不发由用户自己点。所以"确认"不再是
     一句断言，而是"没点发送就一个字节都不出去"这条可测的事实。）
     """
-    from pet import vision as vision_mod
+    from petwisp import vision as vision_mod
 
     sent: list = []
     monkeypatch.setattr(vision_mod, "post_vision_messages",
@@ -551,7 +551,7 @@ def test_the_dialog_card_renders_the_theme_surface(qapp):
 
 def _sent_messages(monkeypatch, reply: str = "答") -> list:
     """把 `post_vision_messages` 换成记录器，返回"每一次发出去的 messages"。"""
-    from pet import vision as vision_mod
+    from petwisp import vision as vision_mod
 
     sent: list = []
     monkeypatch.setattr(vision_mod, "post_vision_messages",
@@ -691,8 +691,8 @@ def test_a_stale_failure_does_not_unlock_the_new_sessions_send(qapp):
 
 def _pin_whale(monkeypatch, *, missing: bool = False):
     """把标题栏 logo 的来源钉成 DS logo（``missing=True`` 钉成素材缺席，验回退）。"""
-    import pet.screen_capture.ask_dialog as ask_mod
-    from pet.screen_capture import brand_icons
+    import petwisp.screen_capture.ask_dialog as ask_mod
+    from petwisp.screen_capture import brand_icons
     from PySide6.QtGui import QPixmap
 
     src = (lambda: QPixmap()) if missing else brand_icons.load_ds_whale

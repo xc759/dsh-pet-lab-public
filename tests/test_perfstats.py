@@ -22,10 +22,10 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor, QImage, QPainter, QPixmap, QRegion
 from PySide6.QtWidgets import QApplication, QWidget
 
-from pet import catalog
-from pet import perfstats
-from pet import window as window_mod
-from pet.webm_clip import WebMClip
+from petwisp import catalog
+from petwisp import perfstats
+from petwisp import window as window_mod
+from petwisp.webm_clip import WebMClip
 
 
 def _qapp() -> QApplication:
@@ -87,7 +87,7 @@ class TestPerfStatsModule:
     def test_dump_logs_when_no_file(self, caplog):
         perfstats.enable()
         perfstats.note("rebuild.calls")
-        with caplog.at_level("INFO", logger="pet.perfstats"):
+        with caplog.at_level("INFO", logger="petwisp.perfstats"):
             perfstats.dump()
         assert any("rebuild.calls" in rec.message for rec in caplog.records)
 

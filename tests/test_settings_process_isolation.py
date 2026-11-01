@@ -2,7 +2,7 @@
 """设置页进程隔离（PostMerge P1）聚焦测试。
 
 覆盖规格里的六件事：
-1. --settings 入口分流（免 pet.app、standalone 标志、单实例锁）；
+1. --settings 入口分流（免 petwisp.app、standalone 标志、单实例锁）；
 2. standalone 保存前 reload 合并（不覆盖主进程中途改的盘；即存型开关同此契约）；
 3. config 目录 watcher 触发应用链；
 4. 主进程单实例锁（已持有不再拉起）与 startDetached 失败回退进程内；
@@ -23,10 +23,10 @@ from unittest import mock
 from PySide6.QtCore import QLockFile, QRect, QTimer
 from PySide6.QtWidgets import QApplication, QDialog
 
-from pet import config as config_mod
-from pet import slot_manager as slot_manager_mod
-from pet.app import AppShell, PetInstance
-from pet.config import Config
+from petwisp import config as config_mod
+from petwisp import slot_manager as slot_manager_mod
+from petwisp.app import AppShell, PetInstance
+from petwisp.config import Config
 
 
 def _qapp() -> QApplication:
@@ -50,8 +50,8 @@ def _bare_shell(config: Config) -> AppShell:
 # ---------------------------------------------------------------- 1. 入口分流
 
 def test_main_routes_settings_flag_to_settings_process(monkeypatch):
-    """`python -m pet --settings` 走独立设置进程分支。"""
-    import pet.__main__ as entry
+    """`python -m petwisp --settings` 走独立设置进程分支。"""
+    import petwisp.__main__ as entry
 
     calls = []
     monkeypatch.setattr(entry, "_run_settings", lambda: calls.append(1) or 0)
@@ -62,7 +62,7 @@ def test_main_routes_settings_flag_to_settings_process(monkeypatch):
 
 def test_settings_instance_id_parsing():
     """--instance 解析（多窗场景主进程显式传参用）。"""
-    import pet.__main__ as entry
+    import petwisp.__main__ as entry
 
     assert entry._settings_instance_id(["pet", "--settings"]) == ""
     assert entry._settings_instance_id(["pet", "--settings", "--instance", "slot-2"]) == "slot-2"
@@ -93,8 +93,8 @@ class _AutoCloseDialog(QDialog):
 
 def test_exec_settings_builds_standalone_dialog(tmp_path, monkeypatch):
     """--settings 主体：parent=None + standalone=True，退出时释放 settings.lock。"""
-    import pet.__main__ as entry
-    import pet.modern_settings_dialog as settings_mod
+    import petwisp.__main__ as entry
+    import petwisp.modern_settings_dialog as settings_mod
 
     app = _qapp()
     monkeypatch.setattr(settings_mod, "ModernSettingsDialog", _AutoCloseDialog)
@@ -120,8 +120,8 @@ def test_exec_settings_builds_standalone_dialog(tmp_path, monkeypatch):
 
 def test_exec_settings_exits_when_another_settings_process_holds_lock(tmp_path, monkeypatch):
     """单实例：锁已被持有（另一个设置进程在跑）时不再开第二个对话框。"""
-    import pet.__main__ as entry
-    import pet.modern_settings_dialog as settings_mod
+    import petwisp.__main__ as entry
+    import petwisp.modern_settings_dialog as settings_mod
 
     config = Config(base=tmp_path)
     config.dir.mkdir(parents=True, exist_ok=True)
@@ -137,9 +137,9 @@ def test_exec_settings_exits_when_another_settings_process_holds_lock(tmp_path, 
 
 
 def test_run_settings_disables_ai_page_without_chat_module(tmp_path, monkeypatch):
-    """no-chat 打包变体（pet.chat 被 excludes）里 include_ai 必须回落 False。"""
-    import pet.__main__ as entry
-    import pet.modern_settings_dialog as settings_mod
+    """no-chat 打包变体（petwisp.chat 被 excludes）里 include_ai 必须回落 False。"""
+    import petwisp.__main__ as entry
+    import petwisp.modern_settings_dialog as settings_mod
 
     app = _qapp()
     monkeypatch.setattr(settings_mod, "ModernSettingsDialog", _AutoCloseDialog)
@@ -154,8 +154,8 @@ def test_run_settings_disables_ai_page_without_chat_module(tmp_path, monkeypatch
 
 
 def test_settings_process_keeps_its_window_without_a_second_dock_item(tmp_path, monkeypatch):
-    import pet.__main__ as entry
-    import pet.platform_mac as platform_mac
+    import petwisp.__main__ as entry
+    import petwisp.platform_mac as platform_mac
 
     app = _qapp()
     policies = []
@@ -175,14 +175,14 @@ def test_settings_process_keeps_its_window_without_a_second_dock_item(tmp_path, 
 
 
 def test_packaging_entries_route_settings_before_importing_app():
-    """打包入口必须在 import pet.app 之前分流 --settings，否则子进程跑成桌宠。"""
+    """打包入口必须在 import petwisp.app 之前分流 --settings，否则子进程跑成桌宠。"""
     root = Path(__file__).resolve().parents[1]
     for name in ("packaging/pet_entry.py", "packaging/pet_entry_no_chat.py"):
         source = (root / name).read_text(encoding="utf-8")
         settings_at = source.index('"--settings" in sys.argv')
-        app_import_at = source.index("from pet.app import main")
-        assert settings_at < app_import_at, f"{name}: --settings 分流必须在 import pet.app 之前"
-        assert "from pet.__main__ import _run_settings" in source
+        app_import_at = source.index("from petwisp.app import main")
+        assert settings_at < app_import_at, f"{name}: --settings 分流必须在 import petwisp.app 之前"
+        assert "from petwisp.__main__ import _run_settings" in source
 
 
 # ------------------------------------------------- 2. standalone 保存前 reload
@@ -193,7 +193,7 @@ def test_standalone_save_merges_external_disk_change(tmp_path):
     用设置页不暴露的 pnpm_bin 做探针：没有 reload 的话内存里的旧空值会把
     外部改动写回覆盖掉（回归点）。
     """
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     _qapp()
     config = Config(base=tmp_path)
@@ -222,10 +222,10 @@ def test_immediate_sound_toggles_do_not_roll_back_external_changes(tmp_path):
     ``mouse_through`` 当探针），随手拨一下音效开关就把托盘改动回滚了。
     ``_write_config`` 早就有这条 reload 契约，两个即存回调漏了同一步。
     """
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     _qapp()
-    from pet.settings_slot_config import route_settings_config
+    from petwisp.settings_slot_config import route_settings_config
 
     config = route_settings_config(Config(base=tmp_path, instance_id="slot-0"))
     dialog = ModernSettingsDialog(config, include_ai=False, standalone=True)
@@ -302,7 +302,7 @@ def test_config_watcher_ignores_unrelated_directory_churn(tmp_path):
 
 def test_apply_external_config_change_fans_out_to_all_instances(tmp_path, monkeypatch):
     """应用链按窗集合扇出（多实例），而不是只看主窗。"""
-    import pet.app as app_mod
+    import petwisp.app as app_mod
 
     class _Inst:
         def __init__(self):
@@ -365,7 +365,7 @@ def test_open_settings_process_disabled_by_config(tmp_path):
 
 def test_open_modern_settings_falls_back_when_launch_fails(tmp_path, monkeypatch):
     """startDetached 失败 → 回退进程内对话框（功能绝不丢）。"""
-    import pet.modern_settings_dialog as settings_mod
+    import petwisp.modern_settings_dialog as settings_mod
 
     _qapp()
     owner = PetInstance.__new__(PetInstance)
@@ -391,7 +391,7 @@ def test_open_modern_settings_falls_back_when_launch_fails(tmp_path, monkeypatch
 
 def test_open_modern_settings_does_not_build_inprocess_dialog_when_launched(tmp_path, monkeypatch):
     """拉起成功 → 不再构造进程内对话框。"""
-    import pet.modern_settings_dialog as settings_mod
+    import petwisp.modern_settings_dialog as settings_mod
 
     _qapp()
     owner = PetInstance.__new__(PetInstance)
@@ -410,8 +410,8 @@ def test_open_modern_settings_does_not_build_inprocess_dialog_when_launched(tmp_
 
 
 def test_launch_settings_process_uses_source_command(tmp_path, monkeypatch):
-    """源码运行：python -m pet --settings（工作目录取仓库根）。"""
-    import pet.app as app_mod
+    """源码运行：python -m petwisp --settings（工作目录取仓库根）。"""
+    import petwisp.app as app_mod
 
     shell = _bare_shell(Config(base=tmp_path))
     calls = []
@@ -424,13 +424,13 @@ def test_launch_settings_process_uses_source_command(tmp_path, monkeypatch):
     assert shell._launch_settings_process() is True
     program, arguments, workdir = calls[0]
     assert program == sys.executable
-    assert arguments == ["-m", "pet", "--settings"]
+    assert arguments == ["-m", "petwisp", "--settings"]
     assert Path(workdir) == Path(app_mod.__file__).resolve().parent.parent
 
 
 def test_launch_settings_process_failure_is_reported(tmp_path, monkeypatch):
     """detach 启动失败 → _launch_settings_process 返回 False（触发回退）。"""
-    import pet.app as app_mod
+    import petwisp.app as app_mod
 
     shell = _bare_shell(Config(base=tmp_path))
     monkeypatch.setattr(app_mod.sys, "frozen", False, raising=False)
@@ -449,8 +449,8 @@ def test_launch_settings_process_tells_child_the_running_topology(tmp_path, monk
     legacy，子宠页会把全部设置写进 ``config-slot-N.json``，而运行中的 overlay 主进程
     对非 per-slot 键只读主配置——"保存成功、实际无效"。
     """
-    import pet.app as app_mod
-    from pet import overlay_settings_command as cmd_mod
+    import petwisp.app as app_mod
+    from petwisp import overlay_settings_command as cmd_mod
 
     config = Config(base=tmp_path)
     assert config.save() is True
@@ -493,12 +493,12 @@ def test_spawn_settings_process_hands_environment_to_the_detached_child(
 
     out = tmp_path / "child-env.txt"
     environment = QProcessEnvironment.systemEnvironment()
-    environment.insert("DSH_PET_PARENT_TOPOLOGY", "overlay")
+    environment.insert("PETWISP_PARENT_TOPOLOGY", "overlay")
 
     script = (
         "import os, pathlib, sys;"
         "pathlib.Path(sys.argv[1]).write_text("
-        "os.environ.get('DSH_PET_PARENT_TOPOLOGY', 'MISSING'), encoding='utf-8')"
+        "os.environ.get('PETWISP_PARENT_TOPOLOGY', 'MISSING'), encoding='utf-8')"
     )
     started = AppShell._spawn_settings_process(
         sys.executable, ["-c", script, str(out)], str(tmp_path), environment)
@@ -585,8 +585,8 @@ def test_modern_settings_finished_delegates_to_shell_apply_chain(tmp_path):
 
 def test_standalone_preview_uses_local_channel(tmp_path, monkeypatch):
     """standalone 试听改走本地通道；进程内实例不挂 on_festival_now。"""
-    import pet.modern_settings_dialog as settings_mod
-    import pet.settings_standalone as standalone_mod
+    import petwisp.modern_settings_dialog as settings_mod
+    import petwisp.settings_standalone as standalone_mod
 
     _qapp()
     seen = []
@@ -610,8 +610,8 @@ def test_standalone_preview_uses_local_channel(tmp_path, monkeypatch):
 
 
 def test_frozen_standalone_missing_tts_points_to_app_update(tmp_path, monkeypatch):
-    import pet.settings_standalone as standalone_mod
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    import petwisp.settings_standalone as standalone_mod
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     _qapp()
     dialog = ModernSettingsDialog(Config(base=tmp_path), include_ai=False)
@@ -629,8 +629,8 @@ def test_frozen_standalone_missing_tts_points_to_app_update(tmp_path, monkeypatc
 
 def test_standalone_festival_preview_shows_notice_without_speech(tmp_path, monkeypatch):
     """节日试听本地演示：文案经宿主 system_notify 可见；语音默认关不触发合成。"""
-    import pet.settings_standalone as standalone_mod
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    import petwisp.settings_standalone as standalone_mod
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     _qapp()
     notices = []
@@ -649,7 +649,7 @@ def test_standalone_festival_preview_shows_notice_without_speech(tmp_path, monke
 
 def test_standalone_runtime_marker_drives_move_away(tmp_path):
     """无 parent 时按 runtime 状态文件避让桌宠位置。"""
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     _qapp()
     config = Config(base=tmp_path)
@@ -667,7 +667,7 @@ def test_standalone_runtime_marker_drives_move_away(tmp_path):
 
 def test_standalone_move_away_without_marker_does_not_crash(tmp_path):
     """读不到 runtime 状态文件时保持默认位置，不许崩。"""
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     _qapp()
     dialog = ModernSettingsDialog(Config(base=tmp_path), include_ai=False, standalone=True)
@@ -683,7 +683,7 @@ def test_standalone_move_away_without_marker_does_not_crash(tmp_path):
 
 def test_standalone_geometry_ignores_dead_process_markers(tmp_path):
     """死者留下的 runtime 标记不算桌宠位置（返回 None）。"""
-    import pet.settings_standalone as standalone_mod
+    import petwisp.settings_standalone as standalone_mod
 
     config = Config(base=tmp_path)
     config.dir.mkdir(parents=True, exist_ok=True)
@@ -721,12 +721,12 @@ def test_settings_process_isolation_survives_reload(tmp_path):
 
 
 def test_settings_standalone_module_does_not_import_heavy_modules():
-    """pet.settings_standalone 顶层不得 import voice chime service / pet.app。
+    """petwisp.settings_standalone 顶层不得 import voice chime service / petwisp.app。
 
     试听/节日服务必须留给点击时惰性 import，否则独立设置进程启动就白付
     edge-tts/QtMultimedia 的导入成本（违反"standalone 启动只许懒加载"）。
     """
-    path = Path(__file__).resolve().parents[1] / "pet" / "settings_standalone.py"
+    path = Path(__file__).resolve().parents[1] / "petwisp" / "settings_standalone.py"
     for lineno, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
         stripped = line.strip()
         if line[:1].isspace():
@@ -734,14 +734,14 @@ def test_settings_standalone_module_does_not_import_heavy_modules():
         if not (stripped.startswith("import ") or stripped.startswith("from ")):
             continue
         assert "chime_service" not in stripped, f"settings_standalone.py:{lineno} 顶层 import 回潮"
-        assert "pet.app" not in stripped, f"settings_standalone.py:{lineno} 顶层 import 回潮"
+        assert "petwisp.app" not in stripped, f"settings_standalone.py:{lineno} 顶层 import 回潮"
 
 
-# ------------------------------------------------- 7. D12「退出子肥鱼」指令分流
+# ------------------------------------------------- 7. D12「退出子宠」指令分流
 
 def _clear_dialog(config):
     """standalone 设置页（无 parent、无 PetWindow 回调面）= 独立设置进程形态。"""
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     _qapp()
     return ModernSettingsDialog(config, include_ai=False, standalone=True)
@@ -749,7 +749,7 @@ def _clear_dialog(config):
 
 def test_clear_spawned_pets_writes_overlay_command(tmp_path, monkeypatch):
     """overlay 拓扑：写指令文件（主进程消费），不再走 taskkill 回退。"""
-    from pet import overlay_settings_command as cmd
+    from petwisp import overlay_settings_command as cmd
 
     monkeypatch.setenv(cmd.ENV_TOPOLOGY, cmd.TOPOLOGY_OVERLAY)
     config = Config(base=tmp_path)
@@ -759,15 +759,15 @@ def test_clear_spawned_pets_writes_overlay_command(tmp_path, monkeypatch):
         command = cmd.read_command(config.dir)
         assert command is not None, "overlay 拓扑必须写下指令文件"
         assert command["command"] == cmd.CMD_EXIT_SPAWNED_PETS
-        assert command["target"] is None                # 主身份 = 全部子肥鱼
+        assert command["target"] is None                # 主身份 = 全部子宠
     finally:
         dialog.deleteLater()
         cmd.command_path(config.dir).unlink(missing_ok=True)
 
 
 def test_clear_spawned_pets_child_config_targets_its_slot(tmp_path, monkeypatch):
-    """子肥鱼的设置页（--instance slot-N）写下 target=slot-N：只退那一只。"""
-    from pet import overlay_settings_command as cmd
+    """子宠的设置页（--instance slot-N）写下 target=slot-N：只退那一只。"""
+    from petwisp import overlay_settings_command as cmd
 
     monkeypatch.setenv(cmd.ENV_TOPOLOGY, cmd.TOPOLOGY_OVERLAY)
     config = Config(base=tmp_path, instance_id="slot-2")
@@ -782,7 +782,7 @@ def test_clear_spawned_pets_child_config_targets_its_slot(tmp_path, monkeypatch)
 
 def test_clear_spawned_pets_legacy_also_uses_command_channel(tmp_path, monkeypatch):
     """4.4a：legacy 拓扑同样走 D12 指令通道（不再 taskkill 子进程）。"""
-    from pet import overlay_settings_command as cmd
+    from petwisp import overlay_settings_command as cmd
 
     monkeypatch.delenv(cmd.ENV_TOPOLOGY, raising=False)
     config = Config(base=tmp_path)
@@ -799,8 +799,8 @@ def test_clear_spawned_pets_legacy_also_uses_command_channel(tmp_path, monkeypat
 
 
 def test_clear_spawned_pets_legacy_child_config_targets_its_slot(tmp_path, monkeypatch):
-    """4.4a：legacy 子肥鱼设置页写 target=slot-N（只退那一只，不再静默早退）。"""
-    from pet import overlay_settings_command as cmd
+    """4.4a：legacy 子宠设置页写 target=slot-N（只退那一只，不再静默早退）。"""
+    from petwisp import overlay_settings_command as cmd
 
     monkeypatch.delenv(cmd.ENV_TOPOLOGY, raising=False)
     config = Config(base=tmp_path, instance_id="slot-1")
@@ -817,7 +817,7 @@ def test_clear_spawned_pets_parent_callback_still_wins(tmp_path, monkeypatch):
     """进程内设置页（有 PetWindow 回调）优先走回调，指令通道不碰。"""
     from types import SimpleNamespace
 
-    from pet import overlay_settings_command as cmd
+    from petwisp import overlay_settings_command as cmd
 
     monkeypatch.setenv(cmd.ENV_TOPOLOGY, cmd.TOPOLOGY_OVERLAY)
     config = Config(base=tmp_path)
@@ -837,7 +837,7 @@ def test_clear_spawned_pets_write_failure_is_not_fatal(tmp_path, monkeypatch, ca
     """指令写失败（只读盘/占位文件）：留日志、不抛、不误回退杀进程。"""
     import logging
 
-    from pet import overlay_settings_command as cmd
+    from petwisp import overlay_settings_command as cmd
 
     monkeypatch.setenv(cmd.ENV_TOPOLOGY, cmd.TOPOLOGY_OVERLAY)
     config = Config(base=tmp_path)
@@ -850,15 +850,15 @@ def test_clear_spawned_pets_write_failure_is_not_fatal(tmp_path, monkeypatch, ca
 
 
 def test_clear_spawned_pets_chain_consumed_by_overlay_shell(tmp_path, monkeypatch):
-    """全链：设置页写指令 → OverlayShell 消费 → 子肥鱼真的退出（无真进程）。"""
+    """全链：设置页写指令 → OverlayShell 消费 → 子宠真的退出（无真进程）。"""
     import tests.test_overlay_window_capabilities as cap
     import tests.test_sprite_menu_facade as fac
-    from pet import overlay_settings_command as cmd
-    from pet.overlay_shell import OverlayShell
-    from pet.pet_sprite import PetSprite
+    from petwisp import overlay_settings_command as cmd
+    from petwisp.overlay_shell import OverlayShell
+    from petwisp.pet_sprite import PetSprite
 
     monkeypatch.setenv(cmd.ENV_TOPOLOGY, cmd.TOPOLOGY_OVERLAY)
-    from pet.config import Config as RealConfig
+    from petwisp.config import Config as RealConfig
 
     config = RealConfig(base=tmp_path)
     instance = cap.CapInstance(config)

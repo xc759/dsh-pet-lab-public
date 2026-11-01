@@ -17,9 +17,9 @@ import time
 import pytest
 from PySide6.QtWidgets import QApplication
 
-from pet.chat.memory import ChatMemory, memory_path
-from pet.chat.memory_recall import is_archived
-from pet.chat.memory_extract import (
+from petwisp.chat.memory import ChatMemory, memory_path
+from petwisp.chat.memory_recall import is_archived
+from petwisp.chat.memory_extract import (
     EXTRACT_INTERVAL_SECONDS,
     parse_ops,
     schedule_extraction,
@@ -33,7 +33,7 @@ def _qapp():
 
 @pytest.fixture(autouse=True)
 def _clear_rate_limit():
-    from pet.chat import memory_extract
+    from petwisp.chat import memory_extract
 
     memory_extract._last_run.clear()
     yield
@@ -58,7 +58,7 @@ class _RecordingProvider:
 
 
 def _config(tmp_path, **overrides):
-    from pet.config import Config
+    from petwisp.config import Config
 
     config = Config(tmp_path)
     # 调度类用例测的是每轮语义：默认把频率闸放到 1（产品默认 5 由
@@ -106,7 +106,7 @@ def test_parse_ops_unknown_op_and_malformed_items_ignored():
 
 
 def test_parse_ops_caps_count_and_text_length():
-    from pet.chat.memory_extract import _MAX_OPS, _OP_TEXT_CHARS
+    from petwisp.chat.memory_extract import _MAX_OPS, _OP_TEXT_CHARS
 
     raw = "[" + ",".join('{"op":"ADD","text":"条目%d"}' % i for i in range(_MAX_OPS + 5)) + "]"
     assert len(parse_ops(raw)) == _MAX_OPS
@@ -248,7 +248,7 @@ def _schedule(tmp_path, config, provider, user_text="我不吃辣，晚上吃什
 
 
 def _provider_config():
-    from pet.chat.models import ProviderConfig
+    from petwisp.chat.models import ProviderConfig
 
     return ProviderConfig("test-provider")
 
@@ -272,7 +272,7 @@ def test_guard_rate_limit(tmp_path, monkeypatch):
     _join_extract_threads()
     assert len(provider.complete_calls) == 1
     # 拨快 monotonic 超过限频窗口：放行
-    from pet.chat import memory_extract
+    from petwisp.chat import memory_extract
 
     real = time.monotonic
     monkeypatch.setattr(memory_extract.time, "monotonic",
@@ -294,7 +294,7 @@ def test_guard_either_switch_off_sends_nothing(tmp_path, overrides):
 
 
 def test_guard_chat_module_inactive_sends_nothing(tmp_path):
-    from pet import feature_activation as fa
+    from petwisp import feature_activation as fa
 
     provider = _RecordingProvider('[{"op":"ADD","text":"我不吃辣"}]')
     fa.freeze_snapshot_for_tests(["weather", "todo"])  # 不含 chat
@@ -367,7 +367,7 @@ def test_extract_exception_never_raises(tmp_path, caplog):
 
 
 def test_service_finished_hook_exception_does_not_propagate():
-    from pet.chat.service import ChatService
+    from petwisp.chat.service import ChatService
 
     _qapp()
     service = ChatService()
@@ -410,8 +410,8 @@ def _pump_until(app, predicate, timeout=10.0):
 
 
 def _modern_window(tmp_path, pet=None, notifier=None):
-    from pet.config import Config
-    from pet.chat.widgets import ChatWindow
+    from petwisp.config import Config
+    from petwisp.chat.widgets import ChatWindow
 
     _qapp()
     cfg = Config(tmp_path)
@@ -500,7 +500,7 @@ def test_extraction_is_silent_no_bubble_no_notify(tmp_path):
 
 # ---------------------------------------------------------------- 提炼频率（每 N 轮）
 def _schedule_turns(config, path, *, user="我不吃辣，晚上吃什么好", reply="试试清汤锅"):
-    from pet.chat.memory_extract import schedule_extraction
+    from petwisp.chat.memory_extract import schedule_extraction
 
     return schedule_extraction(
         config=config, memory_path=path, user_text=user, reply_text=reply,
@@ -510,7 +510,7 @@ def _schedule_turns(config, path, *, user="我不吃辣，晚上吃什么好", r
 
 @pytest.fixture(autouse=True)
 def _reset_turn_counters():
-    from pet.chat import memory_extract as me
+    from petwisp.chat import memory_extract as me
 
     with me._last_run_lock:
         me._turn_count.clear()
@@ -524,7 +524,7 @@ def _reset_turn_counters():
 
 
 def test_extract_every_five_turns_by_default(tmp_path, monkeypatch):
-    from pet.chat import memory_extract as me
+    from petwisp.chat import memory_extract as me
 
     monkeypatch.setattr(me.time, "sleep", lambda *_: None)
     fired = []
@@ -541,7 +541,7 @@ def test_extract_every_five_turns_by_default(tmp_path, monkeypatch):
 
 
 def test_extract_every_turn_when_interval_is_one(tmp_path, monkeypatch):
-    from pet.chat import memory_extract as me
+    from petwisp.chat import memory_extract as me
 
     monkeypatch.setattr(me.threading, "Thread",
                         lambda **kw: type("T", (), {"start": lambda self: None})())
@@ -551,7 +551,7 @@ def test_extract_every_turn_when_interval_is_one(tmp_path, monkeypatch):
 
 
 def test_interval_invalid_falls_back_to_default(tmp_path):
-    from pet.chat.memory_extract import _extract_every_turns
+    from petwisp.chat.memory_extract import _extract_every_turns
 
     assert _extract_every_turns(_config(tmp_path / "c", chat_memory_extract_interval="abc")) == 5
     assert _extract_every_turns(_config(tmp_path / "a", chat_memory_extract_interval=0)) == 1
@@ -561,7 +561,7 @@ def test_interval_invalid_falls_back_to_default(tmp_path):
 def test_turns_before_the_gate_are_buffered_not_dropped(tmp_path, monkeypatch):
     """轮次闸放行前的轮次不丢：interval=2 时，第 1 轮的内容必须出现在第 2 轮
     触发的提炼入参里（修复前只提当轮、前 N-1 轮被静默丢弃——盲审应修 #2）。"""
-    from pet.chat import memory_extract as me
+    from petwisp.chat import memory_extract as me
 
     captured = []
     def fake_thread(**kw):
@@ -583,7 +583,7 @@ def test_turns_before_the_gate_are_buffered_not_dropped(tmp_path, monkeypatch):
 
 def test_transcript_total_budget_keeps_newest(tmp_path):
     """拼接整体超预算时左截留最新（老内容先丢）。"""
-    from pet.chat import memory_extract as me
+    from petwisp.chat import memory_extract as me
 
     turns = [(f"用户{i}" + "x" * 900, f"回复{i}" + "y" * 900) for i in range(5)]
     text = me._dialogue_transcript(turns)

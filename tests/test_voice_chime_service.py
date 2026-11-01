@@ -22,15 +22,15 @@ from pathlib import Path
 import pytest
 from PySide6.QtWidgets import QApplication
 
-from pet.config import Config
-from pet.voice_chime import (
+from petwisp.config import Config
+from petwisp.voice_chime import (
     DEFAULT_PITCH,
     DEFAULT_RATE,
     DEFAULT_VOICE,
     DEFAULT_VOLUME,
     cache_key,
 )
-from pet.voice.chime_service import AUX_PRECACHE_ROLE, VoiceChimeService, _cache_hit
+from petwisp.voice.chime_service import AUX_PRECACHE_ROLE, VoiceChimeService, _cache_hit
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -198,7 +198,7 @@ def _service(tmp_path, monkeypatch, *, tts_available=True):
     不够了：回退链上还有别的后端，而它们的可用性由各自的 ``availability()`` 判定，
     所以这里把所有 provider 的可用性一起钉死。
     """
-    import pet.voice.chime_service as svc_mod
+    import petwisp.voice.chime_service as svc_mod
 
     _qapp()  # 服务的无主 QTimer 需要在有事件分发器的线程里才起得来（产品同口径）
     _WorkerSpy.instances = []
@@ -287,7 +287,7 @@ def test_bubble_taken_by_alert_still_reaches_the_user(tmp_path, monkeypatch, cap
     app.win._speech_bubble = _AlertBubble()
     app.win.visible_content_rect = lambda: object()
 
-    with caplog.at_level(logging.WARNING, logger="pet.voice.chime_service"):
+    with caplog.at_level(logging.WARNING, logger="petwisp.voice.chime_service"):
         service._bubble("现在是上午九点整。")
 
     assert app.win.bubbles == [], "宿主让路（前置）"
@@ -372,7 +372,7 @@ def test_is_running_tracks_timer_state(tmp_path, monkeypatch):
 
 def _quiet():
     """进程级免打扰状态（唯一判据在 quiet_mode，本文件只驱动它）。"""
-    from pet import quiet_mode
+    from petwisp import quiet_mode
 
     return quiet_mode.shared_quiet_state()
 
@@ -485,7 +485,7 @@ def test_voice_comes_back_after_quiet_mode_ends(tmp_path, monkeypatch):
 
 def test_fullscreen_equivalent_quiet_silences_voice(tmp_path, monkeypatch):
     """全屏等效免打扰走同一道闸（不是手动免打扰专属）。"""
-    from pet import quiet_mode
+    from petwisp import quiet_mode
 
     service, app, _cfg = _service(tmp_path, monkeypatch)
     service.apply_config()
@@ -501,7 +501,7 @@ def test_fullscreen_equivalent_quiet_silences_voice(tmp_path, monkeypatch):
 
 def test_fullscreen_quiet_switched_off_by_config_plays(tmp_path, monkeypatch):
     """`quiet_also_on_fullscreen` 关掉时全屏不是免打扰 → 照常出声（判据同源，不各自读标志）。"""
-    from pet import quiet_mode
+    from petwisp import quiet_mode
 
     service, app, _cfg = _service(tmp_path, monkeypatch)
     service.apply_config()
@@ -542,7 +542,7 @@ def test_click_self_talk_speech_is_exempt_from_quiet_mode(tmp_path, monkeypatch)
 
 def test_chime_settings_hint_mentions_quiet_mode(tmp_path):
     """设置页说明同步：启用行必须写明免打扰期间不出声（否则用户以为功能坏了）。"""
-    from pet.voice.chime_settings import VoiceChimeSettingsPage
+    from petwisp.voice.chime_settings import VoiceChimeSettingsPage
 
     _qapp()
     page = VoiceChimeSettingsPage(Config(base=tmp_path))
@@ -560,7 +560,7 @@ def test_settings_page_opens_with_invalid_persisted_values(tmp_path):
     实测缺陷：__init__/refresh_from_config 用裸 int() 读 rate/pitch/volume，
     config.json 里出现 'abc' 就读不出页面 → 用户既改不回来也进不去设置。
     """
-    from pet.voice.chime_settings import VoiceChimeSettingsPage
+    from petwisp.voice.chime_settings import VoiceChimeSettingsPage
 
     _qapp()
     cfg = Config(base=tmp_path)
@@ -579,7 +579,7 @@ def test_settings_page_opens_with_invalid_persisted_values(tmp_path):
 
 def test_settings_page_round_trips_seven_keys_through_save_reload(tmp_path):
     """设置页 7 键写回 → 落盘 → 重新加载：值必须活下来（reload 白名单门禁）。"""
-    from pet.voice.chime_settings import VoiceChimeSettingsPage
+    from petwisp.voice.chime_settings import VoiceChimeSettingsPage
 
     _qapp()
     cfg = Config(base=tmp_path)
@@ -606,7 +606,7 @@ def test_settings_page_round_trips_seven_keys_through_save_reload(tmp_path):
 
 def test_settings_page_preview_writes_config_and_requests_preview(tmp_path):
     """「试听」先落配置再发信号（服务端按最新值合成），且不落盘。"""
-    from pet.voice.chime_settings import VoiceChimeSettingsPage
+    from petwisp.voice.chime_settings import VoiceChimeSettingsPage
 
     _qapp()
     cfg = Config(base=tmp_path)
@@ -624,8 +624,8 @@ def test_settings_page_preview_writes_config_and_requests_preview(tmp_path):
 
 def test_settings_page_hint_matches_wired_voice_helper(tmp_path):
     """音色提示必须是真接线：文案承诺「内置 20+ 款音色」，下拉里就得真能选到。"""
-    from pet.voice_chime import VOICE_OPTIONS
-    from pet.voice.chime_settings import VoiceChimeSettingsPage
+    from petwisp.voice_chime import VOICE_OPTIONS
+    from petwisp.voice.chime_settings import VoiceChimeSettingsPage
 
     _qapp()
     page = VoiceChimeSettingsPage(Config(base=tmp_path))
@@ -641,7 +641,7 @@ def test_settings_page_hint_matches_wired_voice_helper(tmp_path):
 
 def test_voice_chime_service_is_lazy_gated_by_config(tmp_path):
     """门控：关闭时不构造；开启后 sync 构造并运行；再关闭则停表并释放。"""
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     _qapp()
     cfg = Config(base=tmp_path)
@@ -666,7 +666,7 @@ def test_toggle_voice_chime_flips_config_and_syncs(tmp_path):
     默认关闭（2026-09-19 起）：初始无服务；第一次 toggle 开启并建服务，
     第二次 toggle 关闭并释放。
     """
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     _qapp()
     cfg = Config(base=tmp_path)
@@ -689,7 +689,7 @@ def test_audio_channel_survives_on_festival_speak_alone(tmp_path):
     节日语音复用报时服务作为进程内唯一音频通道；若通道随报时开关一起被释放，
     节日播报就会静默失效（有气泡没声音）——这是本功能最隐蔽的接线坑。
     """
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     _qapp()
     cfg = Config(base=tmp_path)
@@ -709,7 +709,7 @@ def test_audio_channel_survives_on_festival_speak_alone(tmp_path):
 
 def test_audio_channel_is_not_created_when_nobody_needs_it(tmp_path):
     """两个开关都关时不该白建通道（保持既有懒创建语义）。"""
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     _qapp()
     cfg = Config(base=tmp_path)
@@ -724,7 +724,7 @@ def test_audio_channel_is_not_created_when_nobody_needs_it(tmp_path):
 
 def test_appshell_injects_yield_hook_into_chime_service(tmp_path):
     """让位钩子必须在创建通道时注入——没注入就等于节日与报时会各说各的。"""
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     _qapp()
     cfg = Config(base=tmp_path)
@@ -741,7 +741,7 @@ def test_appshell_injects_yield_hook_into_chime_service(tmp_path):
 
 def test_window_callbacks_for_voice_chime_are_wired(tmp_path):
     """窗口回调接线：右键「立即报时」「关闭语音报时」两项动作可调用。"""
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     _qapp()
     cfg = Config(base=tmp_path)
@@ -784,8 +784,8 @@ def test_about_to_quit_stops_voice_chime_service(tmp_path, monkeypatch):
     可能在窗口析构后回 GUI 线程回放。
     """
     monkeypatch.setenv("PET_RENDER_TOPOLOGY", "legacy")  # PetWindow 路径测试
-    import pet.app as app_mod
-    from pet.app import AppShell
+    import petwisp.app as app_mod
+    from petwisp.app import AppShell
 
     _qapp()
     monkeypatch.setattr(app_mod.QTimer, "singleShot", lambda *a, **k: None)
@@ -1166,7 +1166,7 @@ def test_aux_precache_failure_leaves_the_chime_slot_intact(tmp_path, monkeypatch
     失败就把报时**已合成好**的缓存路径一起抹掉，到点 ``_consume_precache`` 只能回退
     即时合成（那一段语音晚 3-8 秒才响），日志里还写着"预合成失败"。
     """
-    from pet.voice.chime_service import EDGE_TTS_MISSING
+    from petwisp.voice.chime_service import EDGE_TTS_MISSING
 
     service, _app, cfg = _service(tmp_path, monkeypatch)
     cfg.set("voice_chime_enabled", True)
@@ -1512,7 +1512,7 @@ def test_stale_busy_release_drains_pending_speech(tmp_path, monkeypatch):
     """
     import time as _time
 
-    import pet.voice.chime_service as svc_mod
+    import petwisp.voice.chime_service as svc_mod
 
     service, _app, cfg = _service(tmp_path, monkeypatch)
     cfg.set("voice_chime_enabled", True)
@@ -1568,7 +1568,7 @@ def test_watchdog_runs_even_when_chime_is_disabled(tmp_path, monkeypatch):
     """
     import time as _time
 
-    import pet.voice.chime_service as svc_mod
+    import petwisp.voice.chime_service as svc_mod
 
     service, _app, cfg = _service(tmp_path, monkeypatch)
     service.apply_config()
@@ -1602,7 +1602,7 @@ def test_late_callback_of_superseded_synthesis_is_dropped(tmp_path, monkeypatch)
     """
     import time as _time
 
-    import pet.voice.chime_service as svc_mod
+    import petwisp.voice.chime_service as svc_mod
 
     service, _app, cfg = _service(tmp_path, monkeypatch)
     cfg.set("voice_chime_enabled", True)
@@ -1901,7 +1901,7 @@ def test_service_without_hook_behaves_exactly_as_before(tmp_path, monkeypatch):
 
 def _duet_shell(tmp_path):
     """建一个"报时每小时 + 节日 09:00 播报"的 AppShell，返回 (shell, chime, festival)。"""
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     _qapp()
     cfg = Config(base=tmp_path)
@@ -1983,8 +1983,8 @@ def test_service_module_top_level_does_not_import_edge_tts():
     """
     proc = _run_python(
         "import importlib.util, sys\n"
-        "import pet.voice.chime_service as svc\n"
-        "import pet.tts.edge as edge_mod\n"
+        "import petwisp.voice.chime_service as svc\n"
+        "import petwisp.tts.edge as edge_mod\n"
         "assert 'edge_tts' not in sys.modules, '模块顶层把 edge_tts import 进来了（白付 1.4s）'\n"
         "assert edge_mod._EDGE_TTS_AVAILABLE is (importlib.util.find_spec('edge_tts') is not None), "
         "'惰性探测结果必须与真实可导入性一致（否则会误报“请 pip install”）'\n"
@@ -1996,11 +1996,11 @@ def test_disabled_voice_chime_startup_does_not_import_edge_tts(tmp_path):
     """voice_chime_enabled=False 的启动路径：服务整个不 start，edge_tts 一次都不 import。
 
     两步走：**构造侧**在进程内判（确定：服务对象必须为 None）；**import 侧**在
-    子进程里判（理由见 `_run_python`）。子进程脚本刻意只 `import pet.app`——裸
+    子进程里判（理由见 `_run_python`）。子进程脚本刻意只 `import petwisp.app`——裸
     `python -c` 里没有 conftest 的弹窗桩，构造 AppShell 有卡在模态对话框的风险，
     而这条断言要的证据只是"import 链里没有 edge_tts"。
     """
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     cfg = Config(base=tmp_path)
     cfg.set("voice_chime_enabled", False)
@@ -2011,7 +2011,7 @@ def test_disabled_voice_chime_startup_does_not_import_edge_tts(tmp_path):
 
     proc = _run_python(
         "import sys\n"
-        "import pet.app\n"
+        "import petwisp.app\n"
         "assert 'edge_tts' not in sys.modules, '启动路径把 edge_tts import 进来了'\n"
     )
     assert proc.returncode == 0, proc.stdout + proc.stderr
@@ -2021,7 +2021,7 @@ def test_tts_worker_reports_missing_edge_tts_instead_of_raising(tmp_path, monkey
     """合成线程里 import edge_tts 失败：回调带回 EDGE_TTS_MISSING，不抛给调用方。"""
     import sys
 
-    import pet.voice.chime_service as svc_mod
+    import petwisp.voice.chime_service as svc_mod
 
     monkeypatch.setitem(sys.modules, "edge_tts", None)  # import edge_tts → ImportError
     seen: list = []
@@ -2046,7 +2046,7 @@ def test_tts_worker_reports_missing_edge_tts_instead_of_raising(tmp_path, monkey
 @pytest.mark.parametrize("frozen", [False, True])
 def test_service_bubbles_install_hint_when_edge_tts_import_fails(tmp_path, monkeypatch, frozen):
     """服务收到 EDGE_TTS_MISSING → 走既有「请 pip install edge-tts」降级文案。"""
-    import pet.voice.chime_service as svc_mod
+    import petwisp.voice.chime_service as svc_mod
 
     service, app, _cfg = _service(tmp_path, monkeypatch)
     import sys
@@ -2162,7 +2162,7 @@ def test_audio_channel_survives_on_self_talk_speak_alone(tmp_path):
     每只宠自己的 slot 视图（``AppShell._self_talk_speak_wanted``），主配置只是 slot0
     兜底。这条用例曾经把两个键写在主配置上，判据按每宠视图改过之后那条路已不存在。
     """
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     _qapp()
     cfg = Config(base=tmp_path)
@@ -2183,7 +2183,7 @@ def test_audio_channel_survives_on_self_talk_speak_alone(tmp_path):
 
 def test_audio_channel_not_created_for_self_talk_speak_alone(tmp_path):
     """只想朗读、但点击自言自语本身没开时不该白建通道（懒创建语义不变）。"""
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     _qapp()
     cfg = Config(base=tmp_path)
@@ -2202,7 +2202,7 @@ def test_audio_channel_survives_on_divination_speak_alone(tmp_path):
     与节日语音、点击朗读同族：通道随报时开关一起被释放，抽签语音就变成「有气泡没
     声音」——这正是产品阻断①暴露的那条生命周期缺口。
     """
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     _qapp()
     cfg = Config(base=tmp_path)
@@ -2237,8 +2237,8 @@ def test_divination_speak_uses_the_user_backend_on_a_lazily_created_channel(tmp_
     """
     import datetime as _dt
 
-    import pet.voice.chime_service as svc_mod
-    from pet.app import AppShell
+    import petwisp.voice.chime_service as svc_mod
+    from petwisp.app import AppShell
 
     _qapp()
     cfg = Config(base=tmp_path)
@@ -2325,7 +2325,7 @@ def _recording_channel(played: list, spoken: list, *, play_ok: bool = True):
 
 def test_speak_self_talk_prefers_precached_file(tmp_path, monkeypatch):
     """预缓存命中 → 直接播本地文件：零延迟、断网也能说。"""
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     _qapp()
     cfg = Config(base=tmp_path)
@@ -2345,7 +2345,7 @@ def test_speak_self_talk_prefers_precached_file(tmp_path, monkeypatch):
 
 def test_speak_self_talk_ignores_empty_cache_file(tmp_path, monkeypatch):
     """0 字节缓存不算命中：宁可回落在线合成出声，也不要播静音。"""
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     _qapp()
     cfg = Config(base=tmp_path)
@@ -2365,7 +2365,7 @@ def test_speak_self_talk_ignores_empty_cache_file(tmp_path, monkeypatch):
 
 def test_speak_self_talk_falls_back_to_synthesis_without_cache(tmp_path, monkeypatch):
     """没有预缓存文件时（例如主人新加的台词）仍走在线合成。"""
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     _qapp()
     cfg = Config(base=tmp_path)
@@ -2383,7 +2383,7 @@ def test_speak_self_talk_falls_back_to_synthesis_without_cache(tmp_path, monkeyp
 
 def test_speak_self_talk_falls_back_when_local_playback_fails(tmp_path, monkeypatch):
     """本地文件播不出来（通道忙/解码失败）时，这句话不能就此丢掉。"""
-    from pet.app import AppShell
+    from petwisp.app import AppShell
 
     _qapp()
     cfg = Config(base=tmp_path)
@@ -2583,7 +2583,7 @@ def test_fullscreen_quiet_cut_follows_config(tmp_path, monkeypatch):
     全屏这条边沿只有一个来源（既有全屏 watcher → ``quiet_mode.note_fullscreen``），
     服务必须跟着它走；配置关掉时全屏不是免打扰，同样不许切。
     """
-    from pet import quiet_mode
+    from petwisp import quiet_mode
 
     service, app, _cfg = _service(tmp_path, monkeypatch)
     service.apply_config()
@@ -2618,8 +2618,8 @@ def test_precache_worker_uses_resolved_voice(tmp_path, monkeypatch):
     这一处曾经传配置原值：音色下架时预合成会拿一把在线表里不存在的嗓子白试两轮
     （产物还落到另一个 key 上），并正好踩进 45s 超时自愈的竞态。
     """
-    import pet.tts.edge as edge_mod
-    import pet.voice.chime_service as svc_mod
+    import petwisp.tts.edge as edge_mod
+    import petwisp.voice.chime_service as svc_mod
 
     service, _app, cfg = _service(tmp_path, monkeypatch)
     # 在线表里只剩默认音色 → 配置的这把嗓子被判"已被下架"
@@ -2663,7 +2663,7 @@ def test_manual_channel_arms_unlock_watchdog(tmp_path, monkeypatch):
     """
     import time as _time
 
-    import pet.voice.chime_service as svc_mod
+    import petwisp.voice.chime_service as svc_mod
 
     service, _app, _cfg = _service(tmp_path, monkeypatch)
     service.apply_config()
@@ -2702,7 +2702,7 @@ def test_start_sweeps_orphan_temp_files(tmp_path, monkeypatch):
     留下半截文件；改成临时文件 + 原子换名之后，半截产物只可能叫 ``*.part``，于是按
     名字模式直接删——不按修改时间猜。在跑的合成（在册）不受影响。
     """
-    import pet.voice.chime_service as svc_mod
+    import petwisp.voice.chime_service as svc_mod
 
     service, _app, _cfg = _service(tmp_path, monkeypatch)
     sweep_dir = service._cache_dir / "sweep"
@@ -2752,7 +2752,7 @@ def test_early_unlock_timer_fire_rearms_for_the_remaining_time(tmp_path, monkeyp
     """
     import time as _time
 
-    import pet.voice.chime_service as svc_mod
+    import petwisp.voice.chime_service as svc_mod
 
     service, _app, _cfg = _service(tmp_path, monkeypatch)
     service._busy = True
@@ -2779,7 +2779,7 @@ def test_rearm_does_not_shrink_the_interval_for_the_next_synthesis(tmp_path, mon
     """重布留下的短间隔不许被下一次起合成沿用（否则表会越来越早空响）。"""
     import time as _time
 
-    import pet.voice.chime_service as svc_mod
+    import petwisp.voice.chime_service as svc_mod
 
     service, _app, _cfg = _service(tmp_path, monkeypatch)
     timeout_ms = int(svc_mod._SYNTH_TIMEOUT_S * 1000)
@@ -2808,7 +2808,7 @@ def _isolated_quiet(monkeypatch):
     而 ``reset_shared_quiet_state()`` 只复位状态、**不动监听表**（监听表是订阅方的
     责任）。用私有实例既让本组用例能断言订阅表，也不给共享表添残留。
     """
-    from pet import quiet_mode
+    from petwisp import quiet_mode
 
     state = quiet_mode.QuietState()
     monkeypatch.setattr(quiet_mode, "shared_quiet_state", lambda: state)
@@ -3153,7 +3153,7 @@ def test_publish_retries_transient_replace_conflicts(tmp_path, monkeypatch):
     """
     import os as _os
 
-    import pet.voice.chime_service as svc_mod
+    import petwisp.voice.chime_service as svc_mod
 
     temp = tmp_path / "chime.part"
     temp.write_bytes(b"audio-bytes")
@@ -3183,7 +3183,7 @@ def test_publish_gives_up_after_retry_budget_and_keeps_failure_path(tmp_path, mo
     """
     import os as _os
 
-    import pet.voice.chime_service as svc_mod
+    import petwisp.voice.chime_service as svc_mod
 
     results: list[tuple[str, str, str]] = []
     out_path = tmp_path / "chime.mp3"
@@ -3238,7 +3238,7 @@ def test_synthesis_outcome_settles_watchdog_and_keeps_play_watch(
     """
     import time as _time
 
-    import pet.voice.chime_service as svc_mod
+    import petwisp.voice.chime_service as svc_mod
 
     service, _app, cfg = _service(tmp_path, monkeypatch)
     service.apply_config()
@@ -3283,7 +3283,7 @@ def test_play_watch_still_heals_after_a_synthesis_outcome(tmp_path, monkeypatch)
     """
     import time as _time
 
-    import pet.voice.chime_service as svc_mod
+    import petwisp.voice.chime_service as svc_mod
 
     service, _app, cfg = _service(tmp_path, monkeypatch)
     service.apply_config()
@@ -3332,7 +3332,7 @@ def test_play_pending_cap_heals_a_player_stuck_in_loading(tmp_path, monkeypatch)
     except ImportError:  # pragma: no cover - 缺系统库的 Linux CI 上跳过而非红
         pytest.skip("QtMultimedia 不可用")
 
-    import pet.voice.chime_service as svc_mod
+    import petwisp.voice.chime_service as svc_mod
 
     service, _app, cfg = _service(tmp_path, monkeypatch)
     service.apply_config()
@@ -3399,7 +3399,7 @@ def test_play_pending_cap_does_not_touch_a_genuinely_playing_segment(tmp_path, m
     except ImportError:  # pragma: no cover - 缺系统库的 Linux CI 上跳过而非红
         pytest.skip("QtMultimedia 不可用")
 
-    import pet.voice.chime_service as svc_mod
+    import petwisp.voice.chime_service as svc_mod
 
     service, _app, cfg = _service(tmp_path, monkeypatch)
     service.apply_config()
@@ -3504,9 +3504,9 @@ def test_disabled_lazy_created_channel_is_released_on_sync(tmp_path, monkeypatch
     else 分支加上 ``is_running()`` 之类的条件，未启动的懒创建服务就会只被丢引用、
     不被 stop（QTimer / QMediaPlayer / quiet 监听白挂着）。
     """
-    from pet.app import AppShell
-    from pet import quiet_mode
-    import pet.voice.chime_service as svc_mod
+    from petwisp.app import AppShell
+    from petwisp import quiet_mode
+    import petwisp.voice.chime_service as svc_mod
 
     _qapp()
     cfg = Config(base=tmp_path)
@@ -3543,8 +3543,8 @@ def test_constructor_detaches_quiet_listener_when_attach_fails(tmp_path, monkeyp
     回调——那个对象不会被任何人 ``stop()``，回调永远悬着。防护：attach 抛异常时
     best-effort detach 再原样上抛（异常照旧上报，不吞）。
     """
-    from pet import quiet_mode
-    from pet.voice.chime_service import VoiceChimeService
+    from petwisp import quiet_mode
+    from petwisp.voice.chime_service import VoiceChimeService
 
     _qapp()
     state = quiet_mode.QuietState()
@@ -3607,7 +3607,7 @@ def test_resolve_edge_tts_proxy_reads_system_proxy(monkeypatch):
 
     代理解析随 edge 后端搬进 provider（``pet/tts/edge.py``），语义一字不变。
     """
-    from pet.tts import edge as edge_provider
+    from petwisp.tts import edge as edge_provider
 
     monkeypatch.setattr("urllib.request.getproxies",
                         lambda: {"https": "http://127.0.0.1:7890", "http": "http://127.0.0.1:7890"})
@@ -3630,7 +3630,7 @@ def test_synthesize_passes_proxy_to_communicate(monkeypatch, tmp_path):
     import asyncio
     import types
 
-    from pet.tts import edge as edge_provider
+    from petwisp.tts import edge as edge_provider
 
     captured: dict = {}
 

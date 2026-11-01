@@ -33,7 +33,7 @@ from PySide6.QtGui import QMouseEvent
 from PySide6.QtWidgets import QApplication, QWidget
 
 import tests.test_sprite_menu_facade as fac
-from pet.sprite_bubble import SpriteBubbleFollower, sprite_anchor_rect_global
+from petwisp.sprite_bubble import SpriteBubbleFollower, sprite_anchor_rect_global
 
 app = QApplication.instance() or QApplication([])
 

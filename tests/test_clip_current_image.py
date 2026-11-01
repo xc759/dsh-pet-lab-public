@@ -18,7 +18,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor, QImage, QPixmap
 from PySide6.QtWidgets import QApplication
 
-from pet.library import GifClip, clip_current_image
+from petwisp.library import GifClip, clip_current_image
 
 # 1x1 不透明黑 GIF89a（无 GCE 透明表）：QMovie 可确定性加载，不依赖外部素材。
 _MIN_GIF = (b'GIF89a\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\xff\xff\xff'

@@ -11,8 +11,8 @@ def _slot0_config(tmp_path):
     每宠键（气泡文字大小、气泡方案…）的真值在 ``config-slot-0.json``：裸全局
     ``Config.set/save`` 出闸时会过滤掉它们，改不动任何一只宠。
     """
-    from pet.config import Config
-    from pet.settings_slot_config import route_settings_config
+    from petwisp.config import Config
+    from petwisp.settings_slot_config import route_settings_config
 
     return route_settings_config(Config(base=tmp_path, instance_id="slot-0"))
 
@@ -20,9 +20,9 @@ def _slot0_config(tmp_path):
 def test_modern_message_card_opacity_is_configurable_and_persisted(tmp_path, monkeypatch):
     from PySide6.QtWidgets import QApplication
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.chat.themes import build_modern_custom_overlay_qss
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.chat.themes import build_modern_custom_overlay_qss
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -55,8 +55,8 @@ def test_modern_chat_header_uses_current_pet_image(tmp_path):
     from PySide6.QtGui import QPixmap
     from PySide6.QtWidgets import QApplication
 
-    from pet.chat.widgets import ChatWindow
-    from pet.config import Config
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     avatar = QPixmap(24, 24)
@@ -78,8 +78,8 @@ def test_bubble_text_scale_row_persists(tmp_path, monkeypatch):
     """「气泡文字大小」设置行：默认 100%，改值保存并持久化，越界被配置清洗钳位。"""
     from PySide6.QtWidgets import QApplication
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -106,8 +106,8 @@ def test_harness_autostart_toggle_persisted(tmp_path, monkeypatch):
     """「随桌宠启动 dsh 服务」开关：默认关，开启后保存并持久化。"""
     from PySide6.QtWidgets import QApplication
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -141,8 +141,8 @@ def test_harness_autostart_hint_has_no_markdown_and_names_the_real_stop_gate(tmp
     """
     from PySide6.QtWidgets import QApplication
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -264,8 +264,8 @@ def test_harness_target_desktop_disabled_and_never_saved_on_unsupported_platform
     """
     from PySide6.QtWidgets import QApplication
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -301,8 +301,8 @@ def test_harness_target_desktop_selectable_on_supported_platform(tmp_path, monke
     """对照（Windows）：桌面端项可选可存，说明里不出现「暂不支持」（别把门焊死）。"""
     from PySide6.QtWidgets import QApplication
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -330,8 +330,8 @@ def test_harness_target_offers_service_item_and_auto_says_headless(tmp_path, mon
     """
     from PySide6.QtWidgets import QApplication
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -371,7 +371,7 @@ def test_harness_target_hint_helper_keeps_both_platform_copies_verbatim():
     共用首句与末句，差别只在桌面端能不能自动拉起——本用例逐字钉住，搬迁不许
     顺手改字（改字会同时骗过「暂不支持」的存在性断言）。
     """
-    from pet.settings_pet_controls import (
+    from petwisp.settings_pet_controls import (
         HARNESS_TARGET_HINT_DESKTOP,
         HARNESS_TARGET_HINT_UNSUPPORTED,
         harness_target_hint,
@@ -402,9 +402,9 @@ def test_harness_target_row_hint_is_the_helper_output(tmp_path, monkeypatch, des
     """
     from PySide6.QtWidgets import QApplication
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
-    from pet.settings_pet_controls import harness_target_hint
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
+    from petwisp.settings_pet_controls import harness_target_hint
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -432,8 +432,8 @@ def test_harness_target_select_width_fits_its_longest_item(tmp_path, monkeypatch
     """
     from PySide6.QtWidgets import QApplication
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -451,8 +451,8 @@ def test_harness_target_select_width_fits_its_longest_item(tmp_path, monkeypatch
 def test_click_sound_path_is_linked_to_enable_toggle_and_persisted(tmp_path, monkeypatch):
     from PySide6.QtWidgets import QApplication
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -474,7 +474,7 @@ def test_click_sound_path_is_linked_to_enable_toggle_and_persisted(tmp_path, mon
 
     # #271：空身份会话按 slot0 分流，音效包是每宠键——真值在 config-slot-0.json，
     # 传入的空身份对象读的是主配置，从档案读回。
-    from pet import pet_profiles
+    from petwisp import pet_profiles
 
     assert pet_profiles.read_slot_profile(config.dir, 0).value("click_sound_pack") == {
         "kind": "file", "id": "custom", "path": "/tmp/my-click.wav"}
@@ -485,10 +485,10 @@ def test_click_sound_path_is_linked_to_enable_toggle_and_persisted(tmp_path, mon
 def test_click_sound_path_row_hidden_initially_when_toggle_disabled(tmp_path, monkeypatch):
     """点击音效未启用时，音效包行初始就应隐藏（此前初始同步在 UI 构建前，
     findChild 找不到行导致初始状态错误显示）。"""
-    import pet.modern_settings_dialog as settings_mod
+    import petwisp.modern_settings_dialog as settings_mod
     from PySide6.QtWidgets import QApplication
 
-    from pet.config import Config
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -503,7 +503,7 @@ def test_click_sound_path_row_hidden_initially_when_toggle_disabled(tmp_path, mo
     # #271：空身份会话按 slot0 分流，每宠键的真值在 config-slot-0.json——
     # 内存预置对话框读不到，必须落盘（先建主配置/落种档案，再写该槽偏好）。
     config.save()
-    from pet import pet_profiles
+    from petwisp import pet_profiles
 
     assert pet_profiles.write_profile_settings(
         config.dir, 0, {"click_sound_enabled": False}).ok
@@ -521,10 +521,10 @@ def test_click_sound_path_row_hidden_initially_when_toggle_disabled(tmp_path, mo
 def test_click_sound_path_row_sits_directly_below_toggle(tmp_path, monkeypatch):
     """音效包行必须紧贴点击音效行下方（此前 click_balance 插入 index 1 把
     音效包行挤到第三位）；2026-09-17 定稿口径下这两行仍在「互动 · 点击反馈」。"""
-    import pet.modern_settings_dialog as settings_mod
+    import petwisp.modern_settings_dialog as settings_mod
     from PySide6.QtWidgets import QApplication, QLabel
 
-    from pet.config import Config
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -546,11 +546,11 @@ def test_click_sound_path_row_sits_directly_below_toggle(tmp_path, monkeypatch):
 
 def test_settings_dialog_position_avoids_pet_window(tmp_path, monkeypatch):
     """设置窗口激活时不应遮挡桌宠：打开时移动到不与桌宠相交的位置。"""
-    import pet.modern_settings_dialog as settings_mod
+    import petwisp.modern_settings_dialog as settings_mod
     from PySide6.QtCore import QRect
     from PySide6.QtWidgets import QApplication, QWidget
 
-    from pet.config import Config
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -575,11 +575,11 @@ def test_settings_dialog_position_avoids_pet_window(tmp_path, monkeypatch):
 
 def test_menu_font_select_lists_system_fonts(tmp_path, monkeypatch):
     """UI 字体设置项应枚举系统可用字体，而不是硬编码少数几个。"""
-    import pet.modern_settings_dialog as settings_mod
+    import petwisp.modern_settings_dialog as settings_mod
     from PySide6.QtGui import QFontDatabase
     from PySide6.QtWidgets import QApplication
 
-    from pet.config import Config
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -609,8 +609,8 @@ def test_settings_first_paint_does_not_enumerate_system_fonts(tmp_path, monkeypa
     """系统字体枚举可能在 Windows 阻塞数秒，只能在用户展开字体选择器时执行。"""
     from PySide6.QtWidgets import QApplication
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     calls = []
@@ -636,8 +636,8 @@ def test_settings_first_paint_does_not_enumerate_system_fonts(tmp_path, monkeypa
 def test_settings_save_preserves_custom_font_before_selector_is_opened(tmp_path, monkeypatch):
     from PySide6.QtWidgets import QApplication
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -661,8 +661,8 @@ def test_settings_save_preserves_custom_font_before_selector_is_opened(tmp_path,
 def test_modern_select_reuses_one_popup_without_accumulating_children(tmp_path, monkeypatch):
     from PySide6.QtWidgets import QApplication, QMenu
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -688,10 +688,10 @@ def test_dock_icon_row_platform_gated(tmp_path, monkeypatch):
     """「显示 Dock 图标」是 macOS 专属选项，其他平台不应显示。"""
     import sys
 
-    import pet.modern_settings_dialog as settings_mod
+    import petwisp.modern_settings_dialog as settings_mod
     from PySide6.QtWidgets import QApplication
 
-    from pet.config import Config
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -715,8 +715,8 @@ def test_new_session_title_converts_utc_creation_time_to_local(monkeypatch):
     import os
     import time
 
-    from pet.chat.models import ChatSession
-    from pet.chat.widgets import _short_title
+    from petwisp.chat.models import ChatSession
+    from petwisp.chat.widgets import _short_title
 
     previous_tz = os.environ.get("TZ")
     monkeypatch.setenv("TZ", "Asia/Shanghai")
@@ -741,8 +741,8 @@ def test_chat_window_left_edge_drag_resizes(tmp_path):
     from PySide6.QtGui import QMouseEvent
     from PySide6.QtWidgets import QApplication
 
-    from pet.chat.widgets import ChatWindow
-    from pet.config import Config
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     win = ChatWindow(Config(tmp_path), "demo")
@@ -780,8 +780,8 @@ def test_chat_window_edge_resize_clamps_position_with_size(tmp_path):
     from PySide6.QtGui import QMouseEvent
     from PySide6.QtWidgets import QApplication
 
-    from pet.chat.widgets import ChatWindow
-    from pet.config import Config
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     win = ChatWindow(Config(tmp_path), "demo")
@@ -837,8 +837,8 @@ def test_chat_window_edge_hover_shows_resize_cursor(tmp_path):
     from PySide6.QtGui import QHoverEvent
     from PySide6.QtWidgets import QApplication
 
-    from pet.chat.widgets import ChatWindow
-    from pet.config import Config
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     win = ChatWindow(Config(tmp_path), "demo")
@@ -871,8 +871,8 @@ def test_ojingjing_entry_hover_survives_widget_children(monkeypatch):
     from PySide6.QtGui import QMouseEvent
     from PySide6.QtWidgets import QApplication, QMenu
 
-    import pet.context_menus.fun_entry as fun_entry
-    from pet.context_menus.fun_entry import OjingjingMenuEntry
+    import petwisp.context_menus.fun_entry as fun_entry
+    from petwisp.context_menus.fun_entry import OjingjingMenuEntry
 
     app = QApplication.instance() or QApplication([])
     menu = QMenu()
@@ -917,7 +917,7 @@ def test_windows_ojingjing_children_do_not_intercept_hover():
     from PySide6.QtCore import Qt
     from PySide6.QtWidgets import QApplication, QMenu, QWidget
 
-    from pet.context_menus.fun_entry import OjingjingMenuEntry
+    from petwisp.context_menus.fun_entry import OjingjingMenuEntry
 
     app = QApplication.instance() or QApplication([])
     menu = QMenu()
@@ -950,12 +950,12 @@ def test_macos_hide_pet_respects_dock_icon_hidden_preference(tmp_path, monkeypat
 
     from PySide6.QtWidgets import QWidget
 
-    import pet.app
-    from pet.config import Config
-    from pet.window import PetWindow
+    import petwisp.app
+    from petwisp.config import Config
+    from petwisp.window import PetWindow
 
     monkeypatch.setattr(sys, "platform", "darwin")
-    monkeypatch.setattr(pet.app, "_mac_set_dock_icon_visible", mock.Mock())
+    monkeypatch.setattr(petwisp.app, "_mac_set_dock_icon_visible", mock.Mock())
 
     for pref in (False, True):
         with mock.patch.object(QWidget, "hide") as mock_hide:
@@ -965,14 +965,14 @@ def test_macos_hide_pet_respects_dock_icon_hidden_preference(tmp_path, monkeypat
             PetWindow.hide(win, notify=False)
             mock_hide.assert_called_once()
             assert win.cfg.get("show_dock_icon") is pref
-            pet.app._mac_set_dock_icon_visible.assert_not_called()
+            petwisp.app._mac_set_dock_icon_visible.assert_not_called()
 
 
 def test_windows_settings_has_no_orphan_macos_dock_toggle(tmp_path, monkeypatch):
     from PySide6.QtWidgets import QApplication
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.sys, "platform", "win32")
@@ -1002,8 +1002,8 @@ def test_windows_settings_has_no_orphan_macos_dock_toggle(tmp_path, monkeypatch)
 def test_linux_settings_has_no_orphan_windows_cursor_passthrough_toggle(tmp_path, monkeypatch):
     from PySide6.QtWidgets import QApplication
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.sys, "platform", "linux")
@@ -1029,8 +1029,8 @@ def test_hide_pet_notifies_and_dock_click_restores(tmp_path, monkeypatch):
     from PySide6.QtCore import Qt
     from PySide6.QtWidgets import QApplication, QWidget
 
-    import pet.window as window_mod
-    from pet.config import Config
+    import petwisp.window as window_mod
+    from petwisp.config import Config
 
     monkeypatch.setattr(sys, "platform", "darwin")
     app = QApplication.instance() or QApplication([])
@@ -1068,8 +1068,8 @@ def test_hide_pet_internal_replacement_skips_notify(tmp_path, monkeypatch):
     from PySide6.QtCore import Qt
     from PySide6.QtWidgets import QApplication, QWidget
 
-    import pet.window as window_mod
-    from pet.config import Config
+    import petwisp.window as window_mod
+    from petwisp.config import Config
 
     monkeypatch.setattr(sys, "platform", "darwin")
     app = QApplication.instance() or QApplication([])
@@ -1098,7 +1098,7 @@ def test_animation_icon_applier_updates_action_and_cleans_worker():
     from PySide6.QtGui import QImage
     from PySide6.QtWidgets import QApplication, QMenu
 
-    from pet.context_menus.shared import _AnimationIconApplier
+    from petwisp.context_menus.shared import _AnimationIconApplier
 
     app = QApplication.instance() or QApplication([])
     menu = QMenu()
@@ -1155,7 +1155,7 @@ def test_build_scripts_bundle_menu_templates_and_chat_styles():
         assert "modern_styles.qss" in text, f"{name} 必须打包 modern_styles.qss"
     # 兜底：默认菜单布局 JSON 必须能按资源方式读出来（右键菜单的唯一布局来源；
     # 旧版菜单退役后 pet/menu_templates 下只剩它）
-    from pet.menu_layout import load_default_menu_layout
+    from petwisp.menu_layout import load_default_menu_layout
     assert load_default_menu_layout()["layout_id"] == "modern-default-v1"
 
 
@@ -1165,7 +1165,7 @@ def test_store_fun_asset_keeps_bundled_paths_relative(tmp_path):
     回归背景：设置对话框把默认相对路径固化成安装目录绝对路径，目录移动/
     自更新后彩蛋弹窗失效。
     """
-    from pet.fun_image_popup import bundled_assets_root, store_fun_asset
+    from petwisp.fun_image_popup import bundled_assets_root, store_fun_asset
 
     default = bundled_assets_root() / "big_blue_fat_fish" / "ojingjing.jpg"
     # 绝对路径指向内置 assets → 归一化为相对值
@@ -1184,7 +1184,7 @@ def test_store_fun_asset_keeps_bundled_paths_relative(tmp_path):
 
 def test_popup_image_paths_survives_missing_directory(tmp_path):
     """彩蛋图片目录不存在时回退默认彩蛋池（而非抛异常或空列表）。"""
-    from pet.fun_image_popup import popup_image_paths
+    from petwisp.fun_image_popup import popup_image_paths
 
     paths = popup_image_paths(tmp_path / "does-not-exist")
     assert paths, "缺失目录应回退默认彩蛋图片池"
@@ -1193,8 +1193,8 @@ def test_popup_image_paths_survives_missing_directory(tmp_path):
 
 def test_config_normalizes_polluted_absolute_easter_egg_paths(tmp_path):
     """旧配置里已固化的内置资产绝对路径在加载时归一化回相对值。"""
-    from pet.fun_image_popup import bundled_assets_root
-    from pet.config import Config
+    from petwisp.fun_image_popup import bundled_assets_root
+    from petwisp.config import Config
 
     bundled = bundled_assets_root()
     (tmp_path / "config.json").write_text(
@@ -1220,8 +1220,8 @@ def test_easter_egg_activate_defers_until_menu_closes():
 
     from PySide6.QtWidgets import QApplication, QMenu
 
-    import pet.context_menus.fun_entry as fun_entry_mod
-    from pet.context_menus.fun_entry import OjingjingMenuEntry
+    import petwisp.context_menus.fun_entry as fun_entry_mod
+    from petwisp.context_menus.fun_entry import OjingjingMenuEntry
 
     app = QApplication.instance() or QApplication([])
     menu = QMenu()
@@ -1258,8 +1258,8 @@ def test_modern_settings_save_writes_autostart_wanted(tmp_path, monkeypatch):
     """新版设置保存必须记录 autostart_wanted（启动自检提醒依赖它）。"""
     from PySide6.QtWidgets import QApplication
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -1292,10 +1292,10 @@ def test_menu_autostart_persists_wanted_flag(tmp_path, monkeypatch):
 
     from PySide6.QtWidgets import QApplication, QMenu
 
-    import pet.context_menus.shared as shared_mod
+    import petwisp.context_menus.shared as shared_mod
     import tests.test_context_menu_lifecycle as lc
-    from pet.config import Config
-    from pet.context_menu import populate_context_menu
+    from petwisp.config import Config
+    from petwisp.context_menu import populate_context_menu
 
     app = QApplication.instance() or QApplication([])
     applied: list[bool] = []
@@ -1327,8 +1327,8 @@ def test_modern_provisional_config_falls_back_to_keyring(tmp_path, monkeypatch):
     """测试连接未填 Key 时必须回退系统钥匙串，否则默认场景误报 401。"""
     from PySide6.QtWidgets import QApplication
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -1356,7 +1356,7 @@ def _answer_save_failure(monkeypatch, seen: list, *, discard: bool = False) -> N
     ``tests/test_harness_lifecycle.py::test_confirm_dialog_text_names_pid_and_port``）。
     承载"用户看得见什么"的是 ``text`` / ``info``——标题只在 Windows/Linux 上读得到。
     """
-    from pet import settings_close_flow
+    from petwisp import settings_close_flow
 
     def answer(parent, failure):
         box, _keep, discard_button = settings_close_flow.build_save_failure_box(parent, failure)
@@ -1378,8 +1378,8 @@ def test_modern_settings_close_autosaves(tmp_path, monkeypatch):
     """
     from PySide6.QtWidgets import QApplication
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -1414,8 +1414,8 @@ def test_modern_settings_escape_keeps_the_dialog_open_when_save_fails(tmp_path, 
     from PySide6.QtTest import QTest
     from PySide6.QtWidgets import QApplication
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -1453,8 +1453,8 @@ def test_modern_settings_escape_closes_when_save_succeeds(tmp_path, monkeypatch)
     from PySide6.QtTest import QTest
     from PySide6.QtWidgets import QApplication, QDialog
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -1471,7 +1471,7 @@ def test_modern_settings_escape_closes_when_save_succeeds(tmp_path, monkeypatch)
 
     assert finished == [int(QDialog.DialogCode.Rejected)], "保存成功时 Esc 必须关窗"
     # #271：气泡样式是每宠键——真值在 config-slot-0.json，从档案读回。
-    from pet import pet_profiles
+    from petwisp import pet_profiles
 
     assert pet_profiles.read_slot_profile(config.dir, 0).value(
         "self_talk_bubble_style") == "breath_bubble", "关窗前必须落盘"
@@ -1479,13 +1479,13 @@ def test_modern_settings_escape_closes_when_save_succeeds(tmp_path, monkeypatch)
 
 def test_settings_stylesheet_has_dark_overrides(monkeypatch):
     """深色系统下新版设置必须追加深色覆盖段（白底白字不可读问题）。"""
-    from pet.modern_settings_dialog import _settings_stylesheet
+    from petwisp.modern_settings_dialog import _settings_stylesheet
 
-    monkeypatch.setattr("pet.settings_theme_qss._system_dark", lambda: True)
+    monkeypatch.setattr("petwisp.settings_theme_qss._system_dark", lambda: True)
     qss = _settings_stylesheet()
     assert "background: #202024" in qss
     assert "color: #e4e4e9" in qss
-    monkeypatch.setattr("pet.settings_theme_qss._system_dark", lambda: False)
+    monkeypatch.setattr("petwisp.settings_theme_qss._system_dark", lambda: False)
     qss_light = _settings_stylesheet()
     assert "background: #202024" not in qss_light
     # 浅色也必须显式给按钮补文字色（防深色 palette 白字）
@@ -1497,8 +1497,8 @@ def test_settings_window_uses_the_explicit_dark_appearance_on_a_light_system(
 ):
     from PySide6.QtWidgets import QApplication
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod, "_system_dark", lambda: False)
@@ -1521,11 +1521,11 @@ def test_settings_window_rethemes_immediately_with_the_appearance_selector(
 ):
     from PySide6.QtWidgets import QApplication
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
-    monkeypatch.setattr("pet.settings_theme_qss._system_dark", lambda: False)
+    monkeypatch.setattr("petwisp.settings_theme_qss._system_dark", lambda: False)
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
     dialog = settings_mod.ModernSettingsDialog(Config(tmp_path), include_ai=False)
     assert "QDialog { background: #202024" not in dialog.styleSheet()
@@ -1550,9 +1550,9 @@ def test_modern_settings_finished_refreshes_even_on_rejected(tmp_path, monkeypat
     """
     from PySide6.QtWidgets import QApplication
 
-    import pet.app as app_mod
-    from pet.app import AppShell, PetInstance
-    from pet.config import Config
+    import petwisp.app as app_mod
+    from petwisp.app import AppShell, PetInstance
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     owner = PetInstance.__new__(PetInstance)
@@ -1589,8 +1589,8 @@ def test_ai_page_warns_when_keyring_unavailable(tmp_path, monkeypatch):
     """keyring 不可用时保存必须提示，且 key 仅保留内存（不落盘明文）。"""
     from PySide6.QtWidgets import QApplication
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -1623,8 +1623,8 @@ def test_modern_settings_save_warns_on_failure(tmp_path, monkeypatch):
     """
     from PySide6.QtWidgets import QApplication
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -1645,8 +1645,8 @@ def test_modern_settings_close_applies_autostart(tmp_path, monkeypatch):
     """直接关闭（X）新版设置也必须应用开机自启开关（与「保存并退出」一致）。"""
     from PySide6.QtWidgets import QApplication
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     applied = []
@@ -1672,8 +1672,8 @@ def test_modern_autostart_write_failure_warns(tmp_path, monkeypatch):
     """开机自启写入失败时必须弹窗提示（此前无任何反馈，用户不知自启没生效）。"""
     from PySide6.QtWidgets import QApplication
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -1700,7 +1700,7 @@ def test_macos_dock_menu_keeps_settings_reachable_when_pet_is_mouse_through(monk
 
     from PySide6.QtWidgets import QApplication
 
-    import pet.app as app_mod
+    import petwisp.app as app_mod
 
     app = QApplication.instance() or QApplication([])
     controller = app_mod.AppShell.__new__(app_mod.AppShell)
@@ -1731,7 +1731,7 @@ def _make_pet_sprite(pos, scale=0.5):
     """真 PetSprite（offscreen）：假 clip 无 ffmpeg 依赖，几何 = 640x360 画布 × scale。"""
     from PySide6.QtCore import QPointF
 
-    from pet.pet_sprite import PetSprite
+    from petwisp.pet_sprite import PetSprite
     from tests.test_sprite_collision_id import FakeLibrary
 
     return PetSprite(FakeLibrary(), pos=QPointF(*pos), scale=scale)
@@ -1750,8 +1750,8 @@ def test_real_pets_separate_by_solver_cumulative_in_one_tick():
     """
     from PySide6.QtWidgets import QApplication
 
-    from pet import collision
-    from pet.sprite_collision import SpriteCollisionWorld
+    from petwisp import collision
+    from petwisp.sprite_collision import SpriteCollisionWorld
 
     app = QApplication.instance() or QApplication([])
     a = _make_pet_sprite((600, 300))
@@ -1781,7 +1781,7 @@ def test_real_hidden_pet_is_not_an_invisible_obstacle():
     from PySide6.QtCore import QPointF
     from PySide6.QtWidgets import QApplication
 
-    from pet.sprite_collision import (
+    from petwisp.sprite_collision import (
         INTERACTION_NORMAL,
         INTERACTION_THROWN,
         SpriteCollisionWorld,

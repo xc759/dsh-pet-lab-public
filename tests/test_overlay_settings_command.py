@@ -6,10 +6,10 @@
 2. 消费即删（读一次即摘除，重放不再执行；再次写入是"新指令"）；
 3. 损坏/未知/缺字段/陈旧指令静默跳过（返回 None + 留日志），且同样摘除——
    否则坏文件会被 3s 轮询永远重放；
-4. 指令身份：``target`` 为 slot 编号时只退那一只，裸指令 = 全部子肥鱼。
+4. 指令身份：``target`` 为 slot 编号时只退那一只，裸指令 = 全部子宠。
 
 拓扑门（``is_overlay_topology``）也归本模块：设置进程必须按拓扑分流，但
-``pet/__main__.py --settings`` 明确禁止导入重量级模块（pet.app/overlay_shell），
+``pet/__main__.py --settings`` 明确禁止导入重量级模块（petwisp.app/overlay_shell），
 故拓扑读取实现落在零 Qt 模块，``overlay_shell.is_overlay_topology`` 转发。
 拓扑输入两个：显式 ``PET_RENDER_TOPOLOGY``（dev 逃生门，优先）与主配置
 ``stream_capture_mode``（T4：勾选 = 重启级切到 legacy 单窗，进程内快照一次）。
@@ -21,7 +21,7 @@ import logging
 
 import pytest
 
-from pet import overlay_settings_command as cmd
+from petwisp import overlay_settings_command as cmd
 
 
 def _now() -> float:
@@ -145,9 +145,9 @@ def test_topology_config_path_reuses_app_config_location(monkeypatch):
     from pathlib import Path
 
     monkeypatch.setattr(cmd, "_default_base", lambda: Path("/tmp/base"))
-    monkeypatch.setattr(cmd, "APP_DIR_NAME", "dsh-pet-test")
+    monkeypatch.setattr(cmd, "APP_DIR_NAME", "petwisp-test")
     assert cmd.topology_config_path() == Path(
-        "/tmp/base") / "dsh-pet-test" / "config.json"
+        "/tmp/base") / "petwisp-test" / "config.json"
 
 
 # ---------------------------------------------------------------- 父进程运行中拓扑（R01）
@@ -369,7 +369,7 @@ def test_version_mismatch_is_skipped(tmp_path, caplog):
 
 
 def test_stale_command_is_dropped(tmp_path, caplog):
-    """桌宠没在跑时写下的指令不允许在下次启动时突然清空子肥鱼。"""
+    """桌宠没在跑时写下的指令不允许在下次启动时突然清空子宠。"""
     cmd.write_command(tmp_path, cmd.CMD_EXIT_SPAWNED_PETS,
                       now=_now() - cmd.DEFAULT_MAX_AGE_S - 1.0)
     with caplog.at_level(logging.WARNING):

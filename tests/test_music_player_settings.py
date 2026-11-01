@@ -16,8 +16,8 @@ from __future__ import annotations
 
 import pytest
 
-from pet.music import players as music_players, settings as settings_music
-from pet.settings_widgets import ToggleSwitch, _line_edit
+from petwisp.music import players as music_players, settings as settings_music
+from petwisp.settings_widgets import ToggleSwitch, _line_edit
 
 pytest.importorskip("PySide6")
 
@@ -41,8 +41,8 @@ class _Messages:
 
 @pytest.fixture
 def dialog(tmp_path, monkeypatch):
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = _qapp()
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -87,7 +87,7 @@ def _pickers(dialog):
 
 
 def _row(dialog, key):
-    from pet.modern_settings_dialog import SettingRow
+    from petwisp.modern_settings_dialog import SettingRow
 
     row = dialog.findChild(SettingRow, f"settingRow_{key}")
     assert row is not None, f"缺少设置行 {key}"
@@ -95,7 +95,7 @@ def _row(dialog, key):
 
 
 def _section_title(dialog, key):
-    from pet.modern_settings_dialog import SettingsSection
+    from petwisp.modern_settings_dialog import SettingsSection
 
     parent = _row(dialog, key).parentWidget()
     while parent is not None and not isinstance(parent, SettingsSection):
@@ -169,7 +169,7 @@ def test_key_set_matches_the_backend_player_registry():
 
 def test_every_registered_player_has_a_picker_a_row_and_its_own_label(dialog):
     """注册表里的**每一个**播放器都有独立控件、独立行，标题用注册表登记的显示名。"""
-    from pet.settings_widgets import ResourcePathPicker
+    from petwisp.settings_widgets import ResourcePathPicker
 
     keys = music_players.player_keys()
     pickers = [_picker(dialog, key) for key in keys]
@@ -186,7 +186,7 @@ def test_every_registered_player_has_a_picker_a_row_and_its_own_label(dialog):
 
 def test_rows_follow_the_registry_order_before_the_detect_button(dialog):
     """行序 = 注册表序（网易云 / QQ音乐 / 酷狗 / 汽水），检测按钮垫底。"""
-    from pet.modern_settings_dialog import SettingRow
+    from petwisp.modern_settings_dialog import SettingRow
 
     card = _row(dialog, "music_player_netease").parentWidget()
     layout = card.layout()
@@ -208,7 +208,7 @@ def test_the_four_rows_and_the_detect_button_share_the_advanced_player_group(dia
     ``PLAYER_GROUP_TITLE`` / ``PLAYER_GROUP_TITLE_NO_FOOBAR``）：写死 Windows 组名会让
     非 Windows 上的这条断言必红，skip 掉非 Windows 又等于不验证退化路径。
     """
-    from pet.modern_settings_dialog import SettingRow
+    from petwisp.modern_settings_dialog import SettingRow
 
     group = settings_music.advanced_group_title(dialog)
     for key in PLAYER_ORDER:
@@ -247,8 +247,8 @@ def test_rows_say_the_paths_only_drive_the_context_menu_launch(dialog):
 
 def test_saved_paths_come_back_after_reopening_the_settings(dialog, tmp_path, monkeypatch):
     """保存重开：新开的设置窗要按盘上的值回填（四项都走一遍读回路径）。"""
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     monkeypatch.setattr(settings_music.music_players, "clear_cache", lambda: None)
     saved = {
@@ -272,8 +272,8 @@ def test_saved_paths_come_back_after_reopening_the_settings(dialog, tmp_path, mo
 
 def test_partial_config_fills_only_that_picker_and_survives_saving(tmp_path, monkeypatch):
     """缺项：盘上只有一项（旧版本只存过网易云 / QQ）时，其余三行留空且保存不吞不回填。"""
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     _qapp()
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -297,8 +297,8 @@ def test_partial_config_fills_only_that_picker_and_survives_saving(tmp_path, mon
 
 def test_malformed_config_value_leaves_all_four_pickers_empty(tmp_path, monkeypatch):
     """错误输入：内存态里不是 dict 的值不能让设置页炸，也不能泄漏进控件。"""
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     _qapp()
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -341,9 +341,9 @@ def test_whitespace_only_paths_are_dropped_like_an_empty_row(dialog, monkeypatch
 
 
 def test_no_chat_variant_builds_and_saves_all_four_paths(tmp_path, monkeypatch):
-    """打包变体（excludes=['pet.chat']）：不依赖 chat 页，四行照建、照存。"""
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    """打包变体（excludes=['petwisp.chat']）：不依赖 chat 页，四行照建、照存。"""
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     _qapp()
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -370,8 +370,8 @@ def test_path_rows_are_not_platform_gated(tmp_path, monkeypatch):
     """
     import sys
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     _qapp()
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -388,8 +388,8 @@ def test_path_rows_are_not_platform_gated(tmp_path, monkeypatch):
 
 
 def test_empty_paths_drop_the_key_and_restore_auto_search(dialog, monkeypatch):
-    from pet.config import Config
-    from pet.music import settings as module
+    from petwisp.config import Config
+    from petwisp.music import settings as module
 
     dialog.config.set("music_player_paths", {"netease": "D:/old/cloudmusic.exe"})
     dialog.config.save()
@@ -582,7 +582,7 @@ def test_browser_media_row_is_absent_on_non_windows(monkeypatch):
     """非 Windows 平台：即使控件存在，设置行也不出现（平台闸门优先）。"""
     import sys
 
-    from pet.settings_widgets import ToggleSwitch
+    from petwisp.settings_widgets import ToggleSwitch
 
     _qapp()
     host = type("H", (), {"music_browser_media_check": ToggleSwitch()})()
@@ -612,9 +612,9 @@ def test_browser_media_widget_is_windows_only(monkeypatch, tmp_path):
     """控件本体同样只在 Windows 创建（设置页构造路径）。"""
     import sys
 
-    from pet import settings_pet_controls
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp import settings_pet_controls
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     app = _qapp()
     monkeypatch.setattr(settings_pet_controls.sys, "platform", "linux")
@@ -636,7 +636,7 @@ def test_foobar_lyrics_rows_are_absent_on_non_windows(monkeypatch):
     """非 Windows 平台：即使控件存在，两行也不出现（平台闸门优先）。"""
     import sys
 
-    from pet.settings_widgets import ToggleSwitch
+    from petwisp.settings_widgets import ToggleSwitch
 
     _qapp()
     host = type(
@@ -673,9 +673,9 @@ def test_foobar_lyrics_widgets_are_windows_only(monkeypatch, tmp_path):
     """控件本体同样只在 Windows 创建；缺控件时保存路径安全跳过。"""
     import sys
 
-    from pet import settings_pet_controls
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp import settings_pet_controls
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     app = _qapp()
     monkeypatch.setattr(settings_pet_controls.sys, "platform", "linux")
@@ -689,7 +689,7 @@ def test_foobar_lyrics_widgets_are_windows_only(monkeypatch, tmp_path):
 
 def test_save_source_settings_writes_both_switches_and_format(tmp_path):
     """保存：两个来源开关与格式串一起写回，格式串去掉首尾空白。"""
-    from pet.config import Config
+    from petwisp.config import Config
 
     _qapp()
     cfg = Config(tmp_path)
@@ -715,7 +715,7 @@ def test_save_source_settings_writes_both_switches_and_format(tmp_path):
 
 def test_save_source_settings_skips_missing_widgets(tmp_path):
     """控件不存在（非 Windows）时**整键跳过**：不许把它写成 False 覆盖用户配置。"""
-    from pet.config import Config
+    from petwisp.config import Config
 
     _qapp()
     cfg = Config(tmp_path)
@@ -744,9 +744,9 @@ def test_foobar_controls_are_editable_on_the_child_page(monkeypatch, tmp_path):
     """
     import json
 
-    from pet.music import settings as settings_music
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp.music import settings as settings_music
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     app = _qapp()
     monkeypatch.setattr(settings_music.sys, "platform", "win32")   # 两键仅在 Windows 建
@@ -780,9 +780,9 @@ def test_browser_media_control_is_editable_on_the_child_page(monkeypatch, tmp_pa
     """子宠页：「浏览器媒体会话参与歌词」与 foobar 同组同规——可编辑 + 落主配置。"""
     import json
 
-    from pet.music import settings as settings_music
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp.music import settings as settings_music
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     app = _qapp()
     monkeypatch.setattr(settings_music.sys, "platform", "win32")   # 控件仅在 Windows 建
@@ -812,8 +812,8 @@ def test_music_player_pickers_are_editable_on_the_child_page(tmp_path):
     """子宠页：四条播放器路径与「自动检测」都可编辑，保存落主配置（右键菜单读它）。"""
     import json
 
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     app = _qapp()
     master = ModernSettingsDialog(Config(tmp_path), include_ai=False)

@@ -3,8 +3,8 @@ from __future__ import annotations
 import time
 import threading
 from PySide6.QtWidgets import QApplication
-from pet.chat.models import ProviderConfig
-from pet.chat.service import ChatService
+from petwisp.chat.models import ProviderConfig
+from petwisp.chat.service import ChatService
 
 
 def _get_qapp():
@@ -240,8 +240,8 @@ def test_provider_cancel_closes_blocking_response(monkeypatch):
     旧版全程未触被测对象（provider 构造即丢弃、断言的是测试自己调的 close）；
     新版只在网络边界打桩（urllib.urlopen），生产 provider 的 stream 循环全真。
     """
-    from pet.chat import providers
-    from pet.chat.providers import OpenAICompatibleProvider
+    from petwisp.chat import providers
+    from petwisp.chat.providers import OpenAICompatibleProvider
 
     class BlockingFakeResponse:
         def __init__(self):

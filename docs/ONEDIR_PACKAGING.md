@@ -34,8 +34,8 @@ powershell -ExecutionPolicy Bypass -File scripts\build_onedir.ps1 -Variant webm-
 产物：
 
 ```
-dist-onedir\dsh-pet-standalone-webm-chat\          ← onedir 目录（绿色版 = 整个文件夹）
-dist-onedir\dsh-pet-standalone-webm-chat-portable.zip
+dist-onedir\petwisp-webm-chat\          ← onedir 目录（绿色版 = 整个文件夹）
+dist-onedir\petwisp-webm-chat-portable.zip
 ```
 
 绿色版用法：解压 zip 到任意盘（E:\、D:\、U 盘均可），双击 exe 即用；无安装、无缓存。
@@ -67,7 +67,7 @@ dist-onedir\dsh-pet-standalone-webm-chat-portable.zip
   100 项、违例 0（证据：`.scratch/screen-capture/build_ocr_hidden.out`）。
   产品变体下次出包时应该顺手量一遍并回填这里，而不是继续引用 2026-09 的数字；
 - 后续需要完整 Qt 栈（例如启用 QML 界面）时加 `-SkipSlim`；
-- 冒烟建议：把配置切到 `voice_chime_schedule=every_minute` 启动 exe，确认 `%APPDATA%\dsh-pet-standalone-<variant>\voice_chime_cache` 新增 mp3（edge-tts 合成落盘），验证完恢复配置。
+- 冒烟建议：把配置切到 `voice_chime_schedule=every_minute` 启动 exe，确认 `%APPDATA%\petwisp-<variant>\voice_chime_cache` 新增 mp3（edge-tts 合成落盘），验证完恢复配置。
 
 ### 运行期应用图标：`assets/icon.ico`（三端都带）
 
@@ -78,7 +78,7 @@ macOS 的正式构建在最终签名前写入 `LSUIElement=true`：独立设置�
 
 `--icon assets/icon.ico`（Windows）/ `--icon assets/icon.icns`（macOS）只决定
 **可执行文件 / `.app` 的图标资源**；窗口标题栏那一个图标是运行期由
-`pet/application_icon.py::load_application_icon()` 从 `<_MEIPASS>/assets/icon.ico`
+`petwisp/application_icon.py::load_application_icon()` 从 `<_MEIPASS>/assets/icon.ico`
 读出来的（源码运行时取仓库根的同一相对路径）。所以这一份本身**也必须进包**，
 三个构建脚本各有一行：
 
@@ -111,11 +111,11 @@ macOS 的正式构建在最终签名前写入 `LSUIElement=true`：独立设置�
   Linux 不重生成，随包用的就是入库的那一份）。入库的是**多尺寸** ICO（实测 10 档：
   256/128/96/64/48/40/32/24/20/16，419 110 字节），只为保证干净克隆与 CI 能构建
   （`.gitignore` 里是白名单）。
-- **安装包不用额外条目**：`packaging/dsh-pet.iss` 的 `[Files]` 递归拷整个 onedir
+- **安装包不用额外条目**：`packaging/petwisp.iss` 的 `[Files]` 递归拷整个 onedir
   目录，`SetupIconFile` 另用同一份 ICO 作安装包图标。
 - **契约测试**：`tests/test_application_icon.py` 钉住三件事——三端脚本里的
   `--add-data` 真的挂在 PyInstaller 调用上、目标目录等于产品常量
-  `pet/application_icon.py::APPLICATION_ICON_RELATIVE_PATH`（`("assets", "icon.ico")`，
+  `petwisp/application_icon.py::APPLICATION_ICON_RELATIVE_PATH`（`("assets", "icon.ico")`，
   唯一真相源，脚本里不抄第二份路径）、多尺寸与生成器 `make_icon.ICON_SIZES` 一致；
   顺带钉住"没有 Qt GUI 应用时不许构造 QIcon"（真实崩溃形态：无应用时
   `QIcon(<文件>)` 让进程以退出码 127 死掉，空的 `QIcon()` 无碍）与
@@ -134,7 +134,7 @@ macOS 的正式构建在最终签名前写入 `LSUIElement=true`：独立设置�
 - **只 Windows**：`--add-data` 只写在 `scripts/build_onedir.ps1`，四个 Windows 变体
   （webm / webm-chat / gif / gif-chat）都带；`scripts/build_linux.sh` 与
   `scripts/build_macos.sh` 不加载也不捆它（`tests/test_presentmon_packaging.py` 钉住）。
-  非 Windows 平台上 `pet/game_fps.py` 整段按「不支持」呈现。
+  非 Windows 平台上 `petwisp/game_fps.py` 整段按「不支持」呈现。
 - **架构只有 x86-64**：上游 release 里 x64 与 ARM64 是两个资产，产品只支持 x64，
   构建门会校验 PE 头里的机器类型（ARM64 二进制混进来即中止）。没有也不要有 arm64 变体。
   **运行期也判架构**（`game_fps.platform_problem`：读 `PROCESSOR_ARCHITECTURE` /
@@ -145,9 +145,9 @@ macOS 的正式构建在最终签名前写入 `LSUIElement=true`：独立设置�
   2. **产物里**：`python scripts\verify_presentmon.py --path <app>\_internal\resources\presentmon\<exe>`
      再验一次——`--add-data` 在源目录缺失时一个错都不报，产物会静默少一个后端，而
      界面看不出来（那一段只按「缺少内置采集程序」呈现，功能永远不出数）。
-  判据只有一份，来自 `pet/game_fps.py` 的 `BACKEND_EXE_NAME` / `REQUIRED_SHA256`；
+  判据只有一份，来自 `petwisp/game_fps.py` 的 `BACKEND_EXE_NAME` / `REQUIRED_SHA256`；
   本目录、构建脚本与验证脚本都不再写第二份字面量。
-- **升级 PresentMon**：换 exe 后同时改 `pet/game_fps.py` 的 `BACKEND_EXE_NAME` /
+- **升级 PresentMon**：换 exe 后同时改 `petwisp/game_fps.py` 的 `BACKEND_EXE_NAME` /
   `REQUIRED_SHA256` / `SOURCE_TEXT`、本节的表格与 `THIRD_PARTY_NOTICES.md` 第 6 节。
   文件名自带版本号，就是为了不让「同名不同版」成为静默替换。
 - **手工取得（换机 / 升级时）**：`curl -L -o resources/presentmon/PresentMon-2.6.0-x64.exe <release 资产 URL>`，
@@ -173,13 +173,13 @@ macOS 的正式构建在最终签名前写入 `LSUIElement=true`：独立设置�
 - **三端都带**：`--add-data "resources/rapidocr_models;…"` 写在三个构建脚本里
   （`build_onedir.ps1` / `build_linux.sh` / `build_macos.sh`），四个变体都有。
 - **引擎模块本身还要 hidden-import**（2026-10-13 交叉审查 B1）：截图的引擎走的是
-  **动态 seam**——`pet/screen_capture/actions.py::_resolve_engine` 用 `importlib` 按
-  字符串（`OCR_MODULE = "ocr"`）解析 `pet.screen_capture.ocr`，仓库 `pet/` 下没有一处
+  **动态 seam**——`petwisp/screen_capture/actions.py::_resolve_engine` 用 `importlib` 按
+  字符串（`OCR_MODULE = "ocr"`）解析 `petwisp.screen_capture.ocr`，仓库 `pet/` 下没有一处
   静态 import 指向它，PyInstaller 的静态分析从入口摸不到。少了这条参数，模型与配置
   都在包里、**引擎模块不在**：冻结包里解析不出引擎，产品不崩，只是右键
   「截图 → 提取文字」永远置灰（本机实测：不带那条参数的包 `ocr_engine_available()`
   为假，带上的包认出字，见 `.scratch/screen-capture/build_ocr_hidden.out`）。
-  三个构建脚本因此都带 `--hidden-import pet.screen_capture.ocr`
+  三个构建脚本因此都带 `--hidden-import petwisp.screen_capture.ocr`
   （守卫：`tests/test_screen_capture_packaging.py`）。
   **它还决定整条依赖链在不在包里**：`rapidocr` / `cv2` / `numpy` / `onnxruntime` 都是
   靠 `ocr.py` 的静态 import 才进图的。OCR 探针包实测：不带的产物 200 MB（本地 OCR
@@ -193,7 +193,7 @@ macOS 的正式构建在最终签名前写入 `LSUIElement=true`：独立设置�
   连构造都失败（2026-10-13 实测）；
   而用 `--collect-data rapidocr` 会把它 wheel 自带的同一批 30.3 MiB 模型**再收一份**，
   所以只补这两份 yaml。
-- **判据只有一份，来自 `pet/screen_capture/ocr.py`**（`MODEL_FILES` / `MODEL_SHA256` /
+- **判据只有一份，来自 `petwisp/screen_capture/ocr.py`**（`MODEL_FILES` / `MODEL_SHA256` /
   `MODEL_RELATIVE_DIR`）**与 `actions.py` 的 seam**（`OCR_MODULE`，脚本用
   `required_bundle_modules()` 现算，不抄第二份字面量）。缺件或换版不会让程序崩，
   只会让识别静默变差（错字/漏行）或直接报「请重新安装」，所以必须在打包阶段拦住。
@@ -212,7 +212,7 @@ macOS 的正式构建在最终签名前写入 `LSUIElement=true`：独立设置�
   `--exclude-module` 与 `slim_bundle.py` 的 `FORBIDDEN_GLOBS` 里的 numpy 条目都已删除
   ——留着会让**每一次**构建红在一个完全正常的产物上；而排除它们曾让冻结包的 OCR
   全线不可用（2026-10-13 实测，v3 变体）。
-- **升级模型**：换文件后同时改 `pet/screen_capture/ocr.py` 的 `MODEL_FILES` /
+- **升级模型**：换文件后同时改 `petwisp/screen_capture/ocr.py` 的 `MODEL_FILES` /
   `MODEL_SHA256`、本节的表格与 `THIRD_PARTY_NOTICES.md` 第 7 节。文件名自带版本号
   （`PP-OCRv6_*`）就是为了不让「同名不同版」成为静默替换。
 
@@ -251,7 +251,7 @@ PresentMon 的 ETW 会话只对管理员或 `Performance Log Users`（SID `S-1-5
 `.scratch/product-fps-uac-20261011/archived-uac-helper/`，`build_onedir.ps1` 不再编译、校验或
 打包它。
 
-- **权限怎么拿**：设置页灵动岛帧率段的「授予采集权限…」按钮（`pet/fps_permission.py`），
+- **权限怎么拿**：设置页灵动岛帧率段的「授予采集权限…」按钮（`petwisp/fps_permission.py`），
   弹**一次**系统管理员授权窗口，把当前账户加入该组；桌宠本体始终普通权限运行。
   组成员关系只进**新登录令牌**，所以需要注销并重新登录后生效。
 - **打包侧影响**：只用系统自带的 `powershell.exe` / `whoami.exe`，**不新增任何随包文件**，
@@ -262,20 +262,20 @@ PresentMon 的 ETW 会话只对管理员或 `Performance Log Users`（SID `S-1-5
 ## 二、Inno Setup 安装包（正式分发）
 
 本机已装：`E:\tools\InnoSetup6\ISCC.exe`（便携模式，免管理员）。
-通用脚本 `packaging\dsh-pet.iss` 用 `/D` 定义编译任意变体：
+通用脚本 `packaging\petwisp.iss` 用 `/D` 定义编译任意变体：
 
 ```powershell
 # webm-chat（脚本默认值）
-E:\tools\InnoSetup6\ISCC.exe packaging\dsh-pet.iss
+E:\tools\InnoSetup6\ISCC.exe packaging\petwisp.iss
 
 # webm
-E:\tools\InnoSetup6\ISCC.exe /DMyAppShortName=dsh-pet-standalone-webm /DMyAppExeName=dsh-pet-standalone-webm.exe /DMyAppDir=..\dist-onedir\dsh-pet-standalone-webm "/DMyAppId={{ED2590E4-A968-4E8D-B7C4-75DFE012D0E9}}" "/DMyAppDisplay=dsh-pet-standalone (WebM)" packaging\dsh-pet.iss
+E:\tools\InnoSetup6\ISCC.exe /DMyAppShortName=petwisp-webm /DMyAppExeName=petwisp-webm.exe /DMyAppDir=..\dist-onedir\petwisp-webm "/DMyAppId={{ED2590E4-A968-4E8D-B7C4-75DFE012D0E9}}" "/DMyAppDisplay=petwisp (WebM)" packaging\petwisp.iss
 
 # gif-chat
-E:\tools\InnoSetup6\ISCC.exe /DMyAppShortName=dsh-pet-standalone-gif-chat /DMyAppExeName=dsh-pet-standalone-gif-chat.exe /DMyAppDir=..\dist-onedir\dsh-pet-standalone-gif-chat "/DMyAppId={{7FE1EEDD-91DB-4F4B-834D-894DFE782256}}" "/DMyAppDisplay=dsh-pet-standalone (GIF Chat)" packaging\dsh-pet.iss
+E:\tools\InnoSetup6\ISCC.exe /DMyAppShortName=petwisp-gif-chat /DMyAppExeName=petwisp-gif-chat.exe /DMyAppDir=..\dist-onedir\petwisp-gif-chat "/DMyAppId={{7FE1EEDD-91DB-4F4B-834D-894DFE782256}}" "/DMyAppDisplay=petwisp (GIF Chat)" packaging\petwisp.iss
 
 # gif
-E:\tools\InnoSetup6\ISCC.exe /DMyAppShortName=dsh-pet-standalone-gif /DMyAppExeName=dsh-pet-standalone-gif.exe /DMyAppDir=..\dist-onedir\dsh-pet-standalone-gif "/DMyAppId={{308454BF-3FD5-4A30-B0FF-1D23BF31DCF1}}" "/DMyAppDisplay=dsh-pet-standalone (GIF)" packaging\dsh-pet.iss
+E:\tools\InnoSetup6\ISCC.exe /DMyAppShortName=petwisp-gif /DMyAppExeName=petwisp-gif.exe /DMyAppDir=..\dist-onedir\petwisp-gif "/DMyAppId={{308454BF-3FD5-4A30-B0FF-1D23BF31DCF1}}" "/DMyAppDisplay=petwisp (GIF)" packaging\petwisp.iss
 ```
 
 产物：`dist-onedir\<shortname>-setup.exe`
@@ -303,7 +303,7 @@ E:\tools\InnoSetup6\ISCC.exe /DMyAppShortName=dsh-pet-standalone-gif /DMyAppExeN
    `default_models.yaml`（构建期已自动校验模型名称 / sha256，见上面「随包的本地 OCR 模型」）；
    点一次「截图 → 提取文字」应能认出选区里的文字。
    **注意**：上面那三样是**资源**，看得见；第二件致命的东西是**引擎模块本身**
-   （`pet.screen_capture.ocr`，动态 seam 的目标，只在产物内嵌的 PYZ 里，目录里看不到），
+   （`petwisp.screen_capture.ocr`，动态 seam 的目标，只在产物内嵌的 PYZ 里，目录里看不到），
    它由 `verify_rapidocr_models.py --app-dir` 从模块图里读出来判——手工冒烟时如果
    「提取文字」是灰的，先跑这条门，别再去看模型目录（模型全在也照样会灰）
 8. **FPS 开关打开、当前账户不在 `Performance Log Users` 组时**：岛上那段不显示任何数字，
@@ -331,28 +331,28 @@ E:\tools\InnoSetup6\ISCC.exe /DMyAppShortName=dsh-pet-standalone-gif /DMyAppExeN
 
 ## 四、无 Chat 变体兼容性
 
-无 Chat 入口使用 `packaging/pet_entry_no_chat.py`，构建规格明确排除 `pet.chat`
+无 Chat 入口使用 `packaging/pet_entry_no_chat.py`，构建规格明确排除 `petwisp.chat`
 （**只排它**）。配置仍可能来自曾经启用 Chat 的用户目录，因此运行时
-`Config._migrate_plaintext_keys_to_keyring()` 对缺失的 `pet.chat` 只跳过迁移，
+`Config._migrate_plaintext_keys_to_keyring()` 对缺失的 `petwisp.chat` 只跳过迁移，
 不能让配置加载失败；除该明确缺失模块外的导入错误仍应抛出。
 
 ### `keyring` 四个变体都带（2026-10-17 修正）
 
-2026-10-17 之前，三个构建脚本把 `keyring` 与 `pet.chat` 一起排除在 no-chat 变体之外
-（Windows 是 `--exclude-module keyring`，Linux/macOS 是 `excludes="pet.chat,keyring"`），
+2026-10-17 之前，三个构建脚本把 `keyring` 与 `petwisp.chat` 一起排除在 no-chat 变体之外
+（Windows 是 `--exclude-module keyring`，Linux/macOS 是 `excludes="petwisp.chat,keyring"`），
 收集参数 `--collect-all keyring` 只挂在 `*-chat` 分支里。这个组合是错的：
 
-- 语音报时设置页（`pet/voice_chime_settings.py`）**刻意不依赖 `pet.chat`**（历史事故：
+- 语音报时设置页（`petwisp/voice_chime_settings.py`）**刻意不依赖 `petwisp.chat`**（历史事故：
   设置页在打包版整体打不开），它在 chat / no-chat 两条链路上都注册；MiMo 与豆包这两个
   收费后端的 API Key 字段因此对所有变体都可见；
 - 凭据只走 `pet/tts_secrets`：钥匙串优先，写不进去就退化为**写它的那个进程**的内存；
-- 设置页默认跑在**独立进程**（`settings_process_isolation`，见 `pet/config.py`），
+- 设置页默认跑在**独立进程**（`settings_process_isolation`，见 `petwisp/config.py`），
   真正合成的 `VoiceChimeService` 在主宠进程。于是包外无 keyring 时：用户填了 Key、
   界面报「已保存（仅本次运行）」，主进程读到的却是空串，收费后端永远自报「没配 Key」，
   而界面上没有任何一处说得出原因。
 
 所以现在：`--collect-all keyring` 在**四个变体 × 三端**都无条件生效，`keyring` 不再出现
-在任何排除清单里；no-chat 只排除 `pet.chat`。守卫是
+在任何排除清单里；no-chat 只排除 `petwisp.chat`。守卫是
 [`tests/test_packaging_keyring_notices.py`](../tests/test_packaging_keyring_notices.py)
 （构建参数清单）＋ [`tests/test_tts_secrets.py`](../tests/test_tts_secrets.py)（跨进程读不到
 的行为回归）。界面对这条链路的说法：写失败时行状态是「没能保存上（只在本进程内存，重启
@@ -376,16 +376,16 @@ python -m pytest -q tests/test_packaging_keyring_notices.py tests/test_tts_secre
 
 ## 五、注意事项
 
-- **开机自启**：onedir 不需要 `start /D` 切目录（无解压），`pet/autostart.py` 现有命令无害可保留
-- **`_MEI` 遗留清理按归属，不按名字**：`pet/app.py` 启动时仍调用
-  `_cleanup_stale_runtime_dirs`，但 `pet/runtime_cleanup.py` 现在的候选前提是本产品
-  自己的归属标记（`_MEIPASS` 里的 `.dsh-pet-runtime-owner`，两个冻结入口启动时写）：
+- **开机自启**：onedir 不需要 `start /D` 切目录（无解压），`petwisp/autostart.py` 现有命令无害可保留
+- **`_MEI` 遗留清理按归属，不按名字**：`petwisp/app.py` 启动时仍调用
+  `_cleanup_stale_runtime_dirs`，但 `petwisp/runtime_cleanup.py` 现在的候选前提是本产品
+  自己的归属标记（`_MEIPASS` 里的 `.petwisp-runtime-owner`，两个冻结入口启动时写）：
   名字（`_MEI数字`）+ 年龄只用于筛选，**没有标记的目录一个字节都不动**——系统 Temp
   里的同名目录属于别的 PyInstaller 应用，按名字通配删除等于清别人的解包资源。
   链接/junction/重解析点不跟随，删除前复核归属与身份（防扫描与删除之间的替换）。
   因此**旧 onefile 版本留下的 `_MEI`（无标记）不会被自动清理**：这是刻意的安全降级，
   要清就人工确认后删。卸载侧同理：ISS 已去掉 `{app}\_MEI*` 通配条目
-- **冻结入口的参数分流**：`--uninstall-cleanup` 与 `--settings` 都在 `import pet.app`
+- **冻结入口的参数分流**：`--uninstall-cleanup` 与 `--settings` 都在 `import petwisp.app`
   之前分流（否则会拉成一只完整桌宠）；卸载清理的退出码非 0 时，卸载日志记录退出码，
   交互式卸载还会弹提示，结果同时追加到配置目录的 `uninstall-cleanup.log`
 - **本机遗留旧自启项**：注册表 `HKCU\...\Run` 里的 `DesktopPet = E:\software\AI\AI的有用工具\打字统计\dist\DesktopPet.exe` 是 7 月的旧 onefile 构建（无 `start /D`、解压在 C 盘 Temp），建议删除或替换，避免开机双桌宠 + 继续污染 C 盘

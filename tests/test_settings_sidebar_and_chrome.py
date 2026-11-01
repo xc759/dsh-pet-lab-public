@@ -39,10 +39,10 @@ from PySide6.QtWidgets import (  # noqa: E402
     QWidget,
 )
 
-import pet.application_icon as application_icon  # noqa: E402
-import pet.modern_settings_dialog as settings_mod  # noqa: E402
-from pet.config import Config  # noqa: E402
-from pet.settings_widgets import (  # noqa: E402
+import petwisp.application_icon as application_icon  # noqa: E402
+import petwisp.modern_settings_dialog as settings_mod  # noqa: E402
+from petwisp.config import Config  # noqa: E402
+from petwisp.settings_widgets import (  # noqa: E402
     CONTENT_READING_MAX_WIDTH,
     SIDEBAR_MIN_WIDTH,
     SettingsSection,
@@ -413,9 +413,9 @@ def test_save_and_exit_button_asks_for_the_save_icon(tmp_path, monkeypatch):
     判据（``save``/``back`` 历史上一度同形），而按钮的图标与 tooltip 现在都由
     ``pet/settings_widgets.settings_save_exit_button`` 落——所以拦的是**控件库**里的渲染入口。
     """
-    import pet.context_menus.icons as icons_mod
-    from pet.modern_settings_dialog import vector_widget_icon as real_renderer
-    from pet.settings_widgets import SAVE_EXIT_TOOLTIP
+    import petwisp.context_menus.icons as icons_mod
+    from petwisp.modern_settings_dialog import vector_widget_icon as real_renderer
+    from petwisp.settings_widgets import SAVE_EXIT_TOOLTIP
 
     requested: list[str] = []
 
@@ -423,7 +423,7 @@ def test_save_and_exit_button_asks_for_the_save_icon(tmp_path, monkeypatch):
         requested.append(name)
         return real_renderer(widget, name, size)
 
-    monkeypatch.setattr("pet.settings_widgets.vector_widget_icon", _recording_renderer)
+    monkeypatch.setattr("petwisp.settings_widgets.vector_widget_icon", _recording_renderer)
     dialog = _dialog(tmp_path, monkeypatch)
     try:
         assert "save" in requested, f"保存并退出没按 save 渲染图标（实得 {requested}）"

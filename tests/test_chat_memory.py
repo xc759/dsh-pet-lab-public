@@ -21,7 +21,7 @@ import pytest
 from PySide6.QtCore import QLockFile
 from PySide6.QtWidgets import QApplication
 
-from pet.chat.memory import (
+from petwisp.chat.memory import (
     ARCHIVE_DUP_RATIO,
     INJECT_CHAR_LIMIT,
     MAX_ENTRIES,
@@ -34,8 +34,8 @@ from pet.chat.memory import (
     parse_remember_command,
     render_injection,
 )
-from pet.chat.memory_recall import TOPIC_ARCHIVE_DAYS, is_archived, recall
-from pet.chat.prompt import PromptBuilder
+from petwisp.chat.memory_recall import TOPIC_ARCHIVE_DAYS, is_archived, recall
+from petwisp.chat.prompt import PromptBuilder
 
 
 def _qapp():
@@ -173,7 +173,7 @@ def test_two_instances_interleaved_adds_keep_both(tmp_path):
 def test_memory_file_is_never_listed_or_renamed_as_session(tmp_path):
     """memory.json 与会话文件同目录：会话列表必须跳过它——否则 load() 会把它
     当损坏会话改名成 .corrupt-<ts>.json，记忆文件直接消失（真实缺陷路径）。"""
-    from pet.chat.session_store import SessionStore
+    from petwisp.chat.session_store import SessionStore
 
     path = memory_path(tmp_path, "", "demo")
     ChatMemory(path).add("我不吃辣")
@@ -340,7 +340,7 @@ def test_auto_reaffirm_never_demotes_manual_user_layer(tmp_path):
     loaded = next(e for e in mem.load() if e["id"] == entry["id"])
     assert loaded["layer"] == "user"
     assert loaded["hits"] == 2
-    from pet.chat.memory_recall import render_user_snapshot
+    from petwisp.chat.memory_recall import render_user_snapshot
     assert "我不吃辣" in render_user_snapshot(mem.load())
     # 手动通道仍然可以改层（语义不变）。
     assert mem.apply_ops(
@@ -493,7 +493,7 @@ def test_injection_text_disabled_is_empty(tmp_path):
 
 # ---------------------------------------------------------------- PromptBuilder 注入
 def _settings():
-    from pet.chat.models import ChatSettings
+    from petwisp.chat.models import ChatSettings
 
     return ChatSettings()
 
@@ -512,7 +512,7 @@ def test_build_messages_appends_memory_section():
 @pytest.mark.parametrize("memory_text", [None, "", "   "])
 def test_build_messages_byte_identical_without_memory(memory_text):
     """无记忆 / 空注入：与现状逐字节一致（回归钉死）。"""
-    from pet.chat.models import ChatMessage
+    from petwisp.chat.models import ChatMessage
 
     builder = PromptBuilder()
     history = [ChatMessage("user", "上一条"), ChatMessage("assistant", "回复")]
@@ -526,8 +526,8 @@ def test_build_messages_byte_identical_without_memory(memory_text):
 
 # ---------------------------------------------------------------- 聊天窗：指令 + 钉为记忆
 def _modern_window(tmp_path, monkeypatch):
-    from pet.config import Config
-    from pet.chat.widgets import ChatWindow
+    from petwisp.config import Config
+    from petwisp.chat.widgets import ChatWindow
 
     _qapp()
     window = ChatWindow(Config(tmp_path), "demo")
@@ -603,8 +603,8 @@ def test_pin_bubble_to_memory_modern(tmp_path, monkeypatch):
 
 
 def test_legacy_window_remember_command_and_pin(tmp_path, monkeypatch):
-    from pet.config import Config
-    from pet.chat.legacy_widgets import ChatWindow
+    from petwisp.config import Config
+    from petwisp.chat.legacy_widgets import ChatWindow
 
     _qapp()
     window = ChatWindow(Config(tmp_path), "demo")
@@ -662,9 +662,9 @@ def test_begin_generation_injects_memory_into_system(tmp_path, monkeypatch):
 
 # ---------------------------------------------------------------- 设置组
 def _settings_page(tmp_path, monkeypatch):
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
-    from pet.chat.ai_settings_page import _AiSettingsPage
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
+    from petwisp.chat.ai_settings_page import _AiSettingsPage
 
     _qapp()
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -684,7 +684,7 @@ def test_settings_toggle_writes_back(tmp_path, monkeypatch):
         assert config.get("chat_memory_enabled") is False
         assert config.get("chat_memory_auto_extract") is False
         # 重新打开读回关闭态
-        from pet.chat.ai_settings_page import _AiSettingsPage
+        from petwisp.chat.ai_settings_page import _AiSettingsPage
 
         page2 = _AiSettingsPage(config)
         assert page2.chat_memory_enabled.isChecked() is False
@@ -712,9 +712,9 @@ def test_settings_key_adopted_on_reload(tmp_path, monkeypatch):
 
 def test_settings_memory_rows_claimed_in_ai_domain(tmp_path, monkeypatch):
     """「AI 与对话」域「记忆」组：两行进 claim 清单、挂在域页上，不掉「待分类」。"""
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog, SettingRow
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog, SettingRow
 
     _qapp()
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -751,14 +751,14 @@ def test_settings_memory_manager_list_delete_and_clear(tmp_path, monkeypatch):
             assert dialog._row_count() == 1
             # 全部清空：取消 → 不动
             monkeypatch.setattr(
-                "pet.chat.ai_settings_page.QMessageBox.question",
+                "petwisp.chat.ai_settings_page.QMessageBox.question",
                 lambda *a, **k: _no_button(a[3] if len(a) > 3 else None),
             )
             dialog._clear_all()
             assert len(mem.load()) == 1
             # 全部清空：确认 → 文件删除
             monkeypatch.setattr(
-                "pet.chat.ai_settings_page.QMessageBox.question",
+                "petwisp.chat.ai_settings_page.QMessageBox.question",
                 lambda *a, **k: _yes_button(a[3] if len(a) > 3 else None),
             )
             dialog._clear_all()
@@ -779,8 +779,8 @@ def test_memory_manager_groups_layers_changes_layer_and_restores_topic(tmp_path,
 
     from PySide6.QtWidgets import QComboBox, QLabel, QPushButton
 
-    from pet.chat.memory import LAYERS
-    from pet.chat.memory_recall import is_archived
+    from petwisp.chat.memory import LAYERS
+    from petwisp.chat.memory_recall import is_archived
 
     config, page = _settings_page(tmp_path, monkeypatch)
     try:
@@ -853,7 +853,7 @@ def test_hit_write_gives_up_after_five_failures_with_one_warning(
     tmp_path, monkeypatch, caplog
 ):
     """v2f L1：连续失败 5 次后放弃本批（flush True），只记一条无 traceback 的 warning。"""
-    import pet.chat.memory as memory_mod
+    import petwisp.chat.memory as memory_mod
 
     path = tmp_path / "memory.json"
     mem = ChatMemory(path, clock=_clock())
@@ -864,7 +864,7 @@ def test_hit_write_gives_up_after_five_failures_with_one_warning(
     assert MAX_HIT_WRITE_ATTEMPTS == 5
 
     mem.note_recalled([topic["id"]], now=datetime.now().astimezone())
-    with caplog.at_level(logging.WARNING, logger="pet.chat.memory"):
+    with caplog.at_level(logging.WARNING, logger="petwisp.chat.memory"):
         assert mem.flush_hits(5.0) is True
 
     queue = _hit_queue_for(path)
@@ -881,10 +881,10 @@ def test_hit_write_gives_up_after_five_failures_with_one_warning(
 
 def test_about_to_quit_flushes_chat_memory_hits(tmp_path, monkeypatch):
     """L2：aboutToQuit 收口会调用 flush_pending_hits（带超时），不再丢去抖窗口。"""
-    from pet import app as app_mod
-    from pet.chat import memory as memory_mod
-    from pet.chat import session_store as session_store_mod
-    from pet.config import Config
+    from petwisp import app as app_mod
+    from petwisp.chat import memory as memory_mod
+    from petwisp.chat import session_store as session_store_mod
+    from petwisp.config import Config
 
     calls: list[float] = []
     monkeypatch.setattr(

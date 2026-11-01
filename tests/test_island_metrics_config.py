@@ -17,9 +17,9 @@ import re
 
 import pytest
 
-from pet import config as config_mod
-from pet.config import Config
-from pet.island.segments import CPU, GPU, MEM, NETWORK
+from petwisp import config as config_mod
+from petwisp.config import Config
+from petwisp.island.segments import CPU, GPU, MEM, NETWORK
 
 
 def _dirty_config(tmp_path, raw: dict) -> Config:

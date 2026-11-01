@@ -20,10 +20,10 @@ from PySide6.QtCore import QEvent, QPoint, QPointF, Qt, QTimer
 from PySide6.QtGui import QMouseEvent
 from PySide6.QtWidgets import QApplication
 
-from pet import platform_win as platform_win_mod
-from pet import window as window_mod
-from pet.config import Config
-from pet.window import PetWindow
+from petwisp import platform_win as platform_win_mod
+from petwisp import window as window_mod
+from petwisp.config import Config
+from petwisp.window import PetWindow
 from tests.test_window_pause import FakeLibrary
 
 

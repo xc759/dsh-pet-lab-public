@@ -19,8 +19,8 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from PySide6.QtWidgets import QApplication
 
-from pet.overlay_window import OverlayWindow
-from pet.tick_driver import TickDriver
+from petwisp.overlay_window import OverlayWindow
+from petwisp.tick_driver import TickDriver
 from tests.test_tick_driver import FakeSprite
 
 app = QApplication.instance() or QApplication([])
@@ -73,7 +73,7 @@ def test_other_overlay_sprites_keep_timer_running():
 
 def test_resume_restores_active_tier_and_elapsed():
     """恢复时同步回 T0（start 语义）且不吃停表期的历史流逝。"""
-    from pet.tick_governor import TIER_ACTIVE, TIER_IDLE_STILL
+    from petwisp.tick_governor import TIER_ACTIVE, TIER_IDLE_STILL
 
     driver = TickDriver()
     overlay = OverlayWindow(driver=driver)

@@ -19,7 +19,7 @@ from pathlib import Path
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 # 探针模块在 import 期就会落 OUT_DIR（.scratch/mem-probe/adhoc）：测试不许写仓库
 os.environ["PET_MEM_TRACE_DIR"] = str(
-    Path(tempfile.gettempdir()) / "dsh-pet-mem-probe-test")
+    Path(tempfile.gettempdir()) / "petwisp-mem-probe-test")
 
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
@@ -54,7 +54,7 @@ def test_listed_frames_counts_materialized_paths_only(tmp_path):
     meta_dir.mkdir()
     (meta_dir / "meta.json").write_text(
         json.dumps({"fps": 24.0, "frames": 240}), encoding="utf-8")
-    from pet.frameseq_clip import FrameSeqClip as RealClip
+    from petwisp.frameseq_clip import FrameSeqClip as RealClip
 
     clip = RealClip(meta_dir)
     try:

@@ -515,7 +515,7 @@ class Device:
         The pool is emptied first because `input text` types into a real input
         connection: an appended draft would make the bubble show either line.
         """
-        line = "dsh-pet-acceptance-line"
+        line = "petwisp-acceptance-line"
         self.launch()
         # Looked up before the keyboard opens and again after it closes: leaving the
         # field also commits the draft, and a committed row is a disabled button.

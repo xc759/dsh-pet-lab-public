@@ -28,15 +28,15 @@ from PySide6.QtCore import QPoint, QPointF, QRect, Qt
 from PySide6.QtGui import QImage
 from PySide6.QtWidgets import QApplication, QWidget
 
-from pet import collision as collision_mod
-from pet import overlay_peripherals
-from pet.config import Config
-from pet.island.dynamic_island import DynamicIsland
-from pet.island.bridge import IslandWindowBridge
-from pet.overlay_peripherals import FullscreenCursorWatcher, OverlayVisibilityGate
-from pet.overlay_window import OverlayWindow
-from pet.sprite_bubble import SpriteBubbleFollower, sprite_anchor_rect_global
-from pet.sprite_collision import CollisionEvent, SpriteCollisionWorld
+from petwisp import collision as collision_mod
+from petwisp import overlay_peripherals
+from petwisp.config import Config
+from petwisp.island.dynamic_island import DynamicIsland
+from petwisp.island.bridge import IslandWindowBridge
+from petwisp.overlay_peripherals import FullscreenCursorWatcher, OverlayVisibilityGate
+from petwisp.overlay_window import OverlayWindow
+from petwisp.sprite_bubble import SpriteBubbleFollower, sprite_anchor_rect_global
+from petwisp.sprite_collision import CollisionEvent, SpriteCollisionWorld
 
 app = QApplication.instance() or QApplication([])
 

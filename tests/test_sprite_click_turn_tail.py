@@ -29,8 +29,8 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from PySide6.QtCore import QPointF
 
-from pet.pet_sprite import PetSprite
-from pet.sprite_behavior import (
+from petwisp.pet_sprite import PetSprite
+from petwisp.sprite_behavior import (
     _IDLE_TAIL_GRACE_S,
     STATE_CLICK,
     STATE_IDLE,

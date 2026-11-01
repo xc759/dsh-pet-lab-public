@@ -14,7 +14,7 @@ pytest.importorskip("PySide6")
 from PySide6.QtCore import QBuffer, QByteArray  # noqa: E402
 from PySide6.QtGui import QColor, QImage, QImageReader  # noqa: E402
 
-from pet import qt_image_limits  # noqa: E402
+from petwisp import qt_image_limits  # noqa: E402
 
 
 @pytest.fixture(autouse=True)
@@ -121,8 +121,8 @@ def test_both_entry_points_apply_the_limit():
     from pathlib import Path
 
     root = Path(__file__).resolve().parents[1]
-    app_main = (root / "pet" / "app.py").read_text(encoding="utf-8")
-    settings_main = (root / "pet" / "__main__.py").read_text(encoding="utf-8")
+    app_main = (root / "petwisp" / "app.py").read_text(encoding="utf-8")
+    settings_main = (root / "petwisp" / "__main__.py").read_text(encoding="utf-8")
 
     assert "apply_image_allocation_limit" in app_main, "pet 进程启动点没接线"
     assert "apply_image_allocation_limit" in settings_main, "设置进程启动点没接线"

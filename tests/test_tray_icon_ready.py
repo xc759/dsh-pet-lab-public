@@ -16,10 +16,10 @@ import pytest
 from PySide6.QtGui import QColor, QIcon, QPixmap
 from PySide6.QtWidgets import QApplication, QWidget
 
-from pet.app import AppShell
-from pet.config import Config
-from pet.library import MovieLibrary
-from pet.window import PetWindow
+from petwisp.app import AppShell
+from petwisp.config import Config
+from petwisp.library import MovieLibrary
+from petwisp.window import PetWindow
 
 CHARACTER_RED = 200
 

@@ -29,9 +29,9 @@ import pytest
 from PySide6.QtCore import QPointF, QRect
 from PySide6.QtWidgets import QApplication
 
-import pet.pet_sprite as pet_sprite_mod
-from pet import catalog
-from pet.pet_sprite import PetSprite
+import petwisp.pet_sprite as pet_sprite_mod
+from petwisp import catalog
+from petwisp.pet_sprite import PetSprite
 
 app = QApplication.instance() or QApplication([])
 

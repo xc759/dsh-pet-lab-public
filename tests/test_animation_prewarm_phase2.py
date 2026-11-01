@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from PySide6.QtWidgets import QApplication
 
-import pet.library as library_mod
-from pet.library import MovieLibrary
+import petwisp.library as library_mod
+from petwisp.library import MovieLibrary
 
 
 def _qapp() -> QApplication:

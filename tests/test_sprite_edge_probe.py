@@ -33,11 +33,11 @@ from PySide6.QtCore import QObject, QPointF, QRect, Qt, Signal
 from PySide6.QtGui import QImage, QPainter, QRegion
 from PySide6.QtWidgets import QApplication
 
-from pet.edge_probe import probe_body_bounds
-from pet.overlay_window import OverlayWindow
-from pet.pet_sprite import INTERACTION_DRAG, INTERACTION_NORMAL, INTERACTION_THROWN, PetSprite
-from pet.sprite_behavior import STATE_MOVE, BehaviorController
-from pet.sprite_edge_probe import (
+from petwisp.edge_probe import probe_body_bounds
+from petwisp.overlay_window import OverlayWindow
+from petwisp.pet_sprite import INTERACTION_DRAG, INTERACTION_NORMAL, INTERACTION_THROWN, PetSprite
+from petwisp.sprite_behavior import STATE_MOVE, BehaviorController
+from petwisp.sprite_edge_probe import (
     EDGE_ENGAGE_EXPOSURE,
     EDGE_ENTER_MS,
     EDGE_IDLE_SECONDS,
@@ -818,8 +818,8 @@ def test_overlay_return_corner_cancels_active_probe_session(tmp_path, entry):
     （建造器经 facade 回调落回同一方法）。第二入口此前在 facade 里另写了一份
     「set_pos 落角」，所以它单独构成一条回归面。
     """
-    from pet import catalog
-    from pet.sprite_menu_facade import build_sprite_full_menu
+    from petwisp import catalog
+    from petwisp.sprite_menu_facade import build_sprite_full_menu
 
     clock = FakeClock()
     shell = _shell_with_probe(tmp_path, clock)

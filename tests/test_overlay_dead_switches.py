@@ -25,7 +25,7 @@ from PySide6.QtGui import QMouseEvent
 from PySide6.QtWidgets import QApplication
 
 import tests.test_sprite_menu_facade as fac
-from pet.pet_sprite import INTERACTION_DRAG, INTERACTION_NORMAL
+from petwisp.pet_sprite import INTERACTION_DRAG, INTERACTION_NORMAL
 
 app = QApplication.instance() or QApplication([])
 
@@ -177,7 +177,7 @@ def test_pet_opacity_applied_on_build_and_refresh(tmp_path):
 
 def test_pet_opacity_clamped_to_legacy_range():
     """10-100 钳制（window.py:3853-3857 口径）。"""
-    from pet.overlay_window import OverlayWindow
+    from petwisp.overlay_window import OverlayWindow
 
     overlay = OverlayWindow()
     overlay.apply_opacity(3)

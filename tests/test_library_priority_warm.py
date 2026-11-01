@@ -12,8 +12,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from pet import catalog
-import pet.library as library_mod
+from petwisp import catalog
+import petwisp.library as library_mod
 
 
 class FakeClip:
@@ -163,8 +163,8 @@ def test_low_warm_include_frames_by_policy(tmp_path, monkeypatch):
 def test_app_create_library_prewarm_derivation(tmp_path, monkeypatch):
     """预热策略推导：默认 balanced；手改 media_prewarm=full 生效。
     批10-A3 后省电模式与预热解耦（省电模式只降帧，不再强制 minimal）。"""
-    from pet import app as app_mod
-    from pet.config import Config
+    from petwisp import app as app_mod
+    from petwisp.config import Config
 
     captured = {}
 

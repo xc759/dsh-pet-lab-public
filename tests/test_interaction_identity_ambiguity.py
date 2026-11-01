@@ -31,9 +31,9 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 import pytest  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
-from pet import harness_launcher  # noqa: E402
-from pet.agent_link import AgentLinkManager  # noqa: E402
-from pet.config import Config  # noqa: E402
+from petwisp import harness_launcher  # noqa: E402
+from petwisp.agent_link import AgentLinkManager  # noqa: E402
+from petwisp.config import Config  # noqa: E402
 
 app = QApplication.instance() or QApplication([])
 
@@ -252,7 +252,7 @@ def test_session_less_resolved_with_two_candidates_closes_nothing(tmp_path, capl
         mon._poll()
         assert _sessions_of(mgr) == ["A", "B"]
 
-        with caplog.at_level(logging.WARNING, logger="dsh-pet-standalone"):
+        with caplog.at_level(logging.WARNING, logger="petwisp"):
             _write(mon.events_dir, "dsh-1001.jsonl",
                    {"event": "approval/resolved", "rpcId": "shared"})
             mon._poll()

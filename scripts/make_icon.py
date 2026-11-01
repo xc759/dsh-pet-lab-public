@@ -19,7 +19,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
-from pet import catalog  # noqa: E402  （仅取常量，无 Qt 依赖）
+from petwisp import catalog  # noqa: E402  （仅取常量，无 Qt 依赖）
 
 # 从 catalog 读取默认角色与画布尺寸，避免角色名/分辨率变化时构建失败；
 # 待机动画按约定取 idle 目录下第一个 webm。

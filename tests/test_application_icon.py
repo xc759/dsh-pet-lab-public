@@ -18,7 +18,7 @@
    对象，应用被销毁重建后缓存自动失效（测试会重建 QApplication）。
 
 打包面同样在此钉住：``--icon`` 之外**还必须把这一份真的打进包**（``--add-data``），否则
-冻结版窗口图标静默消失；``packaging/dsh-pet.iss`` 的 ``SetupIconFile`` 与安装目录递归
+冻结版窗口图标静默消失；``packaging/petwisp.iss`` 的 ``SetupIconFile`` 与安装目录递归
 拷贝一并断言（安装包不需要额外条目，但要有证据）。多尺寸契约取自图标生成器
 ``scripts/make_icon.py`` 的 ``ICON_SIZES``，不在这里抄第二份字面量。
 """
@@ -45,10 +45,10 @@ SHELLS = {
     "macos": REPO / "scripts" / "build_macos.sh",
     "linux": REPO / "scripts" / "build_linux.sh",
 }
-ISS = REPO / "packaging" / "dsh-pet.iss"
+ISS = REPO / "packaging" / "petwisp.iss"
 PACKAGING_DOC = REPO / "docs" / "ONEDIR_PACKAGING.md"
 
-import pet.application_icon as application_icon  # noqa: E402  —— 被测模块（唯一入口）
+import petwisp.application_icon as application_icon  # noqa: E402  —— 被测模块（唯一入口）
 
 app = QApplication.instance() or QApplication([])
 
@@ -200,7 +200,7 @@ def test_icon_is_never_built_before_an_application_exists_in_a_fresh_process():
     """
     script = (
         "import json\n"
-        "import pet.application_icon as ai\n"
+        "import petwisp.application_icon as ai\n"
         "fresh = ai._ICON_CACHE is None\n"
         "icon = ai.load_application_icon()\n"
         "print(json.dumps({'fresh': fresh, 'null': icon.isNull(),\n"

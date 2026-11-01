@@ -37,8 +37,8 @@ WM_QUERYENDSESSION = 0x0011
 WM_ENDSESSION = 0x0016
 MESSAGES = {"query_end_session": WM_QUERYENDSESSION, "end_session": WM_ENDSESSION}
 
-WINDOW_TITLE_HINTS = ("dsh-pet", "dsd-pet", "桌宠", "宠物", "pet")
-PROCESS_NAME_HINTS = ("dsh-pet",)
+WINDOW_TITLE_HINTS = ("petwisp", "dsd-pet", "桌宠", "宠物", "pet")
+PROCESS_NAME_HINTS = ("petwisp",)
 
 
 def _require_windows() -> None:
@@ -50,7 +50,7 @@ def _pet_windows(only_exe: str = "") -> list:
     """枚举顶层窗口，返回候选桌宠窗口 [(hwnd, title, pid, exe)]。
 
     匹配分两档，避免误伤同类程序（本机可能装着别的桌宠应用，实测就踩过）：
-    1. 进程可执行名命中 ``dsh-pet*``（本变体产物名，最可靠）；
+    1. 进程可执行名命中 ``petwisp*``（本变体产物名，最可靠）；
     2. 否则退到标题提示词——此时脚本**不自动使用**，必须由 ``--hwnd`` 明确指定。
     """
     user32 = ctypes.windll.user32
@@ -113,7 +113,7 @@ def _ffmpeg_pids() -> set:
 
 def _pet_log_dir() -> Path:
     base = os.environ.get("APPDATA") or str(Path.home())
-    return Path(base) / "dsh-pet-standalone-webm-chat"
+    return Path(base) / "petwisp-webm-chat"
 
 
 def main() -> int:
@@ -137,15 +137,15 @@ def main() -> int:
         print("候选窗口：")
         for h, title, pid, exe in candidates:
             print(f"  hwnd={h:#x} pid={pid} exe={exe!r} title={title!r}")
-        # 只在「进程名明确是 dsh-pet」时才自动选用，避免把消息投给别的桌宠程序
+        # 只在「进程名明确是 petwisp」时才自动选用，避免把消息投给别的桌宠程序
         confident = [c for c in candidates
                      if any(h in c[3].lower() for h in PROCESS_NAME_HINTS)]
         if not confident:
-            print("\n候选里没有进程名匹配 dsh-pet* 的窗口：请用 --hwnd 明确指定目标，")
+            print("\n候选里没有进程名匹配 petwisp* 的窗口：请用 --hwnd 明确指定目标，")
             print("避免误把会话结束消息投给其它同类程序（实测踩过）。")
             return 2
         hwnd = confident[0][0]
-        print(f"使用候选：hwnd={hwnd:#x}（进程名匹配 dsh-pet*）")
+        print(f"使用候选：hwnd={hwnd:#x}（进程名匹配 petwisp*）")
 
     log_dir = _pet_log_dir()
     logs_before = {p: p.stat().st_size for p in log_dir.glob("pet-*.log")} if log_dir.is_dir() else {}

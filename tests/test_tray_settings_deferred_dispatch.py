@@ -29,8 +29,8 @@ from PySide6.QtCore import QPointF
 from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QApplication, QWidget
 
-from pet.app import AppShell
-from pet.config import Config
+from petwisp.app import AppShell
+from petwisp.config import Config
 
 app = QApplication.instance() or QApplication([])
 
@@ -442,15 +442,15 @@ def test_overlay_tray_return_to_corner_waits_for_menu_close(tmp_path):
 
 
 @pytest.mark.parametrize("label,delta", [
-    ("生小肥鱼", +1),
-    ("退出子肥鱼", -1),
+    ("生小宠", +1),
+    ("退出子宠", -1),
 ])
 def test_overlay_tray_pet_lifecycle_waits_for_menu_close(tmp_path, label, delta):
-    """overlay 托盘「生小肥鱼 / 退出子肥鱼」：生灭 sprite 与各自库，同样延迟派发。"""
+    """overlay 托盘「生小宠 / 退出子宠」：生灭 sprite 与各自库，同样延迟派发。"""
     shell, menu = _overlay_tray(tmp_path)
     try:
         if delta < 0:
-            shell.spawn_pet()                # 前置：先有一只子肥鱼可退
+            shell.spawn_pet()                # 前置：先有一只子宠可退
             menu = shell.tray.contextMenu()  # 生灭会重建菜单，重取
         before = len(shell._spawned)
         _open_menu(menu)
@@ -477,7 +477,7 @@ def test_overlay_tray_per_pet_submenu_waits_for_menu_close(tmp_path):
         shell.spawn_pet()
         first, second = shell._spawned[0], shell._spawned[1]
         menu = shell.tray.contextMenu()
-        sub = _submenu(menu, f"小肥鱼 [slot-{shell._spawned_slots[first]}]")
+        sub = _submenu(menu, f"小宠 [slot-{shell._spawned_slots[first]}]")
         corner = _entry(sub, "回到右下角")
         show_this = _entry(sub, "显示这只")
         exit_this = _entry(sub, "退出这只")
@@ -531,7 +531,7 @@ def test_overlay_tray_submenu_entry_waits_for_the_whole_menu_tree(tmp_path):
         shell.spawn_pet()
         menu = shell.tray.contextMenu()          # 生灭会重建菜单，重取
         first = shell._spawned[0]
-        sub = _submenu(menu, f"小肥鱼 [slot-{shell._spawned_slots[first]}]")
+        sub = _submenu(menu, f"小宠 [slot-{shell._spawned_slots[first]}]")
         corner = _entry(sub, "回到右下角")
         expected = shell._default_corner_pos(shell._bounds, first.rect())
         first.set_pos(QPointF(0, 0))

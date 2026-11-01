@@ -12,8 +12,8 @@ def _slot0_config(tmp_path):
     每宠键（自言自语族、气泡样式、尺寸…）的真值在 ``config-slot-0.json``：
     裸全局 ``Config.set/save`` 出闸时会过滤掉它们，改不动任何一只宠。
     """
-    from pet.config import Config
-    from pet.settings_slot_config import route_settings_config
+    from petwisp.config import Config
+    from petwisp.settings_slot_config import route_settings_config
 
     return route_settings_config(Config(base=tmp_path, instance_id="slot-0"))
 
@@ -22,7 +22,7 @@ def test_speech_bubble_never_accepts_focus():
     from PySide6.QtCore import Qt
     from PySide6.QtWidgets import QApplication
 
-    from pet.speech_bubble import PetSpeechBubble
+    from petwisp.speech_bubble import PetSpeechBubble
 
     app = QApplication.instance() or QApplication([])
     bubble = PetSpeechBubble()
@@ -36,7 +36,7 @@ def test_speech_bubble_never_accepts_focus():
 def test_self_talk_bubble_presets_have_distinct_visuals_and_safe_positions():
     from PySide6.QtCore import QRect, QSize
 
-    from pet.speech_bubble import (
+    from petwisp.speech_bubble import (
         BUBBLE_STYLE_PRESETS,
         bubble_rect_for_anchor,
     )
@@ -62,7 +62,7 @@ def test_breath_bubble_uses_organic_water_shape_and_detached_trailing_bubbles():
     from PySide6.QtCore import QRect
     from PySide6.QtWidgets import QApplication
 
-    from pet.speech_bubble import PetSpeechBubble
+    from petwisp.speech_bubble import PetSpeechBubble
 
     app = QApplication.instance() or QApplication([])
     bubble = PetSpeechBubble(style_id="breath_bubble")
@@ -102,7 +102,7 @@ def test_breath_bubble_size_tracks_the_visible_pet_without_dominating_it():
     from PySide6.QtCore import QRect, QSize
     from PySide6.QtWidgets import QApplication
 
-    from pet.speech_bubble import (
+    from petwisp.speech_bubble import (
         PetSpeechBubble,
         breath_bubble_size_for_anchor,
         breath_bubble_size_for_scale,
@@ -141,7 +141,7 @@ def test_breath_bubble_reflows_on_pet_scale_change_and_summarizes_markdown():
     from PySide6.QtCore import QRect
     from PySide6.QtWidgets import QApplication
 
-    from pet.speech_bubble import PetSpeechBubble
+    from petwisp.speech_bubble import PetSpeechBubble
 
     app = QApplication.instance() or QApplication([])
     pet = QRect(420, 460, 220, 260)
@@ -174,7 +174,7 @@ def test_breath_bubble_keeps_its_shape_but_adapts_to_text_and_image_content(tmp_
     from PySide6.QtCore import QRect
     from PySide6.QtWidgets import QApplication
 
-    from pet.speech_bubble import PetSpeechBubble
+    from petwisp.speech_bubble import PetSpeechBubble
 
     app = QApplication.instance() or QApplication([])
     pet = QRect(420, 460, 220, 260)
@@ -207,7 +207,7 @@ def test_breath_bubble_image_is_clipped_and_painted_below_water_details(tmp_path
     from PySide6.QtCore import QPointF, QRect
     from PySide6.QtWidgets import QApplication
 
-    from pet.speech_bubble import PetSpeechBubble
+    from petwisp.speech_bubble import PetSpeechBubble
 
     app = QApplication.instance() or QApplication([])
     image = tmp_path / "square-content.png"
@@ -238,7 +238,7 @@ def test_breath_image_position_uses_actual_window_size_not_hidden_label_hint(tmp
     from PySide6.QtCore import QRect
     from PySide6.QtWidgets import QApplication
 
-    from pet.speech_bubble import PetSpeechBubble, bubble_rect_for_anchor
+    from petwisp.speech_bubble import PetSpeechBubble, bubble_rect_for_anchor
 
     app = QApplication.instance() or QApplication([])
     image = tmp_path / "position.png"
@@ -262,7 +262,7 @@ def test_standard_bubble_images_keep_retina_device_pixel_density(tmp_path, monke
     from PySide6.QtCore import QRect
     from PySide6.QtWidgets import QApplication
 
-    from pet.speech_bubble import PetSpeechBubble
+    from petwisp.speech_bubble import PetSpeechBubble
 
     app = QApplication.instance() or QApplication([])
     image = tmp_path / "retina.png"
@@ -293,7 +293,7 @@ def test_all_bubble_presets_use_soft_layered_shadows():
     from PySide6.QtCore import QRect
     from PySide6.QtWidgets import QApplication
 
-    from pet.speech_bubble import BUBBLE_STYLE_PRESETS, PetSpeechBubble
+    from petwisp.speech_bubble import BUBBLE_STYLE_PRESETS, PetSpeechBubble
 
     app = QApplication.instance() or QApplication([])
     for style_id in BUBBLE_STYLE_PRESETS:
@@ -313,7 +313,7 @@ def test_all_bubble_presets_use_soft_layered_shadows():
 def test_pet_scale_change_reflows_visible_bubble_after_rebuilding_mask():
     from PySide6.QtCore import QRect
 
-    from pet.window import PetWindow
+    from petwisp.window import PetWindow
 
     events = []
 
@@ -366,7 +366,7 @@ def test_change_scale_with_destroyed_bubble_is_noop():
     """N7：closeEvent 置 _speech_bubble=None 后，迟到的 change_scale 不得 AttributeError。"""
     from PySide6.QtCore import QRect
 
-    from pet.window import PetWindow
+    from petwisp.window import PetWindow
 
     class FakePet:
         scale = 1.0
@@ -404,9 +404,9 @@ def test_change_scale_with_destroyed_bubble_is_noop():
 def test_self_talk_images_and_duration_are_normalized_and_scheduled_after_hide(tmp_path, monkeypatch):
     from PIL import Image
 
-    from pet.config import Config, DEFAULT_SELF_TALK_DURATION_SECONDS
-    from pet.speech_bubble import list_self_talk_images
-    from pet.window import PetWindow
+    from petwisp.config import Config, DEFAULT_SELF_TALK_DURATION_SECONDS
+    from petwisp.speech_bubble import list_self_talk_images
+    from petwisp.window import PetWindow
 
     image_dir = tmp_path / "talk-images"
     image_dir.mkdir()
@@ -425,7 +425,7 @@ def test_self_talk_images_and_duration_are_normalized_and_scheduled_after_hide(t
 
     from PySide6.QtCore import QRect
     from PySide6.QtWidgets import QApplication
-    from pet.speech_bubble import PetSpeechBubble
+    from petwisp.speech_bubble import PetSpeechBubble
 
     app = QApplication.instance() or QApplication([])
     bubble = PetSpeechBubble(style_id="breath_bubble")
@@ -442,7 +442,7 @@ def test_self_talk_image_scale_config_and_bubble_size(tmp_path):
     """气泡配图尺寸：配置 50~300 钳位 + 气泡按 image_scale 放大（双气泡形态都验证）。"""
     from PIL import Image
 
-    from pet.config import Config
+    from petwisp.config import Config
 
     image_dir = tmp_path / "talk-images"
     image_dir.mkdir()
@@ -464,7 +464,7 @@ def test_self_talk_image_scale_config_and_bubble_size(tmp_path):
 
     from PySide6.QtCore import QRect
     from PySide6.QtWidgets import QApplication
-    from pet.speech_bubble import PetSpeechBubble
+    from petwisp.speech_bubble import PetSpeechBubble
 
     app = QApplication.instance() or QApplication([])
     anchor = QRect(420, 460, 220, 260)
@@ -498,7 +498,7 @@ def test_self_talk_scheduling_and_random_talk_dispatch(tmp_path, monkeypatch):
 
     from PySide6.QtCore import QRect
 
-    from pet.window import PetWindow
+    from petwisp.window import PetWindow
 
     image_dir = tmp_path / "talk-images"
     image_dir.mkdir()
@@ -534,7 +534,7 @@ def test_self_talk_scheduling_and_random_talk_dispatch(tmp_path, monkeypatch):
                 text, QRect(10, 20, 180, 240), 7500, pet_scale=self.scale
             )
 
-    monkeypatch.setattr("pet.window.random.uniform", lambda *_: 5.0)
+    monkeypatch.setattr("petwisp.window.random.uniform", lambda *_: 5.0)
     PetWindow._schedule_self_talk(FakePet(), after_display=True)
     assert starts == [12500]
 
@@ -553,7 +553,7 @@ def test_self_talk_scheduling_and_random_talk_dispatch(tmp_path, monkeypatch):
     runtime_pet._speech_bubble = Bubble()
     runtime_pet.scale = 0.72
     runtime_pet.visible_content_rect = lambda: QRect(10, 20, 180, 240)
-    monkeypatch.setattr("pet.window.random.choice", lambda choices: choices[-1])
+    monkeypatch.setattr("petwisp.window.random.choice", lambda choices: choices[-1])
     assert PetWindow._show_random_self_talk(runtime_pet)
     assert shown == [(image_dir / "one.png", QRect(10, 20, 180, 240), 7500, 0.72, 1.0)]
 
@@ -571,7 +571,7 @@ def test_speech_bubble_tail_is_one_surface_and_shadow_has_no_graphics_effect():
     from PySide6.QtCore import QPointF, QRect
     from PySide6.QtWidgets import QApplication
 
-    from pet.speech_bubble import PetSpeechBubble
+    from petwisp.speech_bubble import PetSpeechBubble
 
     app = QApplication.instance() or QApplication([])
     bubble = PetSpeechBubble(style_id="classic_top")
@@ -595,7 +595,7 @@ def test_speech_bubble_tail_is_one_surface_and_shadow_has_no_graphics_effect():
 
 
 def test_self_talk_bubble_style_is_normalized_and_persisted(tmp_path):
-    from pet.config import Config
+    from petwisp.config import Config
 
     config = _slot0_config(tmp_path)
     assert config.get("self_talk_bubble_style") == "classic_top"
@@ -633,9 +633,9 @@ def test_icon_composition_ignores_low_alpha_noise_and_fills_canvas():
 def test_pet_app_assigns_distinct_offsets_to_spawned_pets(tmp_path, monkeypatch):
     from PySide6.QtWidgets import QApplication
 
-    import pet.app as app_mod
-    from pet.app import AppShell
-    from pet.config import Config
+    import petwisp.app as app_mod
+    from petwisp.app import AppShell
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     offsets = []
@@ -648,7 +648,7 @@ def test_pet_app_assigns_distinct_offsets_to_spawned_pets(tmp_path, monkeypatch)
 
 
 def test_pet_click_restores_fun_windows_even_without_click_animation():
-    from pet.window import PetWindow
+    from petwisp.window import PetWindow
 
     restored = []
 
@@ -664,7 +664,7 @@ def test_pet_click_restores_fun_windows_even_without_click_animation():
 def test_modern_pet_context_menu_has_spawn_action_with_avatar_icon(monkeypatch):
     from PySide6.QtWidgets import QApplication, QMenu, QWidget
 
-    import pet.window as window_mod
+    import petwisp.window as window_mod
 
     class FakeConfig:
         values = {"character": "demo", "on_top": True}
@@ -720,11 +720,11 @@ def test_modern_pet_context_menu_has_spawn_action_with_avatar_icon(monkeypatch):
     direct_actions = [action for action in menu.actions() if not action.isSeparator()]
     assert direct_actions
     controls = next(action.menu() for action in direct_actions if action.text() == "桌宠控制")
-    spawn_action = next(action for action in controls.actions() if action.text() == "生小肥鱼")
+    spawn_action = next(action for action in controls.actions() if action.text() == "生小宠")
     assert not spawn_action.icon().isNull()
     spawn_action.trigger()
     assert pet.spawn_count == 1
-    clear_action = next(action for action in controls.actions() if action.text() == "退出子肥鱼")
+    clear_action = next(action for action in controls.actions() if action.text() == "退出子宠")
     assert not clear_action.icon().isNull()
     clear_action.trigger()
     assert pet.clear_count == 1
@@ -741,7 +741,7 @@ def test_context_menu_has_no_template_switch_entry(tmp_path):
     """
     from PySide6.QtWidgets import QApplication, QMenu
 
-    from pet.context_menu import populate_context_menu
+    from petwisp.context_menu import populate_context_menu
 
     class Config:
         def __init__(self):
@@ -781,7 +781,7 @@ def test_pet_avatar_menu_icon_fills_native_slot_and_stays_centered(monkeypatch):
     from PySide6.QtGui import QPixmap
     from PySide6.QtWidgets import QApplication, QMenu, QStyle
 
-    from pet.context_menus.icons import pet_avatar_menu_icon
+    from petwisp.context_menus.icons import pet_avatar_menu_icon
 
     class FakePet:
         @staticmethod
@@ -827,9 +827,9 @@ def test_modern_context_menu_has_compact_semantic_groups(monkeypatch):
     from PySide6.QtGui import QPixmap
     from PySide6.QtWidgets import QApplication, QMenu
 
-    import pet.window as window_mod
-    import pet.context_menus.registry as registry_mod
-    import pet.context_menus.shared as shared_menu_mod
+    import petwisp.window as window_mod
+    import petwisp.context_menus.registry as registry_mod
+    import petwisp.context_menus.shared as shared_menu_mod
 
     class FakeConfig:
         def __init__(self):
@@ -954,8 +954,8 @@ def test_divination_draw_reports_where_to_turn_it_back_on(tmp_path):
     """
     from types import SimpleNamespace
 
-    from pet.app import AppShell
-    from pet.config import Config
+    from petwisp.app import AppShell
+    from petwisp.config import Config
 
     class _Win:
         def __init__(self):
@@ -986,7 +986,7 @@ def test_pure_pet_context_menu_keeps_web_but_hides_harness():
     """纯桌宠（无 Chat/DSH 联动）右键菜单去掉 DeepSeek Harness，保留网页版。"""
     from PySide6.QtWidgets import QApplication, QMenu
 
-    from pet.context_menu import populate_context_menu
+    from petwisp.context_menu import populate_context_menu
 
     class FakeConfig:
         def get(self, key, default=None):
@@ -1035,7 +1035,7 @@ def test_pure_pet_context_menu_keeps_web_but_hides_harness():
 def test_context_menu_always_applies_the_modern_style():
     from PySide6.QtWidgets import QApplication, QMenu, QStyle, QWidget
 
-    from pet.context_menu import populate_context_menu
+    from petwisp.context_menu import populate_context_menu
 
     class Config:
         def get(self, key, default=None):
@@ -1082,8 +1082,8 @@ def test_context_menu_always_applies_the_modern_style():
     separator_rule = menu.styleSheet().split("QMenu::separator", 1)[1]
     assert "height: 1px" in separator_rule
     assert "background: #e5e5e5" in separator_rule
-    assert Path("pet/context_menus/menu_styles/common.py").is_file()
-    assert Path("pet/context_menus/menu_styles/modern.py").is_file()
+    assert Path("petwisp/context_menus/menu_styles/common.py").is_file()
+    assert Path("petwisp/context_menus/menu_styles/modern.py").is_file()
     assert menu.style().styleHint(QStyle.StyleHint.SH_Menu_SubMenuPopupDelay, None, menu) == 60
     assert menu.style().styleHint(QStyle.StyleHint.SH_Menu_SubMenuSloppyCloseTimeout, None, menu) == 120
     assert menu.style().styleHint(QStyle.StyleHint.SH_Menu_SubMenuSloppySelectOtherActions, None, menu) == 1
@@ -1101,7 +1101,7 @@ def test_submenu_inherits_the_modern_style_from_its_parent():
     """
     from PySide6.QtWidgets import QApplication, QMenu
 
-    from pet.context_menus.menu_styles.common import inherit_menu_style
+    from petwisp.context_menus.menu_styles.common import inherit_menu_style
 
     app = QApplication.instance() or QApplication([])
     parent = QMenu()          # 刻意不设 menuStyle 属性（默认值路径）
@@ -1118,8 +1118,8 @@ def test_modern_menu_icons_are_crisp_outline_glyphs(monkeypatch):
     from PySide6.QtGui import QColor, QImage
     from PySide6.QtWidgets import QApplication, QMenu
 
-    from pet.context_menus.icons import vector_menu_icon
-    from pet.context_menus.menu_styles.modern import apply_modern_menu_style
+    from petwisp.context_menus.icons import vector_menu_icon
+    from petwisp.context_menus.menu_styles.modern import apply_modern_menu_style
 
     app = QApplication.instance() or QApplication([])
     menu = QMenu()
@@ -1152,7 +1152,7 @@ def test_modern_menu_icons_are_crisp_outline_glyphs(monkeypatch):
 def test_modern_checked_action_is_painted_in_reserved_right_slot():
     from PySide6.QtWidgets import QApplication, QMenu, QWidget
 
-    from pet.context_menus.menu_styles.modern import (
+    from petwisp.context_menus.menu_styles.modern import (
         apply_modern_menu_style,
         install_modern_check_indicators,
     )
@@ -1183,7 +1183,7 @@ def test_modern_menu_starts_with_ojingjing_entry_and_uses_pet_avatar(monkeypatch
     from PySide6.QtGui import QPixmap
     from PySide6.QtWidgets import QApplication, QMenu, QWidget
 
-    from pet.context_menu import populate_context_menu
+    from petwisp.context_menu import populate_context_menu
 
     class Config(dict):
         def get(self, key, default=None):
@@ -1217,7 +1217,7 @@ def test_modern_menu_starts_with_ojingjing_entry_and_uses_pet_avatar(monkeypatch
     assert entry.findChild(QWidget, "ojingjingAvatar") is not None
     assert entry.findChild(QWidget, "ojingjingClickAccessory") is not None
     controls = next(action.menu() for action in menu.actions() if action.text() == "桌宠控制")
-    spawn = next(action for action in controls.actions() if action.text() == "生小肥鱼")
+    spawn = next(action for action in controls.actions() if action.text() == "生小宠")
     pixmap = spawn.icon().pixmap(18, 18)
     center = pixmap.toImage().pixelColor(pixmap.width() // 2, pixmap.height() // 2)
     assert center.blue() > center.red() + 80
@@ -1229,7 +1229,7 @@ def test_ojingjing_windows_are_frameless_stackable_and_closeable():
     from PySide6.QtCore import Qt
     from PySide6.QtWidgets import QApplication, QPushButton
 
-    from pet.fun_image_popup import OjingjingWindowManager
+    from petwisp.fun_image_popup import OjingjingWindowManager
 
     app = QApplication.instance() or QApplication([])
     manager = OjingjingWindowManager()
@@ -1250,7 +1250,7 @@ def test_ojingjing_uses_popup_directory_random_images_and_drag_helpers(monkeypat
     from PySide6.QtCore import QPoint
     from PySide6.QtWidgets import QApplication
 
-    import pet.fun_image_popup as popup_mod
+    import petwisp.fun_image_popup as popup_mod
 
     app = QApplication.instance() or QApplication([])
     paths = popup_mod.popup_image_paths()
@@ -1272,7 +1272,7 @@ def test_ojingjing_uses_popup_directory_random_images_and_drag_helpers(monkeypat
 
 
 def test_ojingjing_invalid_empty_or_unreadable_directory_falls_back(tmp_path):
-    import pet.fun_image_popup as popup_mod
+    import petwisp.fun_image_popup as popup_mod
 
     fallback = popup_mod.oijingjing_image_path().parent
     missing = tmp_path / "missing"
@@ -1293,8 +1293,8 @@ def test_ojingjing_invalid_empty_or_unreadable_directory_falls_back(tmp_path):
 def test_ojingjing_menu_entry_defers_window_until_menu_exec_returns(monkeypatch):
     from PySide6.QtWidgets import QApplication, QMenu
 
-    import pet.context_menus.fun_entry as fun_entry
-    from pet.context_menus.shared import take_deferred_menu_callbacks
+    import petwisp.context_menus.fun_entry as fun_entry
+    from petwisp.context_menus.shared import take_deferred_menu_callbacks
 
     app = QApplication.instance() or QApplication([])
     calls = []
@@ -1318,7 +1318,7 @@ def test_ojingjing_menu_entry_defers_window_until_menu_exec_returns(monkeypatch)
 def test_ojingjing_menu_entry_reports_unexpected_open_error(monkeypatch):
     from PySide6.QtWidgets import QApplication, QMenu
 
-    import pet.context_menus.fun_entry as fun_entry
+    import petwisp.context_menus.fun_entry as fun_entry
 
     app = QApplication.instance() or QApplication([])
     warnings = []
@@ -1341,7 +1341,7 @@ def test_ojingjing_menu_entry_reports_unexpected_open_error(monkeypatch):
 
 
 def test_popup_manager_restores_all_existing_windows_before_new_window():
-    from pet.fun_image_popup import OjingjingWindowManager
+    from petwisp.fun_image_popup import OjingjingWindowManager
 
     class FakeWindow:
         def __init__(self):
@@ -1369,9 +1369,9 @@ def test_modern_settings_panel_uses_sidebar_and_includes_ai_settings(tmp_path, m
     from PySide6.QtCore import QSize, Qt
     from PySide6.QtWidgets import QApplication, QListWidget, QStackedWidget
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     app = QApplication.instance() or QApplication([])
     config = Config(tmp_path)
@@ -1533,8 +1533,8 @@ def test_modern_settings_panel_uses_sidebar_and_includes_ai_settings(tmp_path, m
 def test_modern_settings_progressively_reveals_dependent_controls(tmp_path, monkeypatch):
     from PySide6.QtWidgets import QApplication
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -1583,8 +1583,8 @@ def test_click_self_talk_rows_follow_their_own_toggle(tmp_path, monkeypatch):
     """
     from PySide6.QtWidgets import QApplication
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -1635,8 +1635,8 @@ def test_click_only_self_talk_exposes_the_shared_content_rows(tmp_path, monkeypa
     """
     from PySide6.QtWidgets import QApplication
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -1703,8 +1703,8 @@ def test_click_only_self_talk_exposes_the_shared_content_rows(tmp_path, monkeypa
 def test_modern_settings_toggle_dependencies_hide_complete_setting_groups(tmp_path, monkeypatch):
     from PySide6.QtWidgets import QApplication
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -1769,8 +1769,8 @@ def test_modern_settings_toggle_dependencies_hide_complete_setting_groups(tmp_pa
 def test_windows_proactive_master_and_idle_toggles_hide_dependent_rows(tmp_path, monkeypatch):
     from PySide6.QtWidgets import QApplication
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.sys, "platform", "win32")
@@ -1805,8 +1805,8 @@ def test_windows_proactive_master_and_idle_toggles_hide_dependent_rows(tmp_path,
 def test_chat_appearance_options_follow_selected_window_and_persist_independently(tmp_path, monkeypatch):
     from PySide6.QtWidgets import QApplication
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -1814,13 +1814,13 @@ def test_chat_appearance_options_follow_selected_window_and_persist_independentl
     dialog = settings_mod.ModernSettingsDialog(config, include_ai=True)
 
     assert [dialog.ai_page.chat_ui_style.itemText(index) for index in range(2)] == [
-        "肥鱼版 DeepSeek", "肥鱼牌小手机",
+        "桌宠版 DeepSeek", "桌宠牌小手机",
     ]
     assert dialog.ai_page.chat_ui_style.width() >= 180
     window_row = dialog.findChild(settings_mod.SettingRow, "settingRow_chat_ui_style")
     assert "宽屏现代体验" in window_row.hint_label.text()
     assert "紧凑经典体验" in window_row.hint_label.text()
-    # 内置主题两种风格都可选（肥鱼版 DeepSeek 与肥鱼牌小手机一致）
+    # 内置主题两种风格都可选（桌宠版 DeepSeek 与桌宠牌小手机一致）
     modern_options = [
         dialog.ai_page.background_select.itemText(index)
         for index in range(dialog.ai_page.background_select.count())
@@ -1870,7 +1870,7 @@ def test_quick_launch_editor_drag_order_and_checked_removal_drive_saved_menu_ord
     from PySide6.QtCore import Qt
     from PySide6.QtWidgets import QApplication
 
-    import pet.modern_settings_dialog as settings_mod
+    import petwisp.modern_settings_dialog as settings_mod
 
     app = QApplication.instance() or QApplication([])
     editor = settings_mod.QuickLaunchEditor([
@@ -1890,7 +1890,7 @@ def test_quick_launch_editor_drag_order_and_checked_removal_drive_saved_menu_ord
 def test_quick_launch_editor_uses_content_sized_rows_and_grouped_add_menu():
     from PySide6.QtWidgets import QApplication, QSizePolicy
 
-    import pet.modern_settings_dialog as settings_mod
+    import petwisp.modern_settings_dialog as settings_mod
 
     app = QApplication.instance() or QApplication([])
     editor = settings_mod.QuickLaunchEditor([
@@ -1924,7 +1924,7 @@ def test_quick_launch_editor_collapses_to_a_compact_empty_state_after_last_remov
     from PySide6.QtCore import Qt
     from PySide6.QtWidgets import QApplication
 
-    import pet.modern_settings_dialog as settings_mod
+    import petwisp.modern_settings_dialog as settings_mod
 
     app = QApplication.instance() or QApplication([])
     editor = settings_mod.QuickLaunchEditor([
@@ -1951,7 +1951,7 @@ def test_quick_launch_checkbox_can_be_selected_with_a_pointer_click():
     from PySide6.QtTest import QTest
     from PySide6.QtWidgets import QApplication
 
-    import pet.modern_settings_dialog as settings_mod
+    import petwisp.modern_settings_dialog as settings_mod
 
     app = QApplication.instance() or QApplication([])
     editor = settings_mod.QuickLaunchEditor([
@@ -1978,7 +1978,7 @@ def test_quick_launch_checkbox_can_be_selected_with_a_pointer_click():
 def test_macos_tool_window_stays_visible_when_application_deactivates(monkeypatch):
     from PySide6.QtCore import Qt
 
-    import pet.window as window_mod
+    import petwisp.window as window_mod
 
     attributes = []
 
@@ -1989,13 +1989,13 @@ def test_macos_tool_window_stays_visible_when_application_deactivates(monkeypatc
     monkeypatch.setattr(window_mod.sys, "platform", "darwin")
     window_mod._keep_macos_tool_window_visible(FakeWindow())
     assert attributes == [(Qt.WidgetAttribute.WA_MacAlwaysShowToolWindow, True)]
-    source = Path("pet/window.py").read_text(encoding="utf-8")
+    source = Path("petwisp/window.py").read_text(encoding="utf-8")
     set_on_top_source = source.split("def set_on_top", 1)[1].split("def showEvent", 1)[0]
     assert "WA_MacAlwaysShowToolWindow, on" not in set_on_top_source
 
 
 def test_config_defaults_and_normalizes_menu_appearance_and_quick_launch(tmp_path):
-    from pet.config import Config
+    from petwisp.config import Config
 
     config = Config(tmp_path)
     appearance = config.get("context_menu_appearance")
@@ -2020,8 +2020,8 @@ def test_modern_menu_adds_quick_launch_submenu_and_uses_saved_appearance(monkeyp
     from PySide6.QtGui import QPixmap
     from PySide6.QtWidgets import QApplication, QMenu
 
-    import pet.context_menus.quick_launch as quick_launch_mod
-    from pet.context_menu import populate_context_menu
+    import petwisp.context_menus.quick_launch as quick_launch_mod
+    from petwisp.context_menu import populate_context_menu
 
     class Config:
         values = {
@@ -2076,8 +2076,8 @@ def test_modern_settings_search_locates_rows_and_return_does_not_close(tmp_path,
     from PySide6.QtTest import QTest
     from PySide6.QtWidgets import QApplication
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -2102,14 +2102,14 @@ def test_wired_petwindow_offers_settings_entry(tmp_path):
     """正式装配：真实 PetWindow + 真实 ``_wire_window`` 的「桌宠设置」入口可触发。
 
     真实装配：真实 ``PetWindow``（素材库用既有测试替身）+ **真实**
-    ``pet.app.PetInstance._wire_window``（宿主只补该方法读到的面）；建菜单后触发
+    ``petwisp.app.PetInstance._wire_window``（宿主只补该方法读到的面）；建菜单后触发
     设置项，断言落到 ``_wire_window`` 注入的那条现代设置回调。
     """
     from PySide6.QtWidgets import QApplication, QMenu
 
-    import pet.app as app_mod
-    from pet.context_menu import populate_context_menu
-    from pet.config import Config
+    import petwisp.app as app_mod
+    from petwisp.context_menu import populate_context_menu
+    from petwisp.config import Config
 
     import tests.test_context_menu_lifecycle as lc
 
@@ -2161,7 +2161,7 @@ def test_runtime_pet_icon_crops_transparent_canvas_before_scaling():
     from PySide6.QtGui import QPainter, QPixmap
     from PySide6.QtWidgets import QApplication
 
-    from pet.window import PetWindow
+    from petwisp.window import PetWindow
 
     class FakePet:
         idle = None
@@ -2187,10 +2187,10 @@ def test_windows_build_regenerates_the_icon_before_pyinstaller():
     pyinstaller = build_script.index("python -m PyInstaller")
     assert make_icon < pyinstaller
     assert "assets\\big_blue_fat_fish;assets\\big_blue_fat_fish" in build_script
-    assert "pet\\menu_templates;pet\\menu_templates" in build_script
+    assert "petwisp\\menu_templates;pet\\menu_templates" in build_script
     mac_build_script = Path("scripts/build_macos.sh").read_text(encoding="utf-8")
     assert 'assets/big_blue_fat_fish:assets/big_blue_fat_fish' in mac_build_script
-    assert "pet/menu_templates:pet/menu_templates" in mac_build_script
+    assert "petwisp/menu_templates:pet/menu_templates" in mac_build_script
 
 
 def test_modern_animation_leaf_icons_are_loaded_only_when_category_opens(monkeypatch):
@@ -2200,7 +2200,7 @@ def test_modern_animation_leaf_icons_are_loaded_only_when_category_opens(monkeyp
     from PySide6.QtGui import QImage
     from PySide6.QtWidgets import QApplication, QMenu
 
-    from pet.context_menu import populate_context_menu
+    from petwisp.context_menu import populate_context_menu
 
     class Config(dict):
         def get(self, key, default=None):
@@ -2260,8 +2260,8 @@ def test_animation_leaf_icon_crops_transparent_frame_before_filling_slot():
     from PySide6.QtGui import QBitmap, QPainter, QPixmap, QRegion
     from PySide6.QtWidgets import QApplication, QMenu
 
-    from pet.context_menus.icons import fitted_pet_pixmap_icon
-    from pet.context_menus.menu_styles.modern import apply_modern_menu_style
+    from petwisp.context_menus.icons import fitted_pet_pixmap_icon
+    from petwisp.context_menus.menu_styles.modern import apply_modern_menu_style
 
     app = QApplication.instance() or QApplication([])
     menu = QMenu()
@@ -2283,8 +2283,8 @@ def test_reopened_animation_menu_reuses_cached_images_immediately():
     from PySide6.QtGui import QImage
     from PySide6.QtWidgets import QApplication, QMenu
 
-    from pet.context_menus.shared import build_animation_categories
-    from pet.context_menus.menu_styles.modern import apply_modern_menu_style
+    from petwisp.context_menus.shared import build_animation_categories
+    from petwisp.context_menus.menu_styles.modern import apply_modern_menu_style
 
     class Pet:
         idles = ["idle-a"]
@@ -2318,8 +2318,8 @@ def test_representative_animation_image_is_cached_on_pet(monkeypatch):
     from PySide6.QtCore import Qt
     from PySide6.QtGui import QImage
 
-    import pet.window as window_mod
-    from pet.window import PetWindow
+    import petwisp.window as window_mod
+    from petwisp.window import PetWindow
 
     calls = []
 
@@ -2355,7 +2355,7 @@ def test_representative_animation_decode_is_shared_across_pets(monkeypatch, tmp_
 
     from PySide6.QtGui import QImage
 
-    import pet.animation_thumbnail as thumbnail
+    import petwisp.animation_thumbnail as thumbnail
 
     path = tmp_path / "shared.webm"
     path.write_bytes(b"fixture")
@@ -2379,7 +2379,7 @@ def test_representative_animation_decode_is_shared_across_pets(monkeypatch, tmp_
 def test_long_submenus_enable_qt_scrolling():
     from PySide6.QtWidgets import QApplication, QMenu, QStyle
 
-    from pet.context_menus.menu_styles.common import install_responsive_menu_style
+    from petwisp.context_menus.menu_styles.common import install_responsive_menu_style
 
     app = QApplication.instance() or QApplication([])
     menu = QMenu()
@@ -2397,8 +2397,8 @@ def test_visible_animation_submenu_does_not_relayout_when_thumbnail_finishes():
     from PySide6.QtGui import QImage
     from PySide6.QtWidgets import QApplication, QMenu
 
-    from pet.context_menus.shared import build_animation_categories
-    from pet.context_menus.menu_styles.modern import apply_modern_menu_style
+    from petwisp.context_menus.shared import build_animation_categories
+    from petwisp.context_menus.menu_styles.modern import apply_modern_menu_style
 
     class Pet:
         idles = ["idle-a"]
@@ -2446,8 +2446,8 @@ def test_animation_hover_only_dispatches_bounded_background_work():
     from PySide6.QtGui import QImage
     from PySide6.QtWidgets import QApplication, QMenu
 
-    from pet.context_menus.shared import build_animation_categories
-    from pet.context_menus.menu_styles.modern import apply_modern_menu_style
+    from petwisp.context_menus.shared import build_animation_categories
+    from petwisp.context_menus.menu_styles.modern import apply_modern_menu_style
 
     class Pet:
         idles = turns = moves = clicks = []
@@ -2475,7 +2475,7 @@ def test_animation_hover_only_dispatches_bounded_background_work():
 def test_on_top_pet_reasserts_native_level_after_context_menu_hides():
     from PySide6.QtWidgets import QApplication
 
-    from pet.window import PetWindow
+    from petwisp.window import PetWindow
 
     class Config(dict):
         def get(self, key, default=None):
@@ -2502,7 +2502,7 @@ def test_on_top_pet_reasserts_native_level_after_context_menu_hides():
 def test_disabled_on_top_does_not_raise_after_context_menu_hides():
     from PySide6.QtWidgets import QApplication
 
-    from pet.window import PetWindow
+    from petwisp.window import PetWindow
 
     class Pet:
         cfg = {"on_top": False}
@@ -2520,7 +2520,7 @@ def test_disabled_on_top_does_not_raise_after_context_menu_hides():
 
 
 def test_representative_animation_frame_uses_the_later_middle():
-    from pet.animation_thumbnail import representative_frame_index
+    from petwisp.animation_thumbnail import representative_frame_index
 
     assert representative_frame_index(1) == 0
     assert representative_frame_index(50) == 30
@@ -2531,8 +2531,8 @@ def test_template_reopen_reuses_original_visible_menu_position(monkeypatch):
     from PySide6.QtCore import QPoint
     from PySide6.QtWidgets import QApplication, QMenu
 
-    import pet.window as window_mod
-    from pet.window import PetWindow
+    import petwisp.window as window_mod
+    from petwisp.window import PetWindow
 
     class FakePet:
         _context_menu_anchor = QPoint(320, 240)
@@ -2555,7 +2555,7 @@ def test_template_reopen_reuses_original_visible_menu_position(monkeypatch):
 
 
 def test_menu_easter_egg_and_modern_theme_fields_are_configurable(tmp_path):
-    from pet.config import Config
+    from petwisp.config import Config
 
     config = Config(tmp_path)
     appearance = config.get("context_menu_appearance")
@@ -2582,7 +2582,7 @@ def test_menu_easter_egg_and_modern_theme_fields_are_configurable(tmp_path):
 
 
 def test_easter_egg_config_preserves_custom_paths(tmp_path):
-    from pet.config import Config
+    from petwisp.config import Config
 
     config = Config(tmp_path)
     config.set("menu_easter_egg", {
@@ -2598,8 +2598,8 @@ def test_easter_egg_path_and_color_controls_use_native_pickers(tmp_path, monkeyp
     from PySide6.QtGui import QColor
     from PySide6.QtWidgets import QApplication
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     image = (tmp_path / "avatar.webp").resolve()
@@ -2623,7 +2623,7 @@ def test_easter_egg_path_and_color_controls_use_native_pickers(tmp_path, monkeyp
 def test_easter_egg_menu_text_elides_when_content_is_too_long():
     from PySide6.QtWidgets import QApplication, QMenu
 
-    from pet.context_menus.fun_entry import OjingjingMenuEntry
+    from petwisp.context_menus.fun_entry import OjingjingMenuEntry
 
     app = QApplication.instance() or QApplication([])
     menu = QMenu()
@@ -2641,7 +2641,7 @@ def test_easter_egg_first_row_font_tracks_modern_menu_ui_size():
     from PySide6.QtGui import QFont
     from PySide6.QtWidgets import QApplication, QMenu
 
-    from pet.context_menus.fun_entry import OjingjingMenuEntry
+    from petwisp.context_menus.fun_entry import OjingjingMenuEntry
 
     app = QApplication.instance() or QApplication([])
     menu = QMenu()
@@ -2660,8 +2660,8 @@ def test_easter_egg_text_remains_readable_in_the_dark_menu_theme():
     from PySide6.QtGui import QPalette
     from PySide6.QtWidgets import QApplication, QMenu
 
-    from pet.context_menus.fun_entry import OjingjingMenuEntry
-    from pet.context_menus.menu_styles.modern import apply_modern_menu_style
+    from petwisp.context_menus.fun_entry import OjingjingMenuEntry
+    from petwisp.context_menus.menu_styles.modern import apply_modern_menu_style
 
     app = QApplication.instance() or QApplication([])
     menu = QMenu()
@@ -2690,8 +2690,8 @@ def test_easter_egg_hover_surface_stays_dark_in_the_dark_menu_theme():
     from PySide6.QtGui import QEnterEvent
     from PySide6.QtWidgets import QApplication, QMenu
 
-    from pet.context_menus.fun_entry import OjingjingMenuEntry
-    from pet.context_menus.menu_styles.modern import apply_modern_menu_style
+    from petwisp.context_menus.fun_entry import OjingjingMenuEntry
+    from petwisp.context_menus.menu_styles.modern import apply_modern_menu_style
 
     app = QApplication.instance() or QApplication([])
     menu = QMenu()
@@ -2720,7 +2720,7 @@ def test_modern_menu_exposes_no_template_switch_action():
     ``tests/test_sprite_menu_parity.py::test_open_full_menu_at_rebuilds_menu_at_position``
     覆盖，这里只钉"模板切换项不得复活"。
     """
-    from pet.context_menus.registry import ACTION_LABELS, MENU_ACTIONS
+    from petwisp.context_menus.registry import ACTION_LABELS, MENU_ACTIONS
 
     assert "switch_template" not in MENU_ACTIONS.ids
     assert "switch_template" not in ACTION_LABELS
@@ -2731,7 +2731,7 @@ def test_modern_menu_exposes_no_template_switch_action():
 def test_color_picker_uses_stable_painted_swatch_instead_of_border_hack():
     from PySide6.QtWidgets import QApplication
 
-    from pet.modern_settings_dialog import ColorPicker, ColorSwatchButton
+    from petwisp.modern_settings_dialog import ColorPicker, ColorSwatchButton
 
     app = QApplication.instance() or QApplication([])
     picker = ColorPicker("#171717")
@@ -2747,8 +2747,8 @@ def test_color_picker_uses_stable_painted_swatch_instead_of_border_hack():
 def test_dock_icon_visibility_defaults_on_and_is_saved_by_modern_settings(tmp_path, monkeypatch):
     from PySide6.QtWidgets import QApplication
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.sys, "platform", "darwin")
@@ -2765,7 +2765,7 @@ def test_dock_icon_visibility_defaults_on_and_is_saved_by_modern_settings(tmp_pa
 
 def test_product_copy_has_no_external_brand_reference():
     forbidden = ("co" + "dex").lower()
-    roots = [Path("pet"), Path("tests"), Path("docs"), Path("README.md")]
+    roots = [Path("petwisp"), Path("tests"), Path("docs"), Path("README.md")]
     hits = []
     for root in roots:
         paths = [root] if root.is_file() else list(root.rglob("*"))
@@ -2776,7 +2776,7 @@ def test_product_copy_has_no_external_brand_reference():
             # evidence, not user-facing product copy.
             if (
                 path.name in {"test_agent_link.py"}
-                or path.as_posix().endswith("pet/agent_link/__init__.py")
+                or path.as_posix().endswith("petwisp/agent_link/__init__.py")
                 or path.name.endswith("-RESEARCH.md")
                 # Contributor/change reports are repository evidence, not
                 # user-facing product copy and may mention external brands.
@@ -2791,7 +2791,7 @@ def test_product_copy_has_no_external_brand_reference():
 def test_return_corner_cancels_all_position_writers_before_move():
     from PySide6.QtCore import QRect
 
-    from pet.window import PetWindow
+    from petwisp.window import PetWindow
 
     calls = []
 
@@ -2828,7 +2828,7 @@ def test_return_corner_cancels_all_position_writers_before_move():
 
 
 def test_macos_on_top_reapplies_native_level_without_stale_window_id():
-    source = Path("pet/window.py").read_text(encoding="utf-8")
+    source = Path("petwisp/window.py").read_text(encoding="utf-8")
     method = source.split("def set_on_top", 1)[1].split("def showEvent", 1)[0]
     assert "_schedule_macos_window_level" in method
     assert "int(self.winId())" not in method
@@ -2842,7 +2842,7 @@ def test_context_menu_leaf_actions_stay_open_until_focus_is_lost():
     from PySide6.QtGui import QMouseEvent
     from PySide6.QtWidgets import QApplication, QMenu
 
-    from pet.context_menus.menu_styles.common import install_stay_open_interaction
+    from petwisp.context_menus.menu_styles.common import install_stay_open_interaction
 
     app = QApplication.instance() or QApplication([])
     menu = QMenu()
@@ -2868,7 +2868,7 @@ def test_context_menu_leaf_actions_stay_open_until_focus_is_lost():
 def test_window_opening_menu_action_uses_native_close_path():
     from PySide6.QtWidgets import QApplication, QMenu
 
-    from pet.context_menus.shared import add_action
+    from petwisp.context_menus.shared import add_action
 
     app = QApplication.instance() or QApplication([])
     menu = QMenu()
@@ -2879,8 +2879,8 @@ def test_window_opening_menu_action_uses_native_close_path():
 
 
 def test_macos_dock_icon_policy_tracks_the_saved_visibility_setting():
-    source = Path("pet/app.py").read_text(encoding="utf-8")
-    helper = Path("pet/platform_mac.py").read_text(encoding="utf-8")
+    source = Path("petwisp/app.py").read_text(encoding="utf-8")
+    helper = Path("petwisp/platform_mac.py").read_text(encoding="utf-8")
     assert "NSApplicationActivationPolicyRegular = 0" in helper
     assert "Accessory = 1" in helper
     assert "setActivationPolicy:" in helper
@@ -2893,9 +2893,9 @@ def test_pet_app_binds_about_to_quit_once_to_current_window(tmp_path, monkeypatc
     monkeypatch.setenv("PET_RENDER_TOPOLOGY", "legacy")  # PetWindow 路径测试
     from PySide6.QtWidgets import QApplication
 
-    import pet.app as app_mod
-    from pet.app import AppShell
-    from pet.config import Config
+    import petwisp.app as app_mod
+    from petwisp.app import AppShell
+    from petwisp.config import Config
 
     QApplication.instance() or QApplication([])
 
@@ -2953,8 +2953,8 @@ def test_dsh_converged_state_wiring_drives_thinking(tmp_path, monkeypatch):
     """
     from PySide6.QtWidgets import QApplication
 
-    from pet.app import AppShell
-    from pet.config import Config
+    from petwisp.app import AppShell
+    from petwisp.config import Config
 
     QApplication.instance() or QApplication([])
     owner = AppShell(QApplication.instance(), Config(tmp_path))
@@ -2998,10 +2998,10 @@ def test_external_character_dirs_uses_variant_then_legacy_fallback(tmp_path, mon
     """外部角色目录应优先变体目录，并保留旧 dsh-pet-standalone 目录兜底。"""
     import sys
 
-    import pet.catalog as catalog_mod
-    from pet import config as config_mod
+    import petwisp.catalog as catalog_mod
+    from petwisp import config as config_mod
 
-    monkeypatch.setattr(config_mod, "APP_DIR_NAME", "dsh-pet-standalone-webm-chat")
+    monkeypatch.setattr(config_mod, "APP_DIR_NAME", "petwisp-webm-chat")
     # 数据目录按平台走 APPDATA / Library/Application Support / XDG_CONFIG_HOME
     if sys.platform == "win32":
         root = tmp_path
@@ -3013,7 +3013,7 @@ def test_external_character_dirs_uses_variant_then_legacy_fallback(tmp_path, mon
         root = tmp_path
         monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path))
     dirs = catalog_mod.external_character_dirs()
-    variant = root / "dsh-pet-standalone-webm-chat" / "characters"
+    variant = root / "petwisp-webm-chat" / "characters"
     legacy = root / "dsh-pet-standalone" / "characters"
     assert variant in dirs
     assert legacy in dirs
@@ -3024,10 +3024,10 @@ def test_external_character_dirs_dedupes_base_dir(tmp_path, monkeypatch):
     """非变体（APP_DIR_NAME == 默认）时旧目录不被重复追加。"""
     import sys
 
-    import pet.catalog as catalog_mod
-    from pet import config as config_mod
+    import petwisp.catalog as catalog_mod
+    from petwisp import config as config_mod
 
-    monkeypatch.setattr(config_mod, "APP_DIR_NAME", "dsh-pet-standalone")
+    monkeypatch.setattr(config_mod, "APP_DIR_NAME", "petwisp")
     if sys.platform == "win32":
         root = tmp_path
         monkeypatch.setenv("APPDATA", str(tmp_path))
@@ -3038,12 +3038,12 @@ def test_external_character_dirs_dedupes_base_dir(tmp_path, monkeypatch):
         root = tmp_path
         monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path))
     dirs = catalog_mod.external_character_dirs()
-    base = root / "dsh-pet-standalone" / "characters"
+    base = root / "petwisp" / "characters"
     assert dirs.count(base) == 1
 def test_self_talk_deleted_external_dir_falls_back_to_text_not_bundled(tmp_path):
     """回归：用户显式配置的外部图片目录被删后，不再回退内置彩蛋池
     （用户删目录的意图就是不要再看图）。"""
-    from pet.window import _resolve_self_talk_image_dir
+    from petwisp.window import _resolve_self_talk_image_dir
 
     gone = tmp_path / "deleted_dir"
     assert _resolve_self_talk_image_dir(str(gone)) == ""
@@ -3061,7 +3061,7 @@ def test_image_directory_picker_opens_right_drawer_with_three_column_masonry(tmp
     from PIL import Image
     from PySide6.QtWidgets import QApplication, QDialog, QVBoxLayout
 
-    from pet.modern_settings_dialog import ImagePreviewDrawer, ResourcePathPicker
+    from petwisp.modern_settings_dialog import ImagePreviewDrawer, ResourcePathPicker
 
     short = tmp_path / "01-one.png"
     # 名字要够长（卡片文本按宽度截断显示、tooltip 显示全名），但不能长到触发
@@ -3105,7 +3105,7 @@ def test_cleanup_old_pet_logs(tmp_path):
     import os
     import time
 
-    from pet.app import _cleanup_old_pet_logs
+    from petwisp.app import _cleanup_old_pet_logs
 
     old = tmp_path / "pet-111.log"
     old.write_text("x", encoding="utf-8")
@@ -3136,9 +3136,9 @@ def test_check_update_failure_reports_and_reentry_guard(tmp_path, monkeypatch):
 
     from PySide6.QtWidgets import QApplication
 
-    from pet import app as app_mod
-    from pet.app import AppShell
-    from pet.config import Config
+    from petwisp import app as app_mod
+    from petwisp.app import AppShell
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     owner = AppShell(app, Config(tmp_path))
@@ -3188,8 +3188,8 @@ def test_modern_settings_reject_saves_config(tmp_path):
     """审查 DS-M9 回归：Esc（reject）路径与 X 一样落盘。"""
     from PySide6.QtWidgets import QApplication
 
-    from pet import modern_settings_dialog as settings_mod
-    from pet.config import Config
+    from petwisp import modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     cfg = _slot0_config(tmp_path)
@@ -3203,8 +3203,8 @@ def test_modern_settings_reject_saves_config(tmp_path):
 def test_settings_image_directories_use_preview_but_audio_folders_do_not(tmp_path, monkeypatch):
     from PySide6.QtWidgets import QApplication
 
-    from pet import modern_settings_dialog as settings_mod
-    from pet.config import Config
+    from petwisp import modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -3219,15 +3219,15 @@ def test_settings_image_directories_use_preview_but_audio_folders_do_not(tmp_pat
 def test_clear_proactive_memory_reports_failure_truthfully(tmp_path, monkeypatch):
     """清空陪伴记忆失败时不得再报"已清空"（按 clear() 返回值分支）。
 
-    设置页是**独立进程**（`python -m pet --settings`），与主进程后台主动识屏
+    设置页是**独立进程**（`python -m petwisp --settings`），与主进程后台主动识屏
     写同一份记忆文件；拿不到跨进程锁就是"这次没清"。之前无条件弹"已清空"，
     用户看到的是"清了还在"。
     """
     from PySide6.QtWidgets import QApplication, QMessageBox
 
-    import pet.modern_settings_dialog as settings_mod
-    import pet.proactive as proactive_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    import petwisp.proactive as proactive_mod
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -3266,8 +3266,8 @@ def test_clear_proactive_memory_reports_success_and_removes_file(tmp_path, monke
     """对照组：真清空成功仍报"已清空"，且文件确实被删（返回值不是摆设）。"""
     from PySide6.QtWidgets import QApplication, QMessageBox
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -3308,8 +3308,8 @@ def test_clear_proactive_memory_reports_failure_when_probe_fails(tmp_path, monke
     """
     from PySide6.QtWidgets import QApplication, QMessageBox
 
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)

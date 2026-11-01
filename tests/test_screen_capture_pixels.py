@@ -20,13 +20,13 @@ pytest.importorskip("PySide6")
 from PySide6.QtGui import QColor, QColorSpace, QImage, QPainter, QPixmap  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
-from pet.screen_capture.pixels import (  # noqa: E402
+from petwisp.screen_capture.pixels import (  # noqa: E402
     SRGB8_FORMAT,
     crop_selection,
     grab_screen_image,
     to_srgb8,
 )
-from pet.screen_capture.session import SelectionRect, normalize_drag  # noqa: E402
+from petwisp.screen_capture.session import SelectionRect, normalize_drag  # noqa: E402
 
 
 @pytest.fixture(scope="module", autouse=True)

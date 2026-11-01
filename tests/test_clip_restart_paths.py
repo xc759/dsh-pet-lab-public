@@ -27,9 +27,9 @@ from PySide6.QtCore import QObject, QRect, Signal
 from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QApplication
 
-from pet import catalog
-from pet.config import Config
-from pet.window import PetWindow
+from petwisp import catalog
+from petwisp.config import Config
+from petwisp.window import PetWindow
 
 NAMES = [
     catalog.IDLE,
@@ -509,7 +509,7 @@ def test_move_middle_loop_restart_position_never_regresses_on_sync_emit(app, tmp
     `jumpToFrame(0)`；WebMClip 消费定时器异步发帧不受影响，但顺序契约
     对两条媒体路径都必须成立。
     """
-    import pet.window as window_mod
+    import petwisp.window as window_mod
 
     lib = FakeLibrary()
     win = _make_win(tmp_path, lib)

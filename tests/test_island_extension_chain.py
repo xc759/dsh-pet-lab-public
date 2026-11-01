@@ -34,13 +34,13 @@ from PySide6 import QtCore
 from PySide6.QtCore import QEventLoop, QRect, QTime, QTimer
 from PySide6.QtWidgets import QApplication, QLabel
 
-import pet.island.dynamic_island as island_mod
-import pet.modern_settings_dialog as settings_mod
-from pet.island import extension_host as host
-from pet.island import layout as island_layout, segments as isl
-from pet.config import Config
-from pet.island.dynamic_island import DynamicIsland
-from pet.island.segments import CPU, MEM
+import petwisp.island.dynamic_island as island_mod
+import petwisp.modern_settings_dialog as settings_mod
+from petwisp.island import extension_host as host
+from petwisp.island import layout as island_layout, segments as isl
+from petwisp.config import Config
+from petwisp.island.dynamic_island import DynamicIsland
+from petwisp.island.segments import CPU, MEM
 from tests.test_island_extension_host import (
     MANIFEST, _wait_for, _write_component,
 )
@@ -1228,9 +1228,9 @@ def test_settings_process_reads_the_manifest_without_executing_providers(tmp_pat
 
     script = (
         "import json\n"
-        "from pet.island import extension_host as host\n"
-        "from pet.config import _clean_island_metrics\n"
-        "from pet.settings_network import metric_order\n"
+        "from petwisp.island import extension_host as host\n"
+        "from petwisp.config import _clean_island_metrics\n"
+        "from petwisp.settings_network import metric_order\n"
         "print(json.dumps({\n"
         "    'ids': sorted(host.declared_metric_ids()),\n"
         "    'order': list(metric_order()),\n"

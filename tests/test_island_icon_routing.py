@@ -24,7 +24,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QApplication
 
-from pet.app import AppShell
+from petwisp.app import AppShell
 from tests.test_overlay_shell import _make_shell
 
 app = QApplication.instance() or QApplication([])

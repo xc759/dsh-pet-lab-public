@@ -14,14 +14,14 @@ import datetime as dt
 
 import pytest
 
-from pet import festival as F
-from pet.festival import calendar as C
-from pet.festival import data as D
-from pet.festival.quotes_cn import QUOTES_CN
-from pet.festival.quotes_west import QUOTES_WEST
-from pet.festival.quotes_west_game import QUOTES_WEST_GAME
-from pet.festival.quotes_west_movie import QUOTES_WEST_MOVIE
-from pet.festival.quotes_west_song import QUOTES_WEST_SONG
+from petwisp import festival as F
+from petwisp.festival import calendar as C
+from petwisp.festival import data as D
+from petwisp.festival.quotes_cn import QUOTES_CN
+from petwisp.festival.quotes_west import QUOTES_WEST
+from petwisp.festival.quotes_west_game import QUOTES_WEST_GAME
+from petwisp.festival.quotes_west_movie import QUOTES_WEST_MOVIE
+from petwisp.festival.quotes_west_song import QUOTES_WEST_SONG
 
 # 西方节日的四段内置库（公有领域 -> 电影 -> 游戏 -> 歌曲），顺序即拼装顺序。
 WEST_LIBRARIES = (QUOTES_WEST, QUOTES_WEST_MOVIE, QUOTES_WEST_GAME, QUOTES_WEST_SONG)
@@ -463,7 +463,7 @@ def test_third_party_notices_match_quote_libraries(path, marker, section):
 
     repo_root = _Path(__file__).resolve().parents[1]
     notices = (repo_root / "THIRD_PARTY_NOTICES.md").read_text(encoding="utf-8")
-    actual = _actual_sources(repo_root / "pet" / path, marker)
+    actual = _actual_sources(repo_root / "petwisp" / path, marker)
     declared = _declared_sources(notices, section)
     assert declared == actual, (
         "第三方声明与文案库不一致："
@@ -484,7 +484,7 @@ def test_third_party_notices_list_every_song():
     notices = (_Path(__file__).resolve().parents[1] / "THIRD_PARTY_NOTICES.md").read_text(
         encoding="utf-8"
     )
-    db = _Path(__file__).resolve().parents[1] / "pet" / "festival" / "quotes_west_song.py"
+    db = _Path(__file__).resolve().parents[1] / "petwisp" / "festival" / "quotes_west_song.py"
     # 只取「引号字符串后面紧跟的注释」——否则文件头 # -*- coding -*- 与
     # "# 平安夜（12/24）：…" 这类分组注释也会被当成歌曲名。
     titles = {
@@ -547,7 +547,7 @@ class _App:
 def _service(config, channel=None):
     from PySide6.QtWidgets import QApplication
 
-    from pet.festival.service import FestivalReminderService
+    from petwisp.festival.service import FestivalReminderService
 
     QApplication.instance() or QApplication([])
     app = _App(config, channel if channel is not None else _Channel())
@@ -555,7 +555,7 @@ def _service(config, channel=None):
 
 
 def _cfg_with(tmp_path, **overrides):
-    from pet.config import Config
+    from petwisp.config import Config
 
     cfg = Config(base=tmp_path)
     cfg.set("festival_reminder_enabled", True)
@@ -629,7 +629,7 @@ def test_bubble_taken_by_alert_still_reaches_the_user(tmp_path, caplog):
     app.win._speech_bubble = _AlertBubble()
     app.win.visible_content_rect = lambda: object()
 
-    with caplog.at_level("WARNING", logger="pet.festival.service"):
+    with caplog.at_level("WARNING", logger="petwisp.festival.service"):
         service._bubble("今天是春节。")
 
     assert app.win.bubbles == [], "宿主让路（前置）"
@@ -731,7 +731,7 @@ def test_quiet_mode_defers_festival_bubble(tmp_path):
     语音的静音判定在音频通道内（同一道闸，`quiet_blocked` 是唯一判据）；
     本用例只钉住本服务这一半——被拦下的提醒必须攒住，而不是丢掉。
     """
-    from pet import quiet_mode
+    from petwisp import quiet_mode
 
     service, app = _service(_cfg_with(tmp_path, festival_reminder_speak=True))
     service.apply_config()
@@ -755,8 +755,8 @@ def test_speak_hint_mentions_quiet_mode(tmp_path):
 def _page(tmp_path):
     from PySide6.QtWidgets import QApplication
 
-    from pet.config import Config
-    from pet.festival.settings import FestivalSettingsPage
+    from petwisp.config import Config
+    from petwisp.festival.settings import FestivalSettingsPage
 
     QApplication.instance() or QApplication([])
     return FestivalSettingsPage(Config(base=tmp_path))
@@ -843,8 +843,8 @@ def test_appshell_trigger_festival_now_reaches_service(tmp_path):
     """
     from PySide6.QtWidgets import QApplication
 
-    from pet.app import AppShell
-    from pet.config import Config
+    from petwisp.app import AppShell
+    from petwisp.config import Config
 
     QApplication.instance() or QApplication([])
     cfg = Config(base=tmp_path)
@@ -869,9 +869,9 @@ def test_preview_rows_are_collected_into_domain_sections(tmp_path):
     """
     from PySide6.QtWidgets import QApplication
 
-    from pet.config import Config
-    from pet.modern_settings_dialog import ModernSettingsDialog
-    from pet.settings_widgets import SettingsSection
+    from petwisp.config import Config
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
+    from petwisp.settings_widgets import SettingsSection
 
     QApplication.instance() or QApplication([])
     dialog = ModernSettingsDialog(Config(base=tmp_path), include_ai=False)

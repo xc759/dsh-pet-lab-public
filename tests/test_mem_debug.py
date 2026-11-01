@@ -10,7 +10,7 @@ import queue
 import threading
 import time
 
-from pet import mem_debug
+from petwisp import mem_debug
 
 
 def test_env_flag_parsing(monkeypatch):
@@ -78,7 +78,7 @@ def test_webm_clip_collector_reports_display_slots():
     from PySide6.QtGui import QImage, QPixmap
     from PySide6.QtWidgets import QApplication
 
-    from pet import webm_clip
+    from petwisp import webm_clip
 
     QApplication.instance() or QApplication([])
     mem_debug.set_enabled(True, interval_s=3600)  # clip 构造时才会登记进弱集合

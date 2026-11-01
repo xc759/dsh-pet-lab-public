@@ -28,7 +28,7 @@ import queue
 import threading
 from pathlib import Path
 
-import pet.library as library_mod
+import petwisp.library as library_mod
 
 
 FRAME_BYTES = 1024

@@ -7,7 +7,7 @@ import socket
 from pathlib import Path
 from types import SimpleNamespace
 
-from pet.harness_launcher import _find_launch_command, is_running
+from petwisp.harness_launcher import _find_launch_command, is_running
 
 
 import pytest
@@ -17,7 +17,7 @@ import pytest
 def _no_desktop_by_default(monkeypatch):
     """本文件的既有用例全部钉 web 路径：桌面端探测默认钉死「未安装/未运行」，
     双目标用例在自己的 monkeypatch 里另行覆盖（后 applied 者赢）。"""
-    from pet import harness_launcher as hl
+    from petwisp import harness_launcher as hl
 
     monkeypatch.setattr(hl, "desktop_install_path", lambda: None)
     monkeypatch.setattr(hl, "desktop_process_running", lambda: False)
@@ -36,7 +36,7 @@ def test_harness_port_probe():
 
 
 def test_find_launch_command_resolves_web(monkeypatch):
-    from pet import harness_launcher as hl
+    from petwisp import harness_launcher as hl
 
     monkeypatch.setattr(hl, "_which", lambda name: "dsh" if name == "dsh" else None)
 
@@ -53,7 +53,7 @@ def test_find_launch_command_resolves_web(monkeypatch):
 @pytest.mark.parametrize("package_installed", [True, False])
 def test_find_launch_command_fallback_without_dsh(tmp_path, monkeypatch, package_installed):
     """无 dsh 命令时，按包是否存在选择 node + bin.js 或 npx。"""
-    from pet import harness_launcher as hl
+    from petwisp import harness_launcher as hl
 
     root = tmp_path / "node_modules"
     bin_js = root / "@deepseek-ai" / "dsh" / "lib" / "bin.js"
@@ -74,7 +74,7 @@ def test_find_launch_command_fallback_without_dsh(tmp_path, monkeypatch, package
 
 
 def test_supports_no_open_probes_help(monkeypatch, tmp_path):
-    from pet import harness_launcher as hl
+    from petwisp import harness_launcher as hl
 
     hl._NO_OPEN_CACHE.clear()
     monkeypatch.setattr(hl, "_probe_cache_path", lambda: tmp_path / "nope.json")
@@ -94,7 +94,7 @@ def test_supports_no_open_probes_help(monkeypatch, tmp_path):
 
 
 def test_supports_no_open_probe_failure_defaults_false(monkeypatch, tmp_path):
-    from pet import harness_launcher as hl
+    from petwisp import harness_launcher as hl
 
     hl._NO_OPEN_CACHE.clear()
     monkeypatch.setattr(hl, "_probe_cache_path", lambda: tmp_path / "nope.json")
@@ -109,7 +109,7 @@ def test_supports_no_open_probe_failure_defaults_false(monkeypatch, tmp_path):
 def test_supports_no_open_disk_cache(monkeypatch, tmp_path):
     """落盘缓存：版本匹配时直接用缓存零探测；版本变了才重新慢探测。"""
     import json as _json
-    from pet import harness_launcher as hl
+    from petwisp import harness_launcher as hl
 
     cache_file = tmp_path / "cache.json"
     monkeypatch.setattr(hl, "_probe_cache_path", lambda: cache_file)
@@ -151,7 +151,7 @@ def test_launch_harness_reuses_existing_instance_on_alt_port(monkeypatch):
     ``target="web"`` 显式给出：默认的 auto 已改为 service（只起服务、不开浏览器），
     本用例钉的是 web 目标「复用并打开」这条契约。
     """
-    from pet import harness_launcher as hl
+    from petwisp import harness_launcher as hl
 
     opened = []
     monkeypatch.setattr(hl.webbrowser, "open", lambda url: opened.append(url))
@@ -170,7 +170,7 @@ def test_launch_harness_reuses_existing_instance_on_alt_port(monkeypatch):
 
 def test_launch_harness_prefers_configured_port(monkeypatch):
     """配置端口已有实例时优先复用它，不再探测 3080。"""
-    from pet import harness_launcher as hl
+    from petwisp import harness_launcher as hl
 
     opened = []
     probed = []
@@ -189,7 +189,7 @@ def test_launch_harness_prefers_configured_port(monkeypatch):
 
 def test_launch_harness_no_browser_when_autostart(monkeypatch):
     """open_browser=False（随桌宠自启动）：只起服务，任何分支都不开浏览器。"""
-    from pet import harness_launcher as hl
+    from petwisp import harness_launcher as hl
 
     opened = []
     monkeypatch.setattr(hl.webbrowser, "open", lambda url: opened.append(url))
@@ -228,11 +228,11 @@ def test_harness_autostart_hook_gates(tmp_path, monkeypatch):
     被测对象，用替身替掉它等于什么都没测（本批 K1 就是在这里加第三条门）。
     2026-10-21：第一门从 enable_chat 的历史误绑改为 system_tools 模块激活。
     """
-    from pet import app as app_mod
-    from pet import feature_activation as fa
-    from pet import harness_launcher as hl
-    from pet.config import Config
-    from pet.features import MIGRATION_BASELINE
+    from petwisp import app as app_mod
+    from petwisp import feature_activation as fa
+    from petwisp import harness_launcher as hl
+    from petwisp.config import Config
+    from petwisp.features import MIGRATION_BASELINE
 
     spawned = []
     monkeypatch.setattr(
@@ -281,7 +281,7 @@ def test_harness_autostart_hook_gates(tmp_path, monkeypatch):
 
 
 def test_launch_harness_browser_ownership(monkeypatch):
-    from pet import harness_launcher as hl
+    from petwisp import harness_launcher as hl
 
     opened = []
     threads = []
@@ -328,7 +328,7 @@ def test_spawn_injects_augmented_path(monkeypatch):
     dsh/npx 的 shebang（/usr/bin/env node）依赖子进程环境找 node。"""
     import subprocess
 
-    from pet import harness_launcher as hl
+    from petwisp import harness_launcher as hl
 
     captured = {}
 
@@ -350,7 +350,7 @@ def test_node_runtime_augments_finder_path_with_homebrew(monkeypatch):
     """Issue #67：macOS Finder 的极简 PATH 仍能覆盖 Homebrew bin。"""
     if os.name == "nt":
         return
-    from pet import node_runtime
+    from petwisp import node_runtime
 
     monkeypatch.setenv("PATH", "/usr/bin:/bin:/usr/sbin:/sbin")
     monkeypatch.setattr(
@@ -376,7 +376,7 @@ def test_node_runtime_augments_finder_path_with_homebrew(monkeypatch):
 
 def test_npm_root_probe_skipped_when_npm_missing(monkeypatch):
     """PATH 上没有 npm 时不应执行 npm root -g（避免菜单点击卡 15 秒）。"""
-    from pet import harness_launcher as hl
+    from petwisp import harness_launcher as hl
 
     calls = []
 
@@ -392,7 +392,7 @@ def test_npm_root_probe_skipped_when_npm_missing(monkeypatch):
 
 
 def test_npm_root_probe_runs_when_npm_present(monkeypatch):
-    from pet import harness_launcher as hl
+    from petwisp import harness_launcher as hl
 
     calls = []
 
@@ -415,7 +415,7 @@ def test_target_web_keeps_existing_web_command(monkeypatch):
     必须 ``open_browser=False``：命令带 ``--no-open`` 且要开浏览器时，产品会派生
     一个最长活 90 秒的「等就绪再开浏览器」线程，会逃出用例边界（本用例只验命令）。
     """
-    from pet import harness_launcher as hl
+    from petwisp import harness_launcher as hl
 
     monkeypatch.setattr(hl, "_which", lambda name: "dsh" if name == "dsh" else None)
     monkeypatch.setattr(hl, "_supports_no_open", lambda base: True)
@@ -431,7 +431,7 @@ def test_target_web_keeps_existing_web_command(monkeypatch):
 
 def test_target_desktop_launches_exe_when_installed(monkeypatch, tmp_path):
     """② target=desktop 且检测到安装：拉起桌面端 exe（不开浏览器、不等就绪）。"""
-    from pet import harness_launcher as hl
+    from petwisp import harness_launcher as hl
 
     monkeypatch.setattr(hl, "DESKTOP_SUPPORTED", True)  # 非 Windows CI 上也测 desktop 路径逻辑
     exe = tmp_path / "DeepSeek Harness.exe"
@@ -458,7 +458,7 @@ def test_auto_resolves_to_service_without_probing_desktop(monkeypatch):
     把整个桌面端 GUI 拉起来。把两个探测入口换成会抛的替身：auto 只要碰它们一次
     就是回归。合法/非法/空值一并钉住——非法值照旧回落 auto（= service）。
     """
-    from pet import harness_launcher as hl
+    from petwisp import harness_launcher as hl
 
     def _boom(*args, **kwargs):
         raise AssertionError("auto 不得再探测桌面端（安装位 / 进程枚举）")
@@ -481,7 +481,7 @@ def test_auto_launch_is_headless_service(monkeypatch):
     ``open_browser`` 取默认 True——service 的定义就是「只起服务」，调用方传什么
     都改变不了这一点（自启路径靠这条保证不弹浏览器）。
     """
-    from pet import harness_launcher as hl
+    from petwisp import harness_launcher as hl
 
     opened: list[str] = []
     threads: list = []
@@ -511,7 +511,7 @@ def test_service_target_stays_headless_even_with_open_browser_true(monkeypatch):
     与 web 目标的判别只在这一格：web + open_browser=True + --no-open 会派生
     等待线程（见 ``test_launch_harness_browser_ownership``），service 不会。
     """
-    from pet import harness_launcher as hl
+    from petwisp import harness_launcher as hl
 
     opened: list[str] = []
     threads: list = []
@@ -536,7 +536,7 @@ def test_service_target_stays_headless_even_with_open_browser_true(monkeypatch):
 
 def test_service_target_does_not_open_browser_on_reused_instance(monkeypatch):
     """已有实例在线：service 报 already 但不开浏览器（web 目标这里会开）。"""
-    from pet import harness_launcher as hl
+    from petwisp import harness_launcher as hl
 
     opened: list[str] = []
     monkeypatch.setattr(hl.webbrowser, "open", lambda url: opened.append(url))
@@ -552,7 +552,7 @@ def test_service_target_does_not_open_browser_on_reused_instance(monkeypatch):
 
 def test_explicit_desktop_not_installed_is_not_found(monkeypatch):
     """显式 desktop + 未安装 → not-found（静默回落 web 会让菜单选择失真）。"""
-    from pet import harness_launcher as hl
+    from petwisp import harness_launcher as hl
 
     monkeypatch.setattr(hl, "DESKTOP_SUPPORTED", True)
     monkeypatch.setattr(hl, "desktop_install_path", lambda: None)
@@ -563,7 +563,7 @@ def test_explicit_desktop_not_installed_is_not_found(monkeypatch):
 
 def test_desktop_already_running_short_circuits(monkeypatch):
     """桌面端进程已在跑 → already，绝不重复拉起（Electron 单实例语义）。"""
-    from pet import harness_launcher as hl
+    from petwisp import harness_launcher as hl
 
     monkeypatch.setattr(hl, "DESKTOP_SUPPORTED", True)
     monkeypatch.setattr(hl, "desktop_process_running", lambda: True)
@@ -579,7 +579,7 @@ def test_self_launched_desktop_never_killed_on_exit(monkeypatch):
     ``process_command_line`` / ``is_running_pid`` / ``_terminate_process_tree``
     任一个，就说明它掉进了 web 的收口路径（那才是会误杀用户主力应用的那条路）。
     """
-    from pet import harness_launcher as hl
+    from petwisp import harness_launcher as hl
 
     touched: list[str] = []
 
@@ -624,7 +624,7 @@ def test_dead_desktop_registration_is_forgotten(monkeypatch):
     「不杀」不等于「不管」：收口顺序必须是「先按句柄判死销记，再对活 desktop
     跳过终止」；反了的话每次退出都留一条永不消费的死 pid。
     """
-    from pet import harness_launcher as hl
+    from petwisp import harness_launcher as hl
 
     touched: list[str] = []
     monkeypatch.setattr(
@@ -655,7 +655,7 @@ def test_dead_desktop_registration_is_forgotten(monkeypatch):
 
 def test_spawn_desktop_registers_kind_desktop(monkeypatch, tmp_path):
     """真 ``_spawn_desktop`` 的登记语义：pid 入表且 kind=desktop（「不杀」的依据）。"""
-    from pet import harness_launcher as hl
+    from petwisp import harness_launcher as hl
 
     exe = tmp_path / "DeepSeek Harness.exe"
     exe.write_bytes(b"MZ")
@@ -686,7 +686,7 @@ def test_spawn_desktop_registers_kind_desktop(monkeypatch, tmp_path):
 def test_registry_display_name_accepts_bounded_version_suffix():
     """卸载项 DisplayName 实测为「DeepSeek Harness 0.2.0-rc.2」：只认全名会让
     自定义安装位（默认位不存在时的唯一一路）永远探测不到。版本后缀受约束接受。"""
-    from pet import harness_launcher as hl
+    from petwisp import harness_launcher as hl
 
     assert hl._display_name_matches("DeepSeek Harness") is True
     assert hl._display_name_matches("  DeepSeek Harness 0.2.0-rc.2  ") is True
@@ -703,7 +703,7 @@ def test_registry_display_name_accepts_bounded_version_suffix():
 def test_registry_display_icon_strips_icon_index():
     """DisplayIcon 形如 ``"C:\\...\\DeepSeek Harness.exe",0``：不剥索引会拼出带
     ``,0`` 的假路径，``is_file()`` 永远为假。"""
-    from pet import harness_launcher as hl
+    from petwisp import harness_launcher as hl
 
     exe = r"C:\Program Files\DeepSeek Harness\DeepSeek Harness.exe"
     assert hl._strip_icon_index(f'"{exe}",0') == exe
@@ -720,7 +720,7 @@ def test_registry_probe_finds_versioned_name_and_icon_path(tmp_path, monkeypatch
     import sys
     import types
 
-    from pet import harness_launcher as hl
+    from petwisp import harness_launcher as hl
 
     exe = tmp_path / "DeepSeek Harness.exe"
     exe.write_bytes(b"MZ")
@@ -766,7 +766,7 @@ def test_desktop_unsupported_platform_keeps_web_default(monkeypatch):
     auto 会拐到 desktop、然后 Popen 一个目录。能力位钉死后不许回归；auto 现已
     统一落到 service（与平台无关，非 Windows 只是「更不可能拐到 desktop」）。
     """
-    from pet import harness_launcher as hl
+    from petwisp import harness_launcher as hl
 
     monkeypatch.setattr(hl, "DESKTOP_SUPPORTED", False)
     assert hl.desktop_install_path() is None
@@ -784,7 +784,7 @@ def test_desktop_aborts_when_cancel_check_hits(monkeypatch, tmp_path):
     「探测期间用户把开关关掉」不算数——desktop 路径上这一格的代价是真弹出一个
     用户刚说不想要的 GUI 窗口（web 路径只是多一个后台 node）。
     """
-    from pet import harness_launcher as hl
+    from petwisp import harness_launcher as hl
 
     exe = tmp_path / "DeepSeek Harness.exe"
     exe.write_bytes(b"MZ")
@@ -800,7 +800,7 @@ def test_desktop_aborts_when_cancel_check_hits(monkeypatch, tmp_path):
 
 def test_self_launched_web_still_collected(monkeypatch):
     """对照：web 自拉起登记照旧被收口终止（原行为不破）。"""
-    from pet import harness_launcher as hl
+    from petwisp import harness_launcher as hl
 
     killed = []
     def _fake_terminate(pid, proc=None):

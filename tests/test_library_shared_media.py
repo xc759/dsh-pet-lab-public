@@ -31,10 +31,10 @@ from PySide6.QtGui import QImage
 from PySide6.QtWidgets import QApplication
 
 import tests.test_overlay_window_capabilities as cap
-from pet import catalog, frameseq_provision
-from pet import library as library_mod
-from pet import webm_clip
-from pet.library import MovieLibrary
+from petwisp import catalog, frameseq_provision
+from petwisp import library as library_mod
+from petwisp import webm_clip
+from petwisp.library import MovieLibrary
 from tests.test_frameseq_clip import _make_frames
 
 app = QApplication.instance() or QApplication([])
@@ -464,9 +464,9 @@ class _RealLibraryInstance:
 
 
 def _make_real_shell(tmp_path, dirs):
-    from pet.config import Config
-    from pet.overlay_shell import OverlayShell
-    from pet.pet_sprite import PetSprite
+    from petwisp.config import Config
+    from petwisp.overlay_shell import OverlayShell
+    from petwisp.pet_sprite import PetSprite
 
     config = Config(str(tmp_path / "cfg"))
     config.set("character", catalog.DEFAULT_CHARACTER)

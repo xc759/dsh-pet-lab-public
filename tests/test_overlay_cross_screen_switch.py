@@ -31,9 +31,9 @@ import pytest
 pytestmark = pytest.mark.usefixtures("non_macos_overlay_topology")
 
 import tests.test_overlay_independent_screens as indep
-from pet.config import Config
-from pet.overlay_shell import OverlayShell
-from pet.pet_sprite import PetSprite
+from petwisp.config import Config
+from petwisp.overlay_shell import OverlayShell
+from petwisp.pet_sprite import PetSprite
 from tests.test_overlay_hosts_multiscreen import (
     _hittable, _move, _press, _release)
 from tests.test_overlay_independent_screens import (
@@ -92,7 +92,7 @@ def _seed_two_pets(config_dir, *, slot0_screen=None, slot1_screen=None):
     ``config_dir`` 必须是 ``Config.dir``（= ``base/<应用目录>``）：档案、活跃清单
     与几何都落在这里，直接拿 ``tmp_path`` 是另一个目录。
     """
-    from pet import pet_profiles
+    from petwisp import pet_profiles
 
     for slot, screen_name in ((0, slot0_screen), (1, slot1_screen)):
         pet_profiles.write_profile_settings(config_dir, slot, {"scale": 0.5})

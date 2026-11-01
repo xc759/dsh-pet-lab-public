@@ -12,8 +12,8 @@ import json
 
 import pytest
 
-import pet.chat.models as chat_models
-from pet.config import APP_DIR_NAME, Config
+import petwisp.chat.models as chat_models
+from petwisp.config import APP_DIR_NAME, Config
 
 
 class FakeStore:
@@ -22,7 +22,7 @@ class FakeStore:
     shared: dict = {}
     set_ok: bool = True
 
-    def __init__(self, service_name="dsh-pet-standalone"):
+    def __init__(self, service_name="petwisp"):
         self.service_name = service_name
 
     @property

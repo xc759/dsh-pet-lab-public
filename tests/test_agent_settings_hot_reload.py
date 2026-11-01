@@ -34,12 +34,12 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 import pytest
 from PySide6.QtWidgets import QApplication
 
-import pet.agent_link as agent_link_mod
-import pet.app as app_mod
-import pet.overlay_shell as overlay_shell_mod
-from pet import harness_launcher
-from pet.app import AppShell
-from pet.config import Config
+import petwisp.agent_link as agent_link_mod
+import petwisp.app as app_mod
+import petwisp.overlay_shell as overlay_shell_mod
+from petwisp import harness_launcher
+from petwisp.app import AppShell
+from petwisp.config import Config
 
 app = QApplication.instance() or QApplication([])
 

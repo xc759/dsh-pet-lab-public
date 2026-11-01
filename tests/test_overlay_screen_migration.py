@@ -31,9 +31,9 @@ from PySide6.QtWidgets import QApplication
 
 import tests.test_overlay_window_capabilities as cap
 import tests.test_sprite_menu_facade as fac
-from pet.frameseq_clip import FrameSeqClip
-from pet.overlay_shell import OverlayShell
-from pet.pet_sprite import PetSprite
+from petwisp.frameseq_clip import FrameSeqClip
+from petwisp.overlay_shell import OverlayShell
+from petwisp.pet_sprite import PetSprite
 from tests.test_frameseq_clip import _make_frames
 from tests.test_overlay_geometry_parity import _place_center, _ratio_of
 
@@ -78,7 +78,7 @@ class FakeScreen(QObject):
 
 def _make_shell(tmp_path, screen, values=None):
     config = cap.CapConfig(tmp_path, values)
-    from pet import pet_profiles
+    from petwisp import pet_profiles
 
     pet_profiles.write_profile_settings(tmp_path, 0, values or {"scale": 0.5})
     shell = OverlayShell(

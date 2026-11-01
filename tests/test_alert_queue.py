@@ -14,10 +14,10 @@ from PySide6.QtWidgets import QApplication
 
 from collections import deque
 
-from pet import catalog
-from pet.window_alerts import show_alert
-from pet.config import Config
-from pet.window import PetWindow
+from petwisp import catalog
+from petwisp.window_alerts import show_alert
+from petwisp.config import Config
+from petwisp.window import PetWindow
 
 NAMES = [
     catalog.IDLE,

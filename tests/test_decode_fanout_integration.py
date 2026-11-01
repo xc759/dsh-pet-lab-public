@@ -17,8 +17,8 @@ from pathlib import Path
 import pytest
 from PySide6.QtWidgets import QApplication
 
-from pet.decode_fanout import DecodeFanoutHub
-from pet.webm_clip import WebMClip
+from petwisp.decode_fanout import DecodeFanoutHub
+from petwisp.webm_clip import WebMClip
 
 SAMPLE_WEBM = Path("assets/characters/demo/videos/idle/待机呼吸休闲.webm")
 

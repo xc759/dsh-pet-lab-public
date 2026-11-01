@@ -13,8 +13,8 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from PySide6.QtWidgets import QApplication
 
-from pet.growth.panel import GrowthPanel
-from pet.growth.service import GrowthService
+from petwisp.growth.panel import GrowthPanel
+from petwisp.growth.service import GrowthService
 
 
 class _Cfg:

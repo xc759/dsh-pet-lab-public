@@ -17,8 +17,8 @@ from PySide6.QtGui import QImage
 from PySide6.QtWidgets import QApplication
 
 import tests.test_overlay_window_capabilities as cap
-from pet.pet_sprite import INTERACTION_THROWN, PetSprite
-from pet.sprite_menu_facade import SpriteMenuFacade, build_sprite_full_menu
+from petwisp.pet_sprite import INTERACTION_THROWN, PetSprite
+from petwisp.sprite_menu_facade import SpriteMenuFacade, build_sprite_full_menu
 
 app = QApplication.instance() or QApplication([])
 
@@ -87,10 +87,10 @@ class RichLibrary:
 
 def _make_shell(tmp_path, config_values=None):
     """真实 PetSprite 的壳（facade 接缝需要 velocity/bind_clip/facing 全面）。"""
-    from pet.overlay_shell import OverlayShell
+    from petwisp.overlay_shell import OverlayShell
 
     config = cap.CapConfig(tmp_path, config_values)
-    from pet import pet_profiles
+    from petwisp import pet_profiles
 
     values = {key: value for key, value in (config_values or {}).items()
               if key in pet_profiles.PER_PET_KEYS}
@@ -204,7 +204,7 @@ def test_no_move_bucket_goes_to_acts(tmp_path):
             "randint": lambda self, a, b: a,
             "choice": lambda self, seq: seq[0]})()
         st = shell.behavior._states.setdefault(
-            shell.sprite, __import__("pet.sprite_behavior", fromlist=["_SpriteState"])._SpriteState())
+            shell.sprite, __import__("petwisp.sprite_behavior", fromlist=["_SpriteState"])._SpriteState())
         shell.behavior._roll_next(shell.sprite, st)
         assert shell.sprite._clip_name == "act1"   # 移动桶并入动作池
         assert shell.sprite.velocity == QPointF(0, 0)
@@ -299,7 +299,7 @@ def _stub_sprite(library):
 
 def _seed_menu_icon_cache(shell, library, name, image) -> None:
     """按产品键（库身份 + 动画名）预置一条缓存：单一来源，不在测试里复刻键格式。"""
-    from pet.context_menus.shared import (
+    from petwisp.context_menus.shared import (
         animation_icon_cache_entry,
         animation_icon_cache_key,
     )
@@ -317,7 +317,7 @@ def test_character_switch_clears_menu_icon_cache(tmp_path, monkeypatch):
     缓存挂壳上、键 = （素材库身份, 动画名）（复审#5 起）；切角色清缓存是内存卫生：
     旧库的死项不占着 128 条上限，也不给 id 复用留机会。
     """
-    import pet.animation_thumbnail as thumb_mod
+    import petwisp.animation_thumbnail as thumb_mod
 
     shell, _ = _make_shell(tmp_path)
     try:
@@ -347,7 +347,7 @@ def test_character_switch_clears_menu_icon_cache(tmp_path, monkeypatch):
 
 def test_menu_icon_cache_hit_survives_without_character_switch(tmp_path, monkeypatch):
     """不换角色时缓存行为不变：命中即返回，不重新解码。"""
-    import pet.animation_thumbnail as thumb_mod
+    import petwisp.animation_thumbnail as thumb_mod
 
     shell, _ = _make_shell(tmp_path)
     try:
@@ -372,7 +372,7 @@ def test_same_animation_name_resolves_per_library(tmp_path, monkeypatch):
     缓存挂壳上（facade 每次右键重建，必须长寿命），键只有动画名时：两只宠本来就
     不同角色、**没有任何切换发生**，开各自菜单时同名动画直接命中对方的缩略图。
     """
-    import pet.animation_thumbnail as thumb_mod
+    import petwisp.animation_thumbnail as thumb_mod
 
     shell, _ = _make_shell(tmp_path)
     try:
@@ -407,7 +407,7 @@ def test_late_worker_write_is_keyed_to_the_old_library(tmp_path, monkeypatch):
     都已经发生；写入若只按动画名，就把旧角色的图写回新库的查询键上——B08 的"切角色
     清缓存"管不到这一次迟到写入。
     """
-    import pet.animation_thumbnail as thumb_mod
+    import petwisp.animation_thumbnail as thumb_mod
 
     shell, _ = _make_shell(tmp_path)
     try:
@@ -441,7 +441,7 @@ def test_cache_hit_requires_a_live_identity():
     失败方向必须是"未命中"（重解码），不能是"命中旧图"——所以空条目、没有身份凭证的
     条目（库对象不支持弱引用）、指向别的库的条目都要判未命中。
     """
-    from pet.context_menus.shared import (
+    from petwisp.context_menus.shared import (
         animation_icon_cache_entry,
         animation_icon_cache_hit,
     )
@@ -462,11 +462,11 @@ def test_cache_prune_drops_target_library_and_dead_entries():
     """定向摘的契约：摘目标库的条目 + 顺手清掉对谁都永不命中的条目，活库条目留着。
 
     "永不命中"的两类：库已回收（弱引用已死）、没有身份凭证（库对象不支持弱引用）。
-    它们留着只占 128 条上限与内存，与"退出子肥鱼"这轮清理同源。
+    它们留着只占 128 条上限与内存，与"退出子宠"这轮清理同源。
     """
     import gc
 
-    from pet.context_menus.shared import (
+    from petwisp.context_menus.shared import (
         animation_icon_cache_drop_library,
         animation_icon_cache_entry,
         animation_icon_cache_key,
@@ -499,7 +499,7 @@ def test_cache_entry_does_not_keep_the_library_alive(tmp_path, monkeypatch):
     import gc
     import weakref
 
-    import pet.animation_thumbnail as thumb_mod
+    import petwisp.animation_thumbnail as thumb_mod
 
     shell, _ = _make_shell(tmp_path)
     try:
@@ -535,9 +535,9 @@ def test_stale_entry_is_not_served_when_library_id_is_reused(tmp_path, monkeypat
     """
     import gc
 
-    import pet.animation_thumbnail as thumb_mod
-    import pet.sprite_menu_facade as facade_mod
-    from pet.context_menus.shared import animation_icon_cache_key
+    import petwisp.animation_thumbnail as thumb_mod
+    import petwisp.sprite_menu_facade as facade_mod
+    from petwisp.context_menus.shared import animation_icon_cache_key
 
     shell, _ = _make_shell(tmp_path)
     try:
@@ -582,7 +582,7 @@ def test_stale_entry_is_not_served_when_library_id_is_reused(tmp_path, monkeypat
             "id 复用后必须重解码新库的素材，不得返回旧库的图"
         assert image.pixel(0, 0) == fresh.pixel(0, 0)
         # 覆盖判定用的是新加的条目校验器：放在行为断言之后，修复前先在行为上红
-        from pet.context_menus.shared import animation_icon_cache_hit
+        from petwisp.context_menus.shared import animation_icon_cache_hit
 
         assert animation_icon_cache_hit(shell._menu_icon_cache[pinned], lib_new) is not None, \
             "重解码的结果必须覆盖同键上的旧条目"
@@ -591,9 +591,9 @@ def test_stale_entry_is_not_served_when_library_id_is_reused(tmp_path, monkeypat
 
 
 def test_exiting_spawned_pet_drops_its_menu_icon_cache(tmp_path):
-    """P3：退出子肥鱼即定向摘掉它自己的缩略图条目。
+    """P3：退出子宠即定向摘掉它自己的缩略图条目。
 
-    旧行为：退出子肥鱼只 ``shutdown`` 库，缓存条目留到换角色清缓存或撞 128 条上限——
+    旧行为：退出子宠只 ``shutdown`` 库，缓存条目留到换角色清缓存或撞 128 条上限——
     死图占着上限，且旧库在缓存里的那份身份凭证也一起留着。缓存按库身份分键，这里应当
     摘得准：只摘这只宠的库，别动别的宠（整份清掉会把同壳其他宠的图一起丢掉）。
     """
@@ -624,7 +624,7 @@ def test_exiting_spawned_pet_drops_its_menu_icon_cache(tmp_path):
 # 它的位置与设置（无法恢复）；无子宠时直接退出整个应用。子宠退出有 config-slot-N.json
 # 存档、且是用户明确点选，保持一键直退。
 def _spawn_child(shell):
-    """给壳生一只子肥鱼（per-pet 库走假库工厂，不碰真实素材）。"""
+    """给壳生一只子宠（per-pet 库走假库工厂，不碰真实素材）。"""
     shell._create_main_library = lambda: RichLibrary()
     shell.spawn_pet()
     assert len(shell._spawned) == 1
@@ -632,7 +632,7 @@ def _spawn_child(shell):
 
 
 def _teardown(shell) -> None:
-    """收掉本用例生的子肥鱼（各带自言自语计时器 + 气泡宿主）再删 runtime 标记。
+    """收掉本用例生的子宠（各带自言自语计时器 + 气泡宿主）再删 runtime 标记。
 
     本节的用例都生真实子宠；留着它们，计时器会在后续用例的同一进程里继续跑——
     长跑套件里这是纯粹的噪声源（解码/事件循环被无谓占用）。
@@ -833,7 +833,7 @@ def test_menu_exit_this_for_main_pet_is_gated(tmp_path, monkeypatch):
 
 
 def test_failed_child_write_does_not_apply_or_reflow(tmp_path):
-    from pet import pet_profiles
+    from petwisp import pet_profiles
     from tests import test_overlay_collision_toggle as toggle
 
     shell, cfg = toggle._make_slot_shell(tmp_path)
@@ -861,7 +861,7 @@ def test_failed_child_write_does_not_apply_or_reflow(tmp_path):
 
 def test_child_lock_timeout_keeps_runtime_and_reports_failure(tmp_path, monkeypatch):
     from contextlib import contextmanager
-    from pet import config_write_lock as cwl
+    from petwisp import config_write_lock as cwl
     from tests import test_overlay_collision_toggle as toggle
 
     shell, _ = toggle._make_slot_shell(tmp_path)
@@ -897,8 +897,8 @@ def test_main_save_false_rolls_back_config_and_runtime(tmp_path, monkeypatch):
 
 # ---------------------------------------------------------------- A10 服务结果落点
 # 菜单旁路（右击 → 查看天气 / DeepSeek 余额）此前把**整个壳**交给 AppShell 的
-# 手动服务方法，落点由壳在结果到达时按"最小可见槽"动态决定：右击子肥鱼查天气，
-# 气泡冒在主肥鱼头上；请求在飞时把发起的那一只关掉，结果还会落到别宠身上。
+# 手动服务方法，落点由壳在结果到达时按"最小可见槽"动态决定：右击子宠查天气，
+# 气泡冒在主桌宠头上；请求在飞时把发起的那一只关掉，结果还会落到别宠身上。
 # 点击余额路径早就用 ``_sprite_host(target)`` 收口了，菜单这条路漏了。
 
 def test_service_callbacks_hand_the_initiating_sprite_presenter(tmp_path):

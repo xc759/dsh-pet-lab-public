@@ -16,9 +16,9 @@ import urllib.request
 
 import pytest
 
-from pet.music import lyric as music_lyric
-from pet.music.lyric import Lyrics, LyricLine, parse_lrc
-from pet.music.lyric_controller import LyricTracker
+from petwisp.music import lyric as music_lyric
+from petwisp.music.lyric import Lyrics, LyricLine, parse_lrc
+from petwisp.music.lyric_controller import LyricTracker
 
 
 @pytest.fixture(scope="module")
@@ -334,7 +334,7 @@ def test_lead_makes_lyrics_early_not_late():
 
     带 1 秒提前量时，位置 4.0s 就该显示 5.0s 那句，而不是等真正唱到。
     """
-    from pet.music.lyric_controller import LYRIC_LEAD_SECONDS
+    from petwisp.music.lyric_controller import LYRIC_LEAD_SECONDS
 
     t = LyricTracker()
     t.load(LINES, now=0.0, position=None)
@@ -394,7 +394,7 @@ class _FakeWin(QObject):
 
 def test_title_shows_immediately_on_track_change():
     """切歌瞬间就出标题，不等取词——填上取词那几秒的空窗。"""
-    from pet.music.lyric_controller import MusicLyricController
+    from petwisp.music.lyric_controller import MusicLyricController
 
     win = _FakeWin()
     ctrl = MusicLyricController(win)
@@ -409,7 +409,7 @@ def test_title_shows_immediately_on_track_change():
 
 def test_title_persists_after_lyrics_arrive():
     """歌词到位后，标题必须仍在第一行（这就是本次需求的核心）。"""
-    from pet.music.lyric_controller import MusicLyricController
+    from petwisp.music.lyric_controller import MusicLyricController
 
     win = _FakeWin()
     ctrl = MusicLyricController(win)
@@ -427,7 +427,7 @@ def test_title_persists_after_lyrics_arrive():
 
 def test_title_kept_when_song_has_no_lyrics():
     """无词歌也要常驻标题，不能把气泡清空或让歌名消失。"""
-    from pet.music.lyric_controller import MusicLyricController
+    from petwisp.music.lyric_controller import MusicLyricController
 
     win = _FakeWin()
     ctrl = MusicLyricController(win)
@@ -444,7 +444,7 @@ def test_no_lyric_retry_after_cooldown_not_permanent_blacklist():
     """一次失败只冷却 5 分钟（歌词族终审应修 3）：冷却内不重试，冷却外允许。"""
     import time as _time
 
-    from pet.music.lyric_controller import MusicLyricController
+    from petwisp.music.lyric_controller import MusicLyricController
 
     win = _FakeWin()
     ctrl = MusicLyricController(win)
@@ -473,7 +473,7 @@ def test_title_goes_into_body_when_no_lyric():
 
     气泡在正文为空时直接不渲染，若标题只放 subtitle，取词那几秒会一片空白。
     """
-    from pet.music.lyric_controller import split_bubble_text
+    from petwisp.music.lyric_controller import split_bubble_text
 
     # 无歌词：返回 (subtitle="", text=标题) —— 标题走正文，气泡才会渲染
     assert split_bubble_text("我在唱《x》", "") == ("", "我在唱《x》")
@@ -489,7 +489,7 @@ def test_title_goes_into_body_when_no_lyric():
 
 def test_looks_instrumental_detects_placeholder():
     """平台对纯音乐给的占位文案要能识别出来。"""
-    from pet.music.lyric import LyricLine, _looks_instrumental
+    from petwisp.music.lyric import LyricLine, _looks_instrumental
 
     # QQ音乐实测的两种占位文案
     assert _looks_instrumental([LyricLine(0.0, "此歌曲为没有填词的纯音乐，请您欣赏")])
@@ -501,7 +501,7 @@ def test_looks_instrumental_detects_placeholder():
 
 def test_looks_instrumental_ignores_real_lyrics():
     """真歌词不能被误判，哪怕某一行提到「纯音乐」。"""
-    from pet.music.lyric import LyricLine, _looks_instrumental
+    from petwisp.music.lyric import LyricLine, _looks_instrumental
 
     # 多行真歌词
     assert not _looks_instrumental([
@@ -516,7 +516,7 @@ def test_looks_instrumental_ignores_real_lyrics():
 
 
 def test_lyrics_dataclass_bool_and_len():
-    from pet.music.lyric import Lyrics
+    from petwisp.music.lyric import Lyrics
 
     empty = Lyrics()
     assert not empty and len(empty) == 0
@@ -531,7 +531,7 @@ def test_lyrics_dataclass_bool_and_len():
 
 def test_instrumental_hints_fit_persona():
     """提示文案要够多，且符合女仆人设（称主人 / 用人家 / 带「～」）。"""
-    from pet.music.lyric_controller import INSTRUMENTAL_HINTS
+    from petwisp.music.lyric_controller import INSTRUMENTAL_HINTS
 
     assert len(INSTRUMENTAL_HINTS) >= 4, "至少 4 条"
     assert len(set(INSTRUMENTAL_HINTS)) == len(INSTRUMENTAL_HINTS), "不应重复"
@@ -540,7 +540,7 @@ def test_instrumental_hints_fit_persona():
 
 
 def test_pick_instrumental_hint_returns_member():
-    from pet.music.lyric_controller import (
+    from petwisp.music.lyric_controller import (
         INSTRUMENTAL_HINTS,
         pick_instrumental_hint,
     )
@@ -550,7 +550,7 @@ def test_pick_instrumental_hint_returns_member():
 
 
 def test_now_listening_template():
-    from pet.music.lyric_controller import NOW_LISTENING_TEMPLATE
+    from petwisp.music.lyric_controller import NOW_LISTENING_TEMPLATE
 
     assert NOW_LISTENING_TEMPLATE.format(title="潮鳴り") == "正在听《潮鳴り》"
 
@@ -594,7 +594,7 @@ class _WinWithBubble(_FakeWin):
 
 def test_yields_when_other_bubble_takes_over():
     """点击台词/被动弹窗占用时，歌词必须让路，不能被每秒重发盖掉。"""
-    from pet.music.lyric_controller import LYRIC_YIELD_SECONDS, MusicLyricController
+    from petwisp.music.lyric_controller import LYRIC_YIELD_SECONDS, MusicLyricController
 
     win = _WinWithBubble()
     ctrl = MusicLyricController(win)
@@ -612,7 +612,7 @@ def test_yields_when_other_bubble_takes_over():
 
 
 def test_yield_blocks_show_while_active():
-    from pet.music.lyric_controller import MusicLyricController
+    from petwisp.music.lyric_controller import MusicLyricController
 
     win = _WinWithBubble()
     ctrl = MusicLyricController(win)
@@ -625,7 +625,7 @@ def test_yield_blocks_show_while_active():
 
 def test_yield_expires_and_lyrics_resume():
     """让路到期后歌词恢复显示。"""
-    from pet.music.lyric_controller import MusicLyricController
+    from petwisp.music.lyric_controller import MusicLyricController
 
     win = _WinWithBubble()
     ctrl = MusicLyricController(win)
@@ -640,7 +640,7 @@ def test_yield_expires_and_lyrics_resume():
 
 def test_hidden_bubble_is_not_treated_as_taken():
     """气泡不可见（没有内容）不算被抢占，否则开头会被误判让路。"""
-    from pet.music.lyric_controller import MusicLyricController
+    from petwisp.music.lyric_controller import MusicLyricController
 
     win = _WinWithBubble()
     ctrl = MusicLyricController(win)
@@ -686,7 +686,7 @@ def test_fetch_worker_uses_configured_cache_limit(monkeypatch, tmp_path):
     回归：该键此前默认值/白名单/归一化齐备，但 ``_prune_cache`` 恒用模块常量
     ``CACHE_LIMIT``，用户手改的上限完全不起作用（死开关）。
     """
-    from pet.music.lyric_controller import MusicLyricController
+    from petwisp.music.lyric_controller import MusicLyricController
 
     monkeypatch.setattr(music_lyric, "cache_dir", lambda: tmp_path)
     _only_source(monkeypatch, (LyricLine(1.0, "x"),))
@@ -707,7 +707,7 @@ def test_announce_with_empty_title_still_resets_width_lock():
     回归（实审 P2-3）：_width_locked=False 曾排在空标题提前 return 之后，
     无标题曲目沿用上一首列宽、锁高棘轮整会话不复位。
     """
-    from pet.music.lyric_controller import MusicLyricController
+    from petwisp.music.lyric_controller import MusicLyricController
 
     ctrl = MusicLyricController(_FakeWin())
     ctrl._width_locked = True
@@ -761,7 +761,7 @@ def test_sample_thread_is_reused_across_disable_enable():
     旧线程可能正卡在 WinRT 里，丢掉引用只会让它变成孤儿：之后醒来仍会
     emit，与新线程抢 _sampling 标志（同类教训见 pet/music_detect.py）。
     """
-    from pet.music.lyric_controller import MusicLyricController
+    from petwisp.music.lyric_controller import MusicLyricController
 
     win = _FakeWinVisible()
     ctrl = MusicLyricController(win)
@@ -806,8 +806,8 @@ def test_sampling_resumes_after_disable_enable(monkeypatch):
     ``_sampling`` 卡在 True，重开后每一拍都在 ``_on_tick`` 第一道闸门返回，唤醒口也
     再没人置位——采样线程永远停在 ``wake.wait()`` 上，歌词再也不更新，直到重启应用。
     """
-    from pet.music import now_playing
-    from pet.music.lyric_controller import MusicLyricController
+    from petwisp.music import now_playing
+    from petwisp.music.lyric_controller import MusicLyricController
 
     calls = {"n": 0}
     seen: list = []
@@ -860,7 +860,7 @@ def test_shutdown_leaves_stop_flag_set():
     线程的退出信号就被抹掉了——采样线程退出后会被再次拉起，shutdown 形同虚设。
     直接断言标志位，不依赖 sleep 时序。
     """
-    from pet.music.lyric_controller import MusicLyricController
+    from petwisp.music.lyric_controller import MusicLyricController
 
     win = _FakeWinVisible()
     ctrl = MusicLyricController(win)
@@ -905,7 +905,7 @@ class _Clock:
 
 
 def _patch_clock(monkeypatch, now: float = 100.0) -> _Clock:
-    import pet.music.lyric_controller as mod
+    import petwisp.music.lyric_controller as mod
 
     clock = _Clock(now)
     monkeypatch.setattr(mod, "time", clock)
@@ -913,7 +913,7 @@ def _patch_clock(monkeypatch, now: float = 100.0) -> _Clock:
 
 
 def _playback(position=None, *, title="t", artist="a", playing=True):
-    from pet.music.now_playing import Playback, Track
+    from petwisp.music.now_playing import Playback, Track
 
     return Playback(
         track=Track(title=title, artist=artist, playing=playing),
@@ -924,7 +924,7 @@ def _playback(position=None, *, title="t", artist="a", playing=True):
 
 def _aligned_controller(monkeypatch, *, lines=None, position=None, now=100.0):
     """建一个已装载歌词、标题就绪的控制器（取词线程打桩，保持离线）。"""
-    import pet.music.lyric_controller as mod
+    import petwisp.music.lyric_controller as mod
 
     clock = _patch_clock(monkeypatch, now)
     win = _FakeWin()
@@ -1003,7 +1003,7 @@ def test_tracker_line_now_without_lyrics_is_minus_one():
 
 def test_backward_seek_before_first_line_clears_stale_lyric(monkeypatch):
     """缺陷 2 回归：向后拖到第一句之前，气泡必须不再显示旧句。"""
-    from pet.music.lyric import LyricLine as _LL
+    from petwisp.music.lyric import LyricLine as _LL
 
     win, ctrl, clock = _aligned_controller(
         monkeypatch, lines=[_LL(5.0, "A"), _LL(9.0, "B")],
@@ -1057,7 +1057,7 @@ def test_resync_to_line_lands_exactly_one_line_with_lead(monkeypatch):
     查行时会叠加 ``lead``（默认 1 秒，用户可调到 3 秒），所以按行步进必须先把
     提前量减掉——否则行距比提前量短（快歌/说唱）时，按一次会直接跳过一句。
     """
-    from pet.music.lyric import LyricLine as _LL
+    from petwisp.music.lyric import LyricLine as _LL
 
     lines = [_LL(0.0, "A"), _LL(2.0, "B"), _LL(3.0, "C")]
     win, ctrl, clock = _aligned_controller(monkeypatch, lines=lines)
@@ -1116,7 +1116,7 @@ def test_align_available_after_net_ease_lyrics_arrive(monkeypatch):
     既有用例都用 `_tracker.load(position=None)` 建状态，绕过了这条生产路径，
     所以旧实现是绿的——这个用例刻意走 `_on_playback_ready → _on_lyrics_ready`。
     """
-    import pet.music.lyric_controller as mod
+    import petwisp.music.lyric_controller as mod
 
     _patch_clock(monkeypatch, 100.0)
     win = _FakeWin()
@@ -1138,7 +1138,7 @@ def test_align_available_after_net_ease_lyrics_arrive(monkeypatch):
 
 def test_reported_position_still_disables_align(monkeypatch):
     """真上报进度的播放器（QQ 音乐）：取词后仍不许手动对齐，位置听真值。"""
-    import pet.music.lyric_controller as mod
+    import petwisp.music.lyric_controller as mod
 
     _patch_clock(monkeypatch, 100.0)
     win = _FakeWin()
@@ -1177,7 +1177,7 @@ def test_start_track_first_song_without_position_still_announces_title(monkeypat
     旧实现在 _announce() 之前就 return，用户看到的是一片空白，于是"识别不到
     我放到一半的歌"。
     """
-    import pet.music.lyric_controller as mod
+    import petwisp.music.lyric_controller as mod
 
     _patch_clock(monkeypatch, 100.0)
     win = _FakeWin()
@@ -1197,7 +1197,7 @@ def test_start_track_first_song_without_position_fetches_lyrics(monkeypatch):
     """同一情形下不能因为"猜不到进度"就跳过取词——用户要的是看到歌词。"""
     import threading
 
-    import pet.music.lyric_controller as mod
+    import petwisp.music.lyric_controller as mod
 
     _patch_clock(monkeypatch, 100.0)
     win = _FakeWin()
@@ -1214,7 +1214,7 @@ def test_start_track_first_song_without_position_fetches_lyrics(monkeypatch):
 
 def test_estimated_progress_hint_shown_once_per_session(monkeypatch):
     """不报进度的播放器：提示一次"快进后请用菜单对齐"，不反复打扰。"""
-    import pet.music.lyric_controller as mod
+    import petwisp.music.lyric_controller as mod
 
     class _HintWin(_FakeWin):
         def __init__(self):
@@ -1248,7 +1248,7 @@ def test_estimated_progress_hint_shown_once_per_session(monkeypatch):
 
 def test_no_hint_when_player_reports_progress(monkeypatch):
     """报进度的播放器不该看到这条提示。"""
-    import pet.music.lyric_controller as mod
+    import petwisp.music.lyric_controller as mod
 
     class _HintWin(_FakeWin):
         def __init__(self):
@@ -1284,7 +1284,7 @@ def _real_window_controller(qapp, tmp_path, monkeypatch):
     的 `_bubble_taken_by_other` 又据此判定占用位是否还在——换成 isVisible 恒真的
     假气泡就测不到"引导收起后歌词立即上屏"。
     """
-    import pet.music.lyric_controller as mod
+    import petwisp.music.lyric_controller as mod
     from tests.pet_window_fakes import make_pet_window
 
     _patch_clock(monkeypatch, 100.0)
@@ -1367,7 +1367,7 @@ def test_same_track_retries_lyric_fetch_after_cooldown(monkeypatch):
     不变、压根走不到那条判断——一次网络故障就把这首歌在本次会话里永久拉黑，
     十次同曲采样 ``fetch_attempts`` 恒为 0，网络恢复也不会自愈。
     """
-    import pet.music.lyric_controller as mod
+    import petwisp.music.lyric_controller as mod
 
     clock = _patch_clock(monkeypatch, 100.0)
     ctrl = mod.MusicLyricController(_FakeWin())
@@ -1395,7 +1395,7 @@ def test_same_track_retries_lyric_fetch_after_cooldown(monkeypatch):
 
 def test_same_track_does_not_refetch_while_already_loading(monkeypatch):
     """非回归：取词在途时同曲采样不得叠加第二路请求。"""
-    import pet.music.lyric_controller as mod
+    import petwisp.music.lyric_controller as mod
 
     _patch_clock(monkeypatch, 100.0)
     ctrl = mod.MusicLyricController(_FakeWin())
@@ -1542,7 +1542,7 @@ def test_system_proxy_route_policy_is_logged_once(monkeypatch, caplog):
 
 
 class _LyricClock:
-    """受控时钟：只替换 ``pet.music.lyric`` 里的 monotonic，其余透传。"""
+    """受控时钟：只替换 ``petwisp.music.lyric`` 里的 monotonic，其余透传。"""
 
     def __init__(self, now: float = 1000.0):
         self.now = now
@@ -2122,7 +2122,7 @@ class TestRealSourceParsers:
             ]}},
         })
         import logging
-        with caplog.at_level(logging.WARNING, logger="pet.music.lyric"):
+        with caplog.at_level(logging.WARNING, logger="petwisp.music.lyric"):
             assert music_lyric._fetch_from_netease("歌", "查无此人") is None
         assert any("无人匹配歌手" in rec.message for rec in caplog.records)
 
@@ -2174,7 +2174,7 @@ class TestPendingPlaybackIsBoundPerRequest:
     """
 
     def _controller(self, monkeypatch):
-        import pet.music.lyric_controller as mlc
+        import petwisp.music.lyric_controller as mlc
 
         monkeypatch.setattr(mlc.MusicLyricController, "_announce", lambda self, *a, **k: None)
         monkeypatch.setattr(mlc.MusicLyricController, "_show", lambda self, *a, **k: None)
@@ -2202,7 +2202,7 @@ class TestPendingPlaybackIsBoundPerRequest:
         ctl._current_key = "keyA"
 
         # A 的结果回来：必须读 A 自己的（无进度）上下文——reported=False
-        from pet.music.lyric import LyricLine, Lyrics
+        from petwisp.music.lyric import LyricLine, Lyrics
         lyrics = Lyrics(lines=(LyricLine(1.0, "第一句"), LyricLine(5.0, "第二句")))
 
         monkeypatch.setattr(ctl, "_enter_instrumental_mode", lambda l: None)
@@ -2257,8 +2257,8 @@ def _pump_until(predicate, *, timeout=10.0) -> bool:
 
 def _gated_controller(monkeypatch, *, title="夜曲", artist="周杰伦"):
     """真实控制器 + 真实采样线程，只把 SMTC 采样换成卡在事件上的替身。"""
-    from pet.music import now_playing
-    from pet.music.lyric_controller import MusicLyricController
+    from petwisp.music import now_playing
+    from petwisp.music.lyric_controller import MusicLyricController
 
     sampler = _GatedSampler(_playback(None, title=title, artist=artist))
     monkeypatch.setattr(now_playing, "get_now_playing", sampler)
@@ -2366,8 +2366,8 @@ def test_stale_sample_after_disable_enable_does_not_clear_busy_gate(qapp, monkey
     还在 WinRT 里飞着，忙门却已经打开，"同一时刻只允许一拍在途"就此破裂（两拍
     并发回来会乱序推进状态）。
     """
-    from pet.music import now_playing
-    from pet.music.lyric_controller import MusicLyricController, NOW_SINGING_TEMPLATE
+    from petwisp.music import now_playing
+    from petwisp.music.lyric_controller import MusicLyricController, NOW_SINGING_TEMPLATE
 
     stale = _playback(None, title="旧歌", artist="旧手")   # 关闭前那一拍的结果
     fresh = _playback(None, title="新歌", artist="新手")   # 重开后那一拍的结果
@@ -2423,8 +2423,8 @@ def test_music_mode_reentry_after_inflight_sample_keeps_sampling(qapp, monkeypat
     ``_on_tick`` 每拍都在第一道闸门返回、唤醒口也再没人置位——歌词直到重启都不
     再更新。
     """
-    from pet.music import now_playing
-    from pet.music.lyric_controller import MusicLyricController
+    from petwisp.music import now_playing
+    from petwisp.music.lyric_controller import MusicLyricController
 
     sampler = _IndexedGatedSampler([_playback(None, title="歌", artist="手")])
     monkeypatch.setattr(now_playing, "get_now_playing", sampler)
@@ -2468,7 +2468,7 @@ def test_pause_during_lyric_fetch_is_not_counted_as_playback(monkeypatch):
     歌词到位才由 ``load()`` 建立），暂停边沿也就没人记。结果取词回来按
     ``now - detected`` 估算时把暂停时长算成播放进度，歌词当场跳到未来。
     """
-    import pet.music.lyric_controller as mod
+    import petwisp.music.lyric_controller as mod
 
     clock = _patch_clock(monkeypatch, 100.0)
     win = _FakeWin()
@@ -2503,7 +2503,7 @@ def test_pause_still_open_when_lyrics_arrive_freezes_clock(monkeypatch):
     暂停中的歌词位置必须冻结在"暂停那一刻"：``load()`` 会清掉暂停态，不显式冻结
     的话恢复播放后基准仍从 load 的时刻起算，暂停的这几秒又会被算成播放时间。
     """
-    import pet.music.lyric_controller as mod
+    import petwisp.music.lyric_controller as mod
 
     clock = _patch_clock(monkeypatch, 100.0)
     win = _FakeWin()
@@ -2536,7 +2536,7 @@ def test_pause_still_open_when_lyrics_arrive_freezes_clock(monkeypatch):
 
 def test_pause_bookkeeping_resets_on_track_change(monkeypatch):
     """切歌重置暂停记账：上一首的暂停时长绝不能算进下一首的进度。"""
-    import pet.music.lyric_controller as mod
+    import petwisp.music.lyric_controller as mod
 
     clock = _patch_clock(monkeypatch, 100.0)
     win = _FakeWin()
@@ -2563,7 +2563,7 @@ def test_pause_during_fetch_freezes_clock_even_when_bubble_is_taken(monkeypatch)
     按播放态从 load 那一刻起算，取词期间的暂停被算成播放时间，恢复播放后歌词停在
     错的那一句。冻结时钟与"是否显示"是两件事，必须解耦。
     """
-    import pet.music.lyric_controller as mod
+    import petwisp.music.lyric_controller as mod
 
     clock = _patch_clock(monkeypatch, 100.0)
     win = _FakeWin()
@@ -2602,8 +2602,8 @@ def test_pause_during_fetch_is_deducted_from_reported_progress(monkeypatch):
     保守取 min(暂停, 窗口)，宁可少扣也绝不多扣（多扣会把位置压到采样值以下，
     歌词相对播放器倒退）。
     """
-    import pet.music.lyric_controller as mod
-    from pet.music.now_playing import Playback, Track
+    import petwisp.music.lyric_controller as mod
+    from petwisp.music.now_playing import Playback, Track
 
     clock = _patch_clock(monkeypatch, 100.0)
     win = _FakeWin()
@@ -2640,8 +2640,8 @@ def test_pause_before_a_retry_dispatch_is_not_deducted_from_reported_progress(mo
     采样值"，保证不了"扣的暂停属于窗口"：30s 冷却期暂停撞上 5s 窗口，会把 105 算成 100
     （歌词退回一整句）。修法是派发那一拍快照累计暂停，完成时只扣增量。
     """
-    import pet.music.lyric_controller as mod
-    from pet.music.now_playing import Playback, Track
+    import petwisp.music.lyric_controller as mod
+    from petwisp.music.now_playing import Playback, Track
 
     clock = _patch_clock(monkeypatch, 100.0)
     win = _FakeWin()
@@ -2689,7 +2689,7 @@ def test_cooldown_pause_is_still_deducted_without_reported_progress(monkeypatch)
     有进度 → 本次派发那次采样；无进度 → 检测到切歌的时刻（`_detected_at`，那里的
     暂停记账本就归零）。把"派发基线"照搬到无进度分支会**漏扣**冷却期暂停，位置偏大。
     """
-    import pet.music.lyric_controller as mod
+    import petwisp.music.lyric_controller as mod
 
     clock = _patch_clock(monkeypatch, 100.0)
     win = _FakeWin()
@@ -2772,7 +2772,7 @@ def test_parse_lrc_drops_timestamped_credit_lines():
     """带时间戳的 credits 行（汽水/网易云源的「作词/作曲/编曲」等）不再被当歌词
     ——issue #338（credits 被显示）/ #331（对齐锚点被挤掉）同族。整行都是
     credits 才过滤；真正唱到「作词」的歌词行保留。"""
-    from pet.music.lyric import parse_lrc
+    from petwisp.music.lyric import parse_lrc
 
     text = "\n".join([
         "[ti:歌名]",

@@ -26,7 +26,7 @@ from pathlib import Path
 import pytest
 from PySide6.QtWidgets import QApplication
 
-from pet.webm_clip import WebMClip
+from petwisp.webm_clip import WebMClip
 
 SAMPLE_WEBM = Path("assets/characters/demo/videos/idle/待机呼吸休闲.webm")
 FRAME_BYTES = 640 * 360 * 4  # 921600
@@ -347,7 +347,7 @@ def test_feed_handover_abort_logs_info_not_warning(app, caplog):
     """F1：handover abort → 打 INFO（设计内行为），不再是 WARNING。"""
     clip, feed, stop_evt, gen = _run_reader_feed_abort("handover")
     try:
-        with caplog.at_level(logging.INFO, logger="pet.webm_clip"):
+        with caplog.at_level(logging.INFO, logger="petwisp.webm_clip"):
             done = clip._reader_feed(feed, stop_evt, gen)
         assert done is False  # 仍回退本地解码（_reader_feed 契约）
         info = [r for r in caplog.records
@@ -365,7 +365,7 @@ def test_feed_watchdog_abort_still_warns(app, caplog):
     """F1：watchdog/stop_all abort → 保留 WARNING（真断流仍是故障信号）。"""
     clip, feed, stop_evt, gen = _run_reader_feed_abort("watchdog")
     try:
-        with caplog.at_level(logging.WARNING, logger="pet.webm_clip"):
+        with caplog.at_level(logging.WARNING, logger="petwisp.webm_clip"):
             done = clip._reader_feed(feed, stop_evt, gen)
         assert done is False
         warn = [r for r in caplog.records

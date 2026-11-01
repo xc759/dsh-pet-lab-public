@@ -33,11 +33,11 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication, QLineEdit, QSpinBox
 
-import pet.modern_settings_dialog as settings_mod
-from pet import settings_default_marks
-from pet.config import Config
-from pet.modern_settings_dialog import SettingRow
-from pet.settings_widgets import (
+import petwisp.modern_settings_dialog as settings_mod
+from petwisp import settings_default_marks
+from petwisp.config import Config
+from petwisp.modern_settings_dialog import SettingRow
+from petwisp.settings_widgets import (
     BrowserSpinBox,
     ModernSelect,
     SettingsTabContainer,
@@ -110,7 +110,7 @@ def env(tmp_path, monkeypatch):
     配置面按生产形态给：slot0 身份经 ``SlotRoutedConfig`` 分流，每宠键（点击音效、
     气泡方案…）写进 ``config-slot-0.json``，全局键仍进 ``config.json``。
     """
-    from pet.settings_slot_config import route_settings_config
+    from petwisp.settings_slot_config import route_settings_config
 
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
     cfg = route_settings_config(Config(base=tmp_path, instance_id="slot-0"))
@@ -310,7 +310,7 @@ def test_reset_then_save_round_trips_to_default(env):
 
 
 def test_no_chat_build_still_installs_marks(tmp_path, monkeypatch):
-    """打包变体（excludes=['pet.chat']）：没有 AI 行也要照常接线、不报错。"""
+    """打包变体（excludes=['petwisp.chat']）：没有 AI 行也要照常接线、不报错。"""
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
     dialog = settings_mod.ModernSettingsDialog(Config(base=tmp_path), include_ai=False)
     dialog.show()

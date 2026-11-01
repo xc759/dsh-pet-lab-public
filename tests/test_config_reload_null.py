@@ -18,8 +18,8 @@ import json
 
 import pytest
 
-import pet.config as config_mod
-from pet.config import APP_DIR_NAME, Config
+import petwisp.config as config_mod
+from petwisp.config import APP_DIR_NAME, Config
 
 LAYOUT_OVERRIDE = {
     "schema_version": 1,

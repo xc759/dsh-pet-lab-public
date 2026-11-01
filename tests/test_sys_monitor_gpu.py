@@ -39,9 +39,9 @@ from pathlib import Path
 
 import pytest
 
-from pet import gpu_monitor as gm
-from pet.island import segments as isl
-from pet import sys_monitor as sm
+from petwisp import gpu_monitor as gm
+from petwisp.island import segments as isl
+from petwisp import sys_monitor as sm
 
 #: 采样线程的固定名字（收口/独占断言用）。
 THREAD_NAME = "pet-sys-monitor"
@@ -723,7 +723,7 @@ def test_a_failed_release_is_reported_once_and_never_retried_by_the_worker(
     monitor.start()
     try:
         assert _wait_until(lambda: reader.reads >= 1, timeout=5.0)
-        with caplog.at_level(logging.WARNING, logger="pet.sys_monitor"):
+        with caplog.at_level(logging.WARNING, logger="petwisp.sys_monitor"):
             monitor.unsubscribe_gpu(isl.GPU)
             assert _wait_until(lambda: reader.closes >= 2, timeout=5.0)
             time.sleep(1.2)                     # 至少一整拍：不会再有第三次

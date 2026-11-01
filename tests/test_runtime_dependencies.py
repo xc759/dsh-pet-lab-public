@@ -27,11 +27,11 @@ from pathlib import Path
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-PET_DIR = REPO_ROOT / "pet"
+PET_DIR = REPO_ROOT / "petwisp"
 REQUIREMENTS = REPO_ROOT / "requirements.txt"
 
 # 本仓库内的顶层包名（不参与依赖核对）。
-INTERNAL_MODULES = {"pet", "packaging", "integrations"}
+INTERNAL_MODULES = {"petwisp", "packaging", "integrations"}
 
 # 由已声明依赖带进来的传递依赖：不是我们直接依赖的东西，但代码确实 import 了。
 # 值 = 说明它由谁带进来（换依赖时回来改这里）。
@@ -61,7 +61,7 @@ def _canonical(name: str) -> str:
 
 
 def _pet_third_party_imports() -> dict[str, set[str]]:
-    """pet/ 下所有顶层 import 名 → 引用它的文件（相对仓库根，便于读报错）。"""
+    """petwisp/ 下所有顶层 import 名 → 引用它的文件（相对仓库根，便于读报错）。"""
     found: dict[str, set[str]] = {}
     for path in sorted(PET_DIR.rglob("*.py")):
         # 有些文件带 BOM，用 utf-8-sig 才解析得了。
@@ -101,7 +101,7 @@ def _distributions_for(module: str) -> list[str]:
 
 
 def test_pet_third_party_imports_are_declared():
-    """pet/ 里 import 的第三方包，必须能在 requirements.txt 里找到（或列入白名单）。"""
+    """petwisp/ 里 import 的第三方包，必须能在 requirements.txt 里找到（或列入白名单）。"""
     declared = _declared_requirement_names()
     undeclared: list[str] = []
     for module, users in sorted(_pet_third_party_imports().items()):
@@ -133,6 +133,6 @@ def test_psutil_is_declared_for_player_probe():
         "进程不在时直接启动播放器而**不碰 WinRT**；缺失时该判断放行，"
         "SMTC 卡住的老路会照旧走。"
     )
-    from pet.music import now_playing
+    from petwisp.music import now_playing
 
     assert callable(now_playing.player_process_running)

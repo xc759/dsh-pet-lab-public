@@ -25,17 +25,17 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 import pytest  # noqa: E402
 from PySide6.QtWidgets import QApplication, QPushButton  # noqa: E402
 
-import pet.modern_settings_dialog as settings_mod  # noqa: E402
-from pet.config import Config  # noqa: E402
-from pet.feature_activation import CURRENT_VERSION, pending_enabled  # noqa: E402
-from pet.features import (  # noqa: E402
+import petwisp.modern_settings_dialog as settings_mod  # noqa: E402
+from petwisp.config import Config  # noqa: E402
+from petwisp.feature_activation import CURRENT_VERSION, pending_enabled  # noqa: E402
+from petwisp.features import (  # noqa: E402
     CATEGORY_ORDER,
     FEATURES,
     MIGRATION_BASELINE,
     all_features,
 )
-from pet.settings_features import RECOMMENDED_SUITE, FeaturesPage  # noqa: E402
-from pet.settings_widgets import SettingsSection  # noqa: E402
+from petwisp.settings_features import RECOMMENDED_SUITE, FeaturesPage  # noqa: E402
+from petwisp.settings_widgets import SettingsSection  # noqa: E402
 
 app = QApplication.instance() or QApplication([])
 

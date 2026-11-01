@@ -22,10 +22,10 @@ from PySide6.QtWidgets import QApplication
 
 import tests.test_overlay_window_capabilities as cap
 import tests.test_sprite_menu_facade as fac
-from pet import config as config_mod
-from pet.config import Config
-from pet.overlay_shell import OverlayShell
-from pet.pet_sprite import PetSprite
+from petwisp import config as config_mod
+from petwisp.config import Config
+from petwisp.overlay_shell import OverlayShell
+from petwisp.pet_sprite import PetSprite
 
 app = QApplication.instance() or QApplication([])
 
@@ -36,7 +36,7 @@ def _slot0_config(tmp_path):
     每宠键（``drop_gravity`` 在内）的真值在 ``config-slot-0.json``：裸全局
     ``Config.set/save`` 只碰全局那份，每宠键出闸即被过滤，改不动任何一只宠。
     """
-    from pet.settings_slot_config import route_settings_config
+    from petwisp.settings_slot_config import route_settings_config
 
     return route_settings_config(Config(base=tmp_path, instance_id="slot-0"))
 
@@ -106,7 +106,7 @@ def test_sprite_gets_drop_gravity_from_config(tmp_path):
 
 
 def test_spawned_sprite_inherits_drop_gravity(tmp_path):
-    """spawn 的子肥鱼同样吃这份配置（缺自己的 slot 键回退主配置）。"""
+    """spawn 的子宠同样吃这份配置（缺自己的 slot 键回退主配置）。"""
     shell, _config = _make_shell(tmp_path, {"drop_gravity": True})
     try:
         shell._spawn_slot(7)
@@ -148,7 +148,7 @@ def test_per_slot_value_applies_to_that_pet_only(tmp_path):
 # ---------------------------------------------------------------- ③ 设置页
 def test_settings_row_reads_and_writes_the_key(tmp_path):
     """设置页行与 config 双向：读当前值、勾选后 _save 写回。"""
-    from pet.modern_settings_dialog import ModernSettingsDialog, SettingRow
+    from petwisp.modern_settings_dialog import ModernSettingsDialog, SettingRow
 
     cfg = Config(base=tmp_path)
     dialog = ModernSettingsDialog(cfg, include_ai=False)
@@ -161,7 +161,7 @@ def test_settings_row_reads_and_writes_the_key(tmp_path):
         assert dialog._save() is not False
         # #271：空身份会话按 slot0 分流——每宠键落 config-slot-0.json，
         # 传入的空身份对象读的是主配置（不含每宠键），真值从档案读回。
-        from pet import pet_profiles as profiles
+        from petwisp import pet_profiles as profiles
         assert profiles.read_slot_profile(cfg.dir, 0).value("drop_gravity") is True
 
         # 归属：与「拖动物理」同域页（组内相邻，可发现性由既有分组承担）
@@ -178,9 +178,9 @@ def test_settings_row_reads_and_writes_the_key(tmp_path):
 
 def test_settings_row_shows_configured_value(tmp_path):
     """真值回读：config 已开 → 勾选框显示开（避免「配置说开、界面显示关」）。"""
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
-    from pet import pet_profiles as profiles
+    from petwisp import pet_profiles as profiles
 
     cfg = Config(base=tmp_path)
     cfg.save()  # 落种 slot0 档案（#271 起空身份会话的每宠键读它）
@@ -194,7 +194,7 @@ def test_settings_row_shows_configured_value(tmp_path):
 
 # ---------------------------------------------------------------- ④ 拓扑作用域
 def _dialog_for(cfg):
-    from pet.modern_settings_dialog import ModernSettingsDialog
+    from petwisp.modern_settings_dialog import ModernSettingsDialog
 
     return ModernSettingsDialog(cfg, include_ai=False)
 
@@ -207,7 +207,7 @@ def test_row_disabled_when_capture_mode_makes_topology_legacy(tmp_path):
     那里改了没反应，故如实置灰 + 说明；同节的其它行（拖动物理/甩出力度等）
     legacy 真的消费，保持可用。
     """
-    from pet import overlay_settings_command as cmd_mod
+    from petwisp import overlay_settings_command as cmd_mod
 
     cfg = Config(base=tmp_path)
     cfg.set("stream_capture_mode", True)

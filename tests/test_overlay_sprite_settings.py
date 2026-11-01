@@ -12,9 +12,9 @@ from PySide6.QtWidgets import QApplication
 
 import tests.test_overlay_window_capabilities as cap
 import tests.test_sprite_menu_facade as fac
-from pet.overlay_shell import OverlayShell
-from pet.pet_sprite import PetSprite
-from pet.physics import THROW_STRENGTH_CAPS
+from petwisp.overlay_shell import OverlayShell
+from petwisp.pet_sprite import PetSprite
+from petwisp.physics import THROW_STRENGTH_CAPS
 
 app = QApplication.instance() or QApplication([])
 
@@ -68,7 +68,7 @@ def test_refresh_settings_resyncs_sprite(tmp_path):
 
 
 def test_spawned_sprite_gets_config_sync(tmp_path):
-    """spawn 的子肥鱼同样按 config 应用（不是只吃构造默认）。"""
+    """spawn 的子宠同样按 config 应用（不是只吃构造默认）。"""
     shell, _config = _make_shell(tmp_path, {"drag_physics": False,
                                             "throw_strength": "strong"})
     try:
@@ -114,7 +114,7 @@ def test_settle_supported_resets_flight_playback_speed():
     → 收尾必须调 reset_playback_speed（否则飞行倍率除进 duration()，
     后续 _plan_move 量化失配——sprite_physics 落地分支不是唯一出口）。
     """
-    from pet.sprite_collision import SpriteCollisionWorld
+    from petwisp.sprite_collision import SpriteCollisionWorld
     from tests.test_island_bridge import FakeSprite
 
     world = SpriteCollisionWorld()
@@ -177,7 +177,7 @@ def test_collision_physics_keys_reach_world(tmp_path):
 def test_collision_physics_keys_reach_solver(tmp_path, monkeypatch):
     """4 键必须在运行期真的进求解器入参（不只是写在世界属性上）。"""
     import tests.test_overlay_collision_toggle as toggle
-    from pet import collision as collision_mod
+    from petwisp import collision as collision_mod
 
     shell, _cfg = toggle._make_slot_shell(tmp_path, collision_enabled=True)
     seen: dict = {}
@@ -253,7 +253,7 @@ def test_scale_applies_at_runtime(tmp_path):
     ``config-slot-N.json`` 决定，主宠的设置不再拖走子宠，反之亦然。
     """
     import tests.test_overlay_collision_toggle as toggle
-    from pet import overlay_spawn_state as ovs
+    from petwisp import overlay_spawn_state as ovs
 
     shell, cfg = toggle._make_slot_shell(tmp_path, scale=0.5)
     try:
@@ -268,7 +268,7 @@ def test_scale_applies_at_runtime(tmp_path):
 
         shell.spawn_pet()
         child = shell._spawned[0]
-        # 这只子肥鱼自己的设置页保存了 0.5 → 只有它按 0.5 走
+        # 这只子宠自己的设置页保存了 0.5 → 只有它按 0.5 走
         assert ovs.write_slot_setting(cfg.dir, 1, "scale", 0.5,
                                       user_customized=True)
         shell._on_settings_command_dir_changed(str(cfg.dir))

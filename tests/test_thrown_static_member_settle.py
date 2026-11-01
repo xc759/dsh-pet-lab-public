@@ -23,9 +23,9 @@ import math
 
 from PySide6.QtCore import QPointF, QRect
 
-from pet import collision, physics
-from pet.sprite_collision import SpriteCollisionWorld
-from pet.sprite_physics import ThrowPhysicsController
+from petwisp import collision, physics
+from petwisp.sprite_collision import SpriteCollisionWorld
+from petwisp.sprite_physics import ThrowPhysicsController
 
 INTERACTION_NORMAL = "normal"
 INTERACTION_THROWN = "thrown"

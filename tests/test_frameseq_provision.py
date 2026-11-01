@@ -69,10 +69,10 @@ from PIL import Image
 from PySide6.QtCore import QLockFile
 from PySide6.QtWidgets import QApplication
 
-from pet import frameseq_provision as fp
-from pet import library as library_mod
-from pet.library import MovieLibrary
-from pet.webm_clip import set_session_ending
+from petwisp import frameseq_provision as fp
+from petwisp import library as library_mod
+from petwisp.library import MovieLibrary
+from petwisp.webm_clip import set_session_ending
 
 app = QApplication.instance() or QApplication([])
 
@@ -296,7 +296,7 @@ def _fail_publish_rename(monkeypatch, target: Path) -> list:
 def _light_clips(monkeypatch) -> None:
     """库测试用假 clip：不构造真 FrameSeqClip（共享预取线程留给 test_frameseq_clip）。"""
     monkeypatch.setattr(library_mod, "WebMClip", _FakeClip)
-    monkeypatch.setattr("pet.frameseq_clip.FrameSeqClip", _FakeClip)
+    monkeypatch.setattr("petwisp.frameseq_clip.FrameSeqClip", _FakeClip)
 
 
 def _pump_until(cond, timeout_s: float = 10.0) -> None:
@@ -2218,7 +2218,7 @@ def test_cancel_provision_wait_failure_orphans_worker(tmp_path):
 
 # ---------------------------------------------------------------- tools 薄壳
 def test_tools_shell_delegates_to_core():
-    """薄壳只做命令行：转换核心与参数表都直接复用 pet.frameseq_provision。"""
+    """薄壳只做命令行：转换核心与参数表都直接复用 petwisp.frameseq_provision。"""
     import tools.convert_frameseq as shell
 
     assert shell.convert_clip is fp.convert_clip

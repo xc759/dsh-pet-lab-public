@@ -21,9 +21,9 @@ import time
 import pytest
 from PySide6.QtWidgets import QApplication, QMenu
 
-from pet import memory_trim
-from pet.context_menus import registry as registry_mod
-from pet.context_menus import shared as shared_mod
+from petwisp import memory_trim
+from petwisp.context_menus import registry as registry_mod
+from petwisp.context_menus import shared as shared_mod
 
 MB = 1024 * 1024
 
@@ -840,7 +840,7 @@ def test_registry_registers_memory_trim_with_a_windows_gate(monkeypatch):
 
 
 def test_modern_menu_offers_memory_trim_on_windows_only(app, monkeypatch):
-    from pet.context_menu import populate_context_menu
+    from petwisp.context_menu import populate_context_menu
 
     pet = _Pet({"context_menu_layout": None, "context_menu_appearance": {}})
     monkeypatch.setattr(shared_mod.autostart_mod, "is_enabled", lambda: False)
@@ -864,7 +864,7 @@ def test_modern_menu_offers_memory_trim_on_windows_only(app, monkeypatch):
 
 def test_shared_builder_offers_memory_trim_on_windows_only(app, monkeypatch):
     """平台门在**共享建造器**里（供任何直调它的入口复用），不只是注册表判定。"""
-    from pet.context_menus.shared import add_memory_trim
+    from petwisp.context_menus.shared import add_memory_trim
 
     pet = _Pet()
     monkeypatch.setattr(shared_mod.autostart_mod, "is_enabled", lambda: False)
@@ -1012,7 +1012,7 @@ def test_overlay_facade_host_reads_its_config_and_reports_to_the_shell(app, monk
     facade 这条链：宿主 cfg 是壳的配置视图、汇报气泡经 facade.show_bubble 落到
     壳的 show_bubble（与 ``_MusicLaunchBridge`` 同一条既有通道）。
     """
-    from pet.sprite_menu_facade import SpriteMenuFacade
+    from petwisp.sprite_menu_facade import SpriteMenuFacade
 
     calls: list[dict] = []
     monkeypatch.setattr(sys, "platform", "win32")

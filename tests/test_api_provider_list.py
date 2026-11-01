@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from PySide6.QtWidgets import QApplication
 
-from pet.config import Config
+from petwisp.config import Config
 
 
 def _app():
@@ -13,7 +13,7 @@ def _app():
 
 def test_chat_settings_provider_list_add_switch_delete(tmp_path):
     """AI 设置对话框：API 列表添加后能切换并保留编辑，删除后回到默认项。"""
-    from pet.chat.settings_dialog import ChatSettingsDialog
+    from petwisp.chat.settings_dialog import ChatSettingsDialog
 
     _app()
     cfg = Config(tmp_path)
@@ -47,7 +47,7 @@ def test_chat_settings_provider_list_add_switch_delete(tmp_path):
 
 def test_chat_settings_provider_id_not_reused_after_delete(tmp_path):
     """删除后再次添加不能复用已删除 provider_id，避免保存合并误过滤。"""
-    from pet.chat.settings_dialog import ChatSettingsDialog
+    from petwisp.chat.settings_dialog import ChatSettingsDialog
 
     _app()
     cfg = Config(tmp_path)
@@ -68,7 +68,7 @@ def test_chat_settings_provider_id_not_reused_after_delete(tmp_path):
 
 def test_chat_settings_provider_switch_keeps_key_draft(tmp_path):
     """切走再切回后，已录入但未保存的 API Key 不应被空输入框覆盖丢失。"""
-    from pet.chat.settings_dialog import ChatSettingsDialog
+    from petwisp.chat.settings_dialog import ChatSettingsDialog
 
     _app()
     cfg = Config(tmp_path)
@@ -91,7 +91,7 @@ def test_chat_settings_provider_switch_keeps_key_draft(tmp_path):
 
 def test_chat_settings_provider_list_save_persists_active_provider(tmp_path):
     """保存后 active_provider 与新增 Provider 应写入配置。"""
-    from pet.chat.settings_dialog import ChatSettingsDialog
+    from petwisp.chat.settings_dialog import ChatSettingsDialog
 
     _app()
     cfg = Config(tmp_path)
@@ -113,7 +113,7 @@ def test_chat_settings_provider_list_save_persists_active_provider(tmp_path):
 
 def test_modern_ai_page_provider_list_add_switch_delete(tmp_path, monkeypatch):
     """现代设置 AI 页：API 列表同样支持添加/切换/删除。"""
-    import pet.modern_settings_dialog as settings_mod
+    import petwisp.modern_settings_dialog as settings_mod
 
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
     _app()

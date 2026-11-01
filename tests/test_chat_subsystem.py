@@ -10,17 +10,17 @@ from pathlib import Path
 
 import pytest
 
-from pet.chat.models import ChatMessage, ChatSettings, ProviderConfig
-from pet.chat.prompt import PromptBuilder, load_character_prompt
-from pet.chat.providers import (
+from petwisp.chat.models import ChatMessage, ChatSettings, ProviderConfig
+from petwisp.chat.prompt import PromptBuilder, load_character_prompt
+from petwisp.chat.providers import (
     ProviderError,
     SSEParser,
     _is_cert_verify_error,
     _make_ssl_context,
     normalize_chat_endpoint,
 )
-from pet.chat.session_store import SessionStore
-from pet.window import _squash_geometry
+from petwisp.chat.session_store import SessionStore
+from petwisp.window import _squash_geometry
 
 
 def test_provider_endpoint_normalization():
@@ -113,7 +113,7 @@ def test_provider_error_is_safe():
     assert "api_key" not in str(error).lower()
 
 def test_config_v4_migrates_legacy_chat_fields(tmp_path: Path, monkeypatch):
-    from pet.config import Config
+    from petwisp.config import Config
 
     # 内存假 keyring：加载时明文迁移（_migrate_plaintext_keys_to_keyring）会把
     # legacy chat_api_key 搬进去，不碰真实系统钥匙串。
@@ -131,10 +131,10 @@ def test_config_v4_migrates_legacy_chat_fields(tmp_path: Path, monkeypatch):
             return True
 
     _FakeStore.shared = {}
-    monkeypatch.setattr("pet.chat.models.SecretStore", _FakeStore)
+    monkeypatch.setattr("petwisp.chat.models.SecretStore", _FakeStore)
 
     root = tmp_path / "appdata"
-    cfg_dir = root / "dsh-pet-standalone"
+    cfg_dir = root / "petwisp"
     cfg_dir.mkdir(parents=True)
     (cfg_dir / "config.json").write_text(json.dumps({
         "version": 2,
@@ -159,8 +159,8 @@ def test_config_v4_migrates_legacy_chat_fields(tmp_path: Path, monkeypatch):
 
 def test_chat_window_offscreen_smoke(tmp_path: Path, monkeypatch):
     from PySide6.QtWidgets import QApplication
-    from pet.config import Config
-    from pet.chat.widgets import ChatWindow
+    from petwisp.config import Config
+    from petwisp.chat.widgets import ChatWindow
     monkeypatch.setenv("QT_QPA_PLATFORM", "offscreen")
     app = QApplication.instance() or QApplication([])
     window = ChatWindow(Config(tmp_path), "demo")
@@ -172,8 +172,8 @@ def test_chat_window_offscreen_smoke(tmp_path: Path, monkeypatch):
 
 def test_chat_window_has_playful_shell_and_session_controls(tmp_path: Path):
     from PySide6.QtWidgets import QApplication
-    from pet.config import Config
-    from pet.chat.widgets import ChatWindow
+    from petwisp.config import Config
+    from petwisp.chat.widgets import ChatWindow
 
     app = QApplication.instance() or QApplication([])
     window = ChatWindow(Config(tmp_path), "demo")
@@ -192,7 +192,7 @@ def test_chat_window_has_playful_shell_and_session_controls(tmp_path: Path):
 
 
 def test_message_bubble_exposes_avatar_body_and_state():
-    from pet.chat.widgets import MessageBubble
+    from petwisp.chat.widgets import MessageBubble
 
     bubble = MessageBubble("assistant", "hello", character_id="demo")
     assert bubble.objectName() == "message-bubble"
@@ -207,8 +207,8 @@ def test_message_bubble_exposes_avatar_body_and_state():
 
 def test_session_sidebar_uses_readable_deepseek_style_list(tmp_path: Path):
     from PySide6.QtWidgets import QApplication, QListWidget
-    from pet.config import Config
-    from pet.chat.widgets import ChatWindow
+    from petwisp.config import Config
+    from petwisp.chat.widgets import ChatWindow
 
     app = QApplication.instance() or QApplication([])
     window = ChatWindow(Config(tmp_path), "demo")
@@ -222,8 +222,8 @@ def test_session_sidebar_uses_readable_deepseek_style_list(tmp_path: Path):
 def test_chat_window_uses_visible_pet_bounds_for_side_placement(tmp_path: Path):
     from PySide6.QtCore import QRect
     from PySide6.QtWidgets import QApplication, QWidget
-    from pet.chat.widgets import ChatWindow
-    from pet.config import Config
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     pet = QWidget()
@@ -254,8 +254,8 @@ def test_chat_window_uses_visible_pet_bounds_for_side_placement(tmp_path: Path):
 def test_chat_window_moves_to_left_of_pet_at_right_screen_edge(tmp_path: Path):
     from PySide6.QtCore import QRect
     from PySide6.QtWidgets import QApplication, QWidget
-    from pet.chat.widgets import ChatWindow
-    from pet.config import Config
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     work_area = app.primaryScreen().availableGeometry()
@@ -283,7 +283,7 @@ def test_pet_window_visible_content_rect_uses_alpha_mask():
     from PySide6.QtCore import QPoint, QRect, QSize
     from PySide6.QtGui import QRegion
     from PySide6.QtWidgets import QApplication
-    from pet.window import PetWindow
+    from petwisp.window import PetWindow
 
     class FakePet:
         def frameGeometry(self):
@@ -310,7 +310,7 @@ def test_pet_window_bubble_anchor_prefers_stable_collision_bounds():
     """
     from PySide6.QtCore import QPoint, QRect, QSize
 
-    from pet import window_placement
+    from petwisp import window_placement
 
     class FakePet:
         _collision_local_bounds = QRect(10, 20, 100, 150)
@@ -328,7 +328,7 @@ def test_pet_window_bubble_anchor_falls_back_without_collision_bounds():
     """碰撞边界还没算出来（启动首帧）时回退当前帧轮廓，不许崩。"""
     from PySide6.QtCore import QRect
 
-    from pet import window_placement
+    from petwisp import window_placement
 
     class FakePet:
         _collision_local_bounds = None
@@ -344,8 +344,8 @@ def test_pet_window_bubble_anchor_falls_back_without_collision_bounds():
 
 def test_streaming_scroll_only_follows_when_already_near_bottom(tmp_path: Path):
     from PySide6.QtWidgets import QApplication
-    from pet.chat.widgets import ChatWindow
-    from pet.config import Config
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     window = ChatWindow(Config(tmp_path), "demo")
@@ -362,8 +362,8 @@ def test_streaming_scroll_only_follows_when_already_near_bottom(tmp_path: Path):
 def test_ai_settings_is_modeless_so_pet_can_still_move(tmp_path: Path):
     from PySide6.QtCore import Qt
     from PySide6.QtWidgets import QApplication
-    from pet.app import AppShell
-    from pet.config import Config
+    from petwisp.app import AppShell
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     owner = AppShell(app, Config(tmp_path))
@@ -386,10 +386,10 @@ def test_present_dialog_defers_until_popup_menu_closes(tmp_path: Path, monkeypat
     """
     import time
 
-    import pet.app as app_mod
+    import petwisp.app as app_mod
     from PySide6.QtWidgets import QApplication, QDialog
-    from pet.app import AppShell
-    from pet.config import Config
+    from petwisp.app import AppShell
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     owner = AppShell(app, Config(tmp_path))
@@ -418,10 +418,10 @@ def test_present_dialog_defers_until_popup_menu_closes(tmp_path: Path, monkeypat
 def test_heavy_chat_creation_is_deferred_until_context_menu_closes(tmp_path: Path, monkeypatch):
     import time
 
-    import pet.app as app_mod
+    import petwisp.app as app_mod
     from PySide6.QtWidgets import QApplication
-    from pet.app import AppShell
-    from pet.config import Config
+    from petwisp.app import AppShell
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     owner = AppShell(app, Config(tmp_path))
@@ -446,8 +446,8 @@ def test_heavy_chat_creation_is_deferred_until_context_menu_closes(tmp_path: Pat
 
 def test_chat_window_session_switch_and_character_refresh(tmp_path: Path):
     from PySide6.QtWidgets import QApplication
-    from pet.config import Config
-    from pet.chat.widgets import ChatWindow
+    from petwisp.config import Config
+    from petwisp.chat.widgets import ChatWindow
 
     app = QApplication.instance() or QApplication([])
     config = Config(tmp_path)
@@ -491,8 +491,8 @@ def test_squash_geometry_uses_logical_frame_size_at_high_dpi():
 def test_follow_pet_option_registers_and_unregisters_position_listener(tmp_path: Path):
     from PySide6.QtCore import QRect
     from PySide6.QtWidgets import QApplication
-    from pet.chat.widgets import ChatWindow
-    from pet.config import Config
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.config import Config
 
     class FakePet:
         def __init__(self):
@@ -538,20 +538,20 @@ def test_no_chat_packaging_uses_isolated_entrypoint():
     no_chat_entry = Path("packaging/pet_entry_no_chat.py").read_text(encoding="utf-8")
     assert "main(enable_chat=False)" in no_chat_entry
     # spec 是构建产物（*.spec 已 gitignore）；干净检出时不存在则跳过，
-    # 存在时（本机构建过）校验无 Chat 变体必须排除 pet.chat。
+    # 存在时（本机构建过）校验无 Chat 变体必须排除 petwisp.chat。
     for spec_name in (
-        "dsh-pet-standalone.spec",
-        "dsh-pet-standalone-hd.spec",
-        "dsh-pet-standalone-gif.spec",
-        "dsh-pet-standalone-webm.spec",
+        "petwisp.spec",
+        "petwisp-hd.spec",
+        "petwisp-gif.spec",
+        "petwisp-webm.spec",
     ):
         spec_path = Path(spec_name)
         if not spec_path.is_file():
             continue
         spec = spec_path.read_text(encoding="utf-8")
         assert "pet_entry_no_chat.py" in spec
-        assert "'pet.chat'" in spec
-    for spec_name in ("dsh-pet-standalone-gif-chat.spec", "dsh-pet-standalone-webm-chat.spec"):
+        assert "'petwisp.chat'" in spec
+    for spec_name in ("petwisp-gif-chat.spec", "petwisp-webm-chat.spec"):
         spec_path = Path(spec_name)
         if not spec_path.is_file():
             continue
@@ -563,8 +563,8 @@ def test_no_chat_packaging_uses_isolated_entrypoint():
 def test_chat_window_uses_transparent_window_around_opaque_rounded_shell(tmp_path: Path):
     from PySide6.QtCore import Qt
     from PySide6.QtWidgets import QApplication
-    from pet.chat.widgets import ChatWindow
-    from pet.config import Config
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     window = ChatWindow(Config(tmp_path), "demo")
@@ -586,8 +586,8 @@ def test_modern_chat_window_icons_are_dark_on_light_surfaces(tmp_path: Path):
     """
     from PySide6.QtGui import QColor, QPalette
     from PySide6.QtWidgets import QApplication
-    from pet.chat.widgets import ChatWindow
-    from pet.config import Config
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     # 模拟深色系统：palette 前景为白（回归条件——图标曾取 palette 前景色）
@@ -637,7 +637,7 @@ def test_modern_chat_window_icons_are_dark_on_light_surfaces(tmp_path: Path):
 def test_icon_theme_inherits_from_ancestor_widget():
     from PySide6.QtGui import QColor, QPalette
     from PySide6.QtWidgets import QApplication, QWidget
-    from pet.context_menus.icons import _icon_theme, vector_widget_icon
+    from petwisp.context_menus.icons import _icon_theme, vector_widget_icon
 
     app = QApplication.instance() or QApplication([])
     root = QWidget()
@@ -661,8 +661,8 @@ def test_icon_theme_inherits_from_ancestor_widget():
 
 def test_chat_window_uses_modern_two_pane_ai_chat_layout(tmp_path: Path):
     from PySide6.QtWidgets import QApplication, QWidget
-    from pet.chat.widgets import ChatWindow
-    from pet.config import Config
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     window = ChatWindow(Config(tmp_path), "demo")
@@ -681,8 +681,8 @@ def test_chat_window_uses_modern_two_pane_ai_chat_layout(tmp_path: Path):
 def test_legacy_chat_window_renames_current_session(tmp_path, monkeypatch):
     from PySide6.QtWidgets import QApplication, QInputDialog
 
-    from pet.chat.legacy_widgets import ChatWindow
-    from pet.config import Config
+    from petwisp.chat.legacy_widgets import ChatWindow
+    from petwisp.config import Config
 
     monkeypatch.setattr(QInputDialog, "getText", staticmethod(lambda *args, **kwargs: ("新名字", True)))
     app = QApplication.instance() or QApplication([])
@@ -701,9 +701,9 @@ def test_legacy_chat_window_renames_current_session(tmp_path, monkeypatch):
 
 def test_legacy_and_modern_chat_windows_use_independent_modules_and_styles(tmp_path: Path):
     from PySide6.QtWidgets import QApplication
-    from pet.chat.legacy_widgets import ChatWindow as LegacyChatWindow
-    from pet.chat.widgets import ChatWindow as ModernChatWindow
-    from pet.config import Config
+    from petwisp.chat.legacy_widgets import ChatWindow as LegacyChatWindow
+    from petwisp.chat.widgets import ChatWindow as ModernChatWindow
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     legacy = LegacyChatWindow(Config(tmp_path), "demo")
@@ -720,8 +720,8 @@ def test_legacy_and_modern_chat_windows_use_independent_modules_and_styles(tmp_p
 
 
 def test_chat_ui_style_defaults_modern_and_dispatches_classic_on_request(tmp_path: Path):
-    from pet.app import AppShell
-    from pet.config import Config
+    from petwisp.app import AppShell
+    from petwisp.config import Config
 
     config = Config(tmp_path)
     assert config.get("chat_ui_style") == "modern"
@@ -738,7 +738,7 @@ def test_chat_ui_style_defaults_modern_and_dispatches_classic_on_request(tmp_pat
 
 def test_single_modern_menu_routes_to_selected_chat_dispatcher():
     from PySide6.QtWidgets import QApplication, QMenu
-    from pet.context_menu import populate_context_menu
+    from petwisp.context_menu import populate_context_menu
 
     class Config(dict):
         def get(self, key, default=None):
@@ -769,7 +769,7 @@ def test_single_modern_menu_routes_to_selected_chat_dispatcher():
 
 def test_modern_message_rows_hide_identity_and_offer_inline_tools():
     from PySide6.QtWidgets import QApplication
-    from pet.chat.widgets import MessageBubble
+    from petwisp.chat.widgets import MessageBubble
 
     app = QApplication.instance() or QApplication([])
     user = MessageBubble("user", "hello", "demo")
@@ -787,8 +787,8 @@ def test_modern_message_rows_hide_identity_and_offer_inline_tools():
 def test_modern_sidebar_groups_sessions_and_exposes_row_action_menu(tmp_path: Path):
     from PySide6.QtCore import Qt
     from PySide6.QtWidgets import QApplication
-    from pet.chat.widgets import ChatWindow
-    from pet.config import Config
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     window = ChatWindow(Config(tmp_path), "demo")
@@ -812,8 +812,8 @@ def test_modern_sidebar_groups_sessions_and_exposes_row_action_menu(tmp_path: Pa
 
 def test_new_conversation_keeps_empty_canvas_on_the_styled_white_surface(tmp_path: Path):
     from PySide6.QtWidgets import QApplication
-    from pet.chat.widgets import ChatWindow
-    from pet.config import Config
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     window = ChatWindow(Config(tmp_path), "demo")
@@ -829,8 +829,8 @@ def test_new_conversation_keeps_empty_canvas_on_the_styled_white_surface(tmp_pat
 def test_modern_sidebar_multi_select_can_batch_pin_and_delete_sessions(tmp_path: Path, monkeypatch):
     from PySide6.QtCore import Qt
     from PySide6.QtWidgets import QApplication, QDialog
-    from pet.chat import widgets as chat_widgets
-    from pet.config import Config
+    from petwisp.chat import widgets as chat_widgets
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     window = chat_widgets.ChatWindow(Config(tmp_path), "demo")
@@ -888,8 +888,8 @@ def test_modern_sidebar_multi_select_can_batch_pin_and_delete_sessions(tmp_path:
 
 def test_modern_delete_uses_custom_confirmation_and_respects_cancel(tmp_path: Path, monkeypatch):
     from PySide6.QtWidgets import QApplication, QDialog
-    from pet.chat import widgets as chat_widgets
-    from pet.config import Config
+    from petwisp.chat import widgets as chat_widgets
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     window = chat_widgets.ChatWindow(Config(tmp_path), "demo")
@@ -923,8 +923,8 @@ def test_modern_header_avatar_uses_pet_image_without_colored_round_backplate(tmp
     from PySide6.QtCore import Qt
     from PySide6.QtGui import QPixmap
     from PySide6.QtWidgets import QApplication
-    from pet.chat.widgets import ChatWindow
-    from pet.config import Config
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     avatar = QPixmap(34, 34)
@@ -948,8 +948,8 @@ def test_modern_header_avatar_uses_pet_image_without_colored_round_backplate(tmp
 
 def test_batch_delete_style_outranks_generic_batch_button_color(tmp_path: Path):
     from PySide6.QtWidgets import QApplication
-    from pet.chat.widgets import ChatWindow
-    from pet.config import Config
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     window = ChatWindow(Config(tmp_path), "demo")
@@ -963,7 +963,7 @@ def test_batch_delete_style_outranks_generic_batch_button_color(tmp_path: Path):
 
 def test_delete_confirmation_uses_visible_rounded_card_surface():
     from PySide6.QtWidgets import QApplication
-    from pet.chat.widgets import DeleteConversationDialog
+    from petwisp.chat.widgets import DeleteConversationDialog
 
     app = QApplication.instance() or QApplication([])
     dialog = DeleteConversationDialog(3)
@@ -977,7 +977,7 @@ def test_delete_confirmation_uses_visible_rounded_card_surface():
 
 
 def test_chat_session_custom_title_and_pin_round_trip():
-    from pet.chat.models import ChatSession
+    from petwisp.chat.models import ChatSession
 
     session = ChatSession.create("demo", "provider", "prompt")
     session.custom_title = "置顶会话"
@@ -989,8 +989,8 @@ def test_chat_session_custom_title_and_pin_round_trip():
 
 def test_modern_composer_is_single_rounded_card_with_inline_send(tmp_path: Path):
     from PySide6.QtWidgets import QApplication
-    from pet.chat.widgets import ChatWindow
-    from pet.config import Config
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     window = ChatWindow(Config(tmp_path), "demo")
@@ -1008,8 +1008,8 @@ def test_modern_composer_is_single_rounded_card_with_inline_send(tmp_path: Path)
 
 def test_modern_sidebar_footer_only_keeps_status_and_follow(tmp_path: Path):
     from PySide6.QtWidgets import QApplication, QToolButton
-    from pet.chat.widgets import ChatWindow
-    from pet.config import Config
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     window = ChatWindow(Config(tmp_path), "demo")
@@ -1034,8 +1034,8 @@ def test_modern_sidebar_footer_only_keeps_status_and_follow(tmp_path: Path):
 
 def test_modern_new_conversation_button_is_compact_and_elevated(tmp_path: Path):
     from PySide6.QtWidgets import QApplication
-    from pet.chat.widgets import ChatWindow
-    from pet.config import Config
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     window = ChatWindow(Config(tmp_path), "demo")
@@ -1049,7 +1049,7 @@ def test_modern_new_conversation_button_is_compact_and_elevated(tmp_path: Path):
 
 def test_modern_message_surface_and_toolbar_are_separate_and_pin_and_copy():
     from PySide6.QtWidgets import QToolButton
-    from pet.chat.widgets import MessageBubble
+    from petwisp.chat.widgets import MessageBubble
 
     user = MessageBubble("user", "hello", character_id="demo")
     assistant = MessageBubble("assistant", "hi", character_id="demo")
@@ -1068,7 +1068,7 @@ def test_modern_message_surface_and_toolbar_are_separate_and_pin_and_copy():
 
 def test_modern_composer_supports_file_picker_state_and_drop_payload(tmp_path: Path):
     from PySide6.QtWidgets import QApplication
-    from pet.chat.widgets import ChatComposer
+    from petwisp.chat.widgets import ChatComposer
 
     app = QApplication.instance() or QApplication([])
     document = tmp_path / "notes.txt"
@@ -1095,8 +1095,8 @@ def test_modern_composer_supports_file_picker_state_and_drop_payload(tmp_path: P
 
 def test_modern_sidebar_becomes_overlay_drawer_on_compact_width(tmp_path: Path):
     from PySide6.QtWidgets import QApplication
-    from pet.chat.widgets import ChatWindow
-    from pet.config import Config
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     window = ChatWindow(Config(tmp_path), "demo")
@@ -1119,8 +1119,8 @@ def test_modern_sidebar_becomes_overlay_drawer_on_compact_width(tmp_path: Path):
 
 def test_compact_sidebar_scrim_starts_at_actual_drawer_edge(tmp_path: Path):
     from PySide6.QtWidgets import QApplication
-    from pet.chat.widgets import ChatWindow
-    from pet.config import Config
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     window = ChatWindow(Config(tmp_path), "demo")
@@ -1137,7 +1137,7 @@ def test_compact_sidebar_scrim_starts_at_actual_drawer_edge(tmp_path: Path):
 
 def test_error_message_has_rounded_surface_and_single_error_row():
     from PySide6.QtWidgets import QApplication, QHBoxLayout
-    from pet.chat.widgets import MessageBubble
+    from petwisp.chat.widgets import MessageBubble
 
     app = QApplication.instance() or QApplication([])
     bubble = MessageBubble("assistant", "请求失败：HTTP 400", "demo")
@@ -1160,7 +1160,7 @@ def test_error_message_has_rounded_surface_and_single_error_row():
 def test_attachment_chip_has_thumbnail_and_hover_remove(tmp_path: Path):
     from PySide6.QtGui import QImage
     from PySide6.QtWidgets import QApplication
-    from pet.chat.widgets import AttachmentChip, ChatComposer
+    from petwisp.chat.widgets import AttachmentChip, ChatComposer
 
     app = QApplication.instance() or QApplication([])
     image_path = tmp_path / "preview.png"
@@ -1184,7 +1184,7 @@ def test_file_drop_is_intercepted_by_input_instead_of_inserting_file_url(tmp_pat
     from PySide6.QtCore import QMimeData, QPointF, Qt, QUrl
     from PySide6.QtGui import QDropEvent
     from PySide6.QtWidgets import QApplication
-    from pet.chat.widgets import ChatComposer
+    from petwisp.chat.widgets import ChatComposer
 
     app = QApplication.instance() or QApplication([])
     path = tmp_path / "test.log"
@@ -1204,8 +1204,8 @@ def test_file_drop_is_intercepted_by_input_instead_of_inserting_file_url(tmp_pat
 
 def test_assistant_message_expands_to_available_timeline_width(tmp_path: Path):
     from PySide6.QtWidgets import QApplication
-    from pet.chat.widgets import ChatWindow
-    from pet.config import Config
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     window = ChatWindow(Config(tmp_path), "demo")
@@ -1240,8 +1240,8 @@ def test_modern_chat_trailing_blank_does_not_grow_with_message_count(tmp_path: P
     每次加消息后的空白都不比上一次多出一档布局 spacing（24px）以上。"""
     from PySide6.QtCore import Qt
     from PySide6.QtWidgets import QApplication
-    from pet.chat.widgets import ChatWindow
-    from pet.config import Config
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     samples = [
@@ -1277,8 +1277,8 @@ def test_modern_chat_trailing_blank_does_not_grow_with_message_count(tmp_path: P
 
 def test_status_and_model_are_in_header_not_sidebar(tmp_path: Path):
     from PySide6.QtWidgets import QApplication
-    from pet.chat.widgets import ChatWindow
-    from pet.config import Config
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     window = ChatWindow(Config(tmp_path), "demo")
@@ -1295,8 +1295,8 @@ def test_empty_provider_response_becomes_visible_error(tmp_path: Path):
     import time
 
     from PySide6.QtWidgets import QApplication
-    from pet.chat.models import ProviderConfig
-    from pet.chat.service import ChatService
+    from petwisp.chat.models import ProviderConfig
+    from petwisp.chat.service import ChatService
 
     class EmptyProvider:
         def stream(self, messages, config, cancel):
@@ -1324,8 +1324,8 @@ def test_empty_provider_response_becomes_visible_error(tmp_path: Path):
 def test_streaming_reply_uses_typewriter_and_finishes_after_buffer_drains(tmp_path: Path):
     import time
     from PySide6.QtWidgets import QApplication
-    from pet.chat.widgets import ChatWindow
-    from pet.config import Config
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     window = ChatWindow(Config(tmp_path), "demo")
@@ -1354,9 +1354,9 @@ def test_session_switch_during_typewriter_drain_does_not_cross_write(tmp_path: P
     """
     import time
     from PySide6.QtWidgets import QApplication
-    from pet.chat.widgets import ChatWindow
-    from pet.chat.models import ChatMessage
-    from pet.config import Config
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.chat.models import ChatMessage
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     window = ChatWindow(Config(tmp_path), "demo")
@@ -1389,7 +1389,7 @@ def test_image_payloads_skips_deleted_attachments(tmp_path: Path):
     """附件文件已删除时发送图片不得抛 FileNotFoundError。"""
     from PySide6.QtWidgets import QApplication
 
-    from pet.chat.widgets import ChatComposer
+    from petwisp.chat.widgets import ChatComposer
 
     app = QApplication.instance() or QApplication([])
     composer = ChatComposer()
@@ -1409,8 +1409,8 @@ def test_enter_while_ime_composing_does_not_send():
     from PySide6.QtGui import QInputMethodEvent, QKeyEvent
     from PySide6.QtWidgets import QApplication
 
-    from pet.chat.legacy_widgets import ChatComposer as LegacyComposer
-    from pet.chat.widgets import ChatComposer as ModernComposer
+    from petwisp.chat.legacy_widgets import ChatComposer as LegacyComposer
+    from petwisp.chat.widgets import ChatComposer as ModernComposer
 
     app = QApplication.instance() or QApplication([])
     for composer_type in (ModernComposer, LegacyComposer):
@@ -1469,8 +1469,8 @@ def test_sent_message_stays_visible_without_manual_scroll(tmp_path: Path):
     """
     from PySide6.QtWidgets import QApplication
 
-    from pet.chat.widgets import ChatWindow
-    from pet.config import Config
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     window = ChatWindow(Config(tmp_path), "demo")
@@ -1514,8 +1514,8 @@ def test_resize_keeps_following_reader_at_bottom(tmp_path: Path):
     """改窗口尺寸导致气泡重新折行时，跟随中的读者仍停在最新消息。"""
     from PySide6.QtWidgets import QApplication
 
-    from pet.chat.widgets import ChatWindow
-    from pet.config import Config
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     window = ChatWindow(Config(tmp_path), "demo")
@@ -1546,8 +1546,8 @@ def test_manual_scroll_up_is_not_yanked_back_by_streaming(tmp_path: Path):
     """
     from PySide6.QtWidgets import QApplication
 
-    from pet.chat.widgets import ChatWindow
-    from pet.config import Config
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     window = ChatWindow(Config(tmp_path), "demo")
@@ -1584,8 +1584,8 @@ def test_modern_chat_pauses_follow_when_user_scrolls_up(tmp_path: Path):
     """上翻阅读历史时暂停自动滚底；回到顶部/底部时按位置更新跟随状态。"""
     from PySide6.QtWidgets import QApplication
 
-    from pet.chat.widgets import ChatWindow
-    from pet.config import Config
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     window = ChatWindow(Config(tmp_path), "demo")
@@ -1621,9 +1621,9 @@ def test_session_switch_lands_at_bottom(tmp_path: Path):
     import time
     from PySide6.QtWidgets import QApplication
 
-    from pet.chat.widgets import ChatWindow
-    from pet.chat.models import ChatMessage
-    from pet.config import Config
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.chat.models import ChatMessage
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     window = ChatWindow(Config(tmp_path), "demo")
@@ -1660,8 +1660,8 @@ def test_append_look_sync_persists_to_session(tmp_path: Path):
     """「看看屏幕」结果必须同步进当前会话并持久化（PR#11 重写后丢失）。"""
     from PySide6.QtWidgets import QApplication
 
-    from pet.chat.widgets import ChatWindow
-    from pet.config import Config
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     window = ChatWindow(Config(tmp_path), "demo")
@@ -1678,8 +1678,8 @@ def test_append_look_sync_persists_to_session(tmp_path: Path):
 def test_quit_closes_active_context_menu_before_leaving_event_loop(monkeypatch):
     import time
     from PySide6.QtWidgets import QApplication
-    import pet.window as window_mod
-    from pet.window import PetWindow
+    import petwisp.window as window_mod
+    from petwisp.window import PetWindow
 
     events = []
 
@@ -1716,8 +1716,8 @@ def test_quit_closes_active_context_menu_before_leaving_event_loop(monkeypatch):
 
 def test_short_conversation_starts_at_timeline_top_while_composer_stays_bottom(tmp_path: Path):
     from PySide6.QtWidgets import QApplication
-    from pet.chat.widgets import ChatWindow
-    from pet.config import Config
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     window = ChatWindow(Config(tmp_path), "demo")
@@ -1738,8 +1738,8 @@ def test_short_conversation_starts_at_timeline_top_while_composer_stays_bottom(t
 
 def test_close_required_menu_callback_runs_only_after_exec_returns(monkeypatch):
     from PySide6.QtCore import QPoint
-    import pet.window as window_mod
-    from pet.window import PetWindow
+    import petwisp.window as window_mod
+    from petwisp.window import PetWindow
 
     state = {"inside_exec": False}
     calls = []
@@ -1813,8 +1813,8 @@ def test_close_required_menu_callback_runs_only_after_exec_returns(monkeypatch):
 def test_context_menu_window_callback_waits_until_old_menu_is_destroyed(monkeypatch):
     from PySide6.QtCore import QPoint
 
-    import pet.window as window_mod
-    from pet.window import PetWindow
+    import petwisp.window as window_mod
+    from petwisp.window import PetWindow
 
     calls = []
     timers = []
@@ -1908,8 +1908,8 @@ def test_context_menu_drops_callbacks_when_owning_pet_is_already_destroyed(monke
 
     from PySide6.QtCore import QPoint
 
-    import pet.window as window_mod
-    from pet.window import PetWindow
+    import petwisp.window as window_mod
+    from petwisp.window import PetWindow
 
     timers = []
     created = []
@@ -1991,7 +1991,7 @@ def test_context_menu_drops_callbacks_when_owning_pet_is_already_destroyed(monke
 
 def test_close_required_actions_are_queued_while_menu_is_visible():
     from PySide6.QtWidgets import QApplication, QMenu
-    from pet.context_menus.shared import add_action, take_deferred_menu_callbacks
+    from petwisp.context_menus.shared import add_action, take_deferred_menu_callbacks
 
     app = QApplication.instance() or QApplication([])
     calls = []
@@ -2011,8 +2011,8 @@ def test_close_required_actions_are_queued_while_menu_is_visible():
 
 def test_conversation_mode_pins_composer_to_bottom_and_top_aligns_short_messages(tmp_path: Path):
     from PySide6.QtWidgets import QApplication
-    from pet.chat.widgets import ChatWindow
-    from pet.config import Config
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     window = ChatWindow(Config(tmp_path), "demo")
@@ -2036,8 +2036,8 @@ def test_conversation_mode_pins_composer_to_bottom_and_top_aligns_short_messages
 
 def test_empty_conversation_centers_prompt_and_composer_as_one_group(tmp_path: Path):
     from PySide6.QtWidgets import QApplication
-    from pet.chat.widgets import ChatWindow
-    from pet.config import Config
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     window = ChatWindow(Config(tmp_path), "demo")
@@ -2059,8 +2059,8 @@ def test_empty_conversation_centers_prompt_and_composer_as_one_group(tmp_path: P
 def test_long_conversation_scrolls_only_after_timeline_overflows(tmp_path: Path):
     from PySide6.QtCore import Qt
     from PySide6.QtWidgets import QApplication
-    from pet.chat.widgets import ChatWindow
-    from pet.config import Config
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     window = ChatWindow(Config(tmp_path), "demo")
@@ -2087,8 +2087,8 @@ def test_long_conversation_scrolls_only_after_timeline_overflows(tmp_path: Path)
 def test_present_dialog_restores_a_minimized_chat_window(tmp_path: Path):
     from PySide6.QtCore import Qt
     from PySide6.QtWidgets import QApplication, QDialog
-    from pet.app import AppShell
-    from pet.config import Config
+    from petwisp.app import AppShell
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     owner = AppShell(app, Config(tmp_path))
@@ -2105,8 +2105,8 @@ def test_present_dialog_restores_a_minimized_chat_window(tmp_path: Path):
 
 
 def test_quit_runs_immediately_when_native_menu_has_already_returned(monkeypatch):
-    import pet.window as window_mod
-    from pet.window import PetWindow
+    import petwisp.window as window_mod
+    from petwisp.window import PetWindow
 
     events = []
 
@@ -2132,7 +2132,7 @@ def test_quit_runs_immediately_when_native_menu_has_already_returned(monkeypatch
 
 
 def test_pet_animation_and_self_talk_defaults_are_persisted(tmp_path: Path):
-    from pet.config import (
+    from petwisp.config import (
         DEFAULT_SELF_TALK_TEXTS,
         Config,
     )
@@ -2149,7 +2149,7 @@ def test_pet_animation_and_self_talk_defaults_are_persisted(tmp_path: Path):
     cfg.save()
     loaded = Config(tmp_path)
     assert loaded.get("animation_gap_seconds") == 2.5
-    from pet.settings_slot_config import route_settings_config
+    from petwisp.settings_slot_config import route_settings_config
 
     profile = route_settings_config(Config(tmp_path, instance_id="slot-0"))
     assert profile.get("self_talk_enabled") is True
@@ -2157,7 +2157,7 @@ def test_pet_animation_and_self_talk_defaults_are_persisted(tmp_path: Path):
 
 
 def test_reference_animation_materials_are_folder_classified():
-    from pet import catalog
+    from petwisp import catalog
 
     root = Path("assets/characters/demo/videos")
     files = list(root.rglob("*.webm"))
@@ -2193,7 +2193,7 @@ def test_reference_animation_materials_are_folder_classified():
 def test_pet_speech_bubble_prefers_centered_position_above_character():
     from PySide6.QtCore import QRect
     from PySide6.QtWidgets import QApplication
-    from pet.speech_bubble import PetSpeechBubble
+    from petwisp.speech_bubble import PetSpeechBubble
 
     app = QApplication.instance() or QApplication([])
     bubble = PetSpeechBubble()
@@ -2207,7 +2207,7 @@ def test_pet_speech_bubble_prefers_centered_position_above_character():
 
 def test_webm_playback_speed_updates_timer_before_and_after_start():
     from PySide6.QtWidgets import QApplication
-    from pet.webm_clip import WebMClip
+    from petwisp.webm_clip import WebMClip
 
     app = QApplication.instance() or QApplication([])
     clip = WebMClip(Path("assets/characters/demo/videos/idle/待机呼吸休闲.webm"))
@@ -2242,16 +2242,16 @@ def test_webm_and_gif_animation_sets_are_in_sync():
 
 def test_config_variant_dir_and_legacy_migration(tmp_path, monkeypatch):
     """变体使用独立配置目录，并从旧共享目录一次性迁移配置与会话。"""
-    from pet import config as config_mod
+    from petwisp import config as config_mod
 
-    legacy = tmp_path / "dsh-pet-standalone"
+    legacy = tmp_path / "dsh-pet-standalone"  # 改名前的共享目录
     legacy.mkdir()
     (legacy / "config.json").write_text('{"version": 3, "scale": 0.85}', encoding="utf-8")
     (legacy / "sessions").mkdir()
 
-    monkeypatch.setattr(config_mod, "APP_DIR_NAME", "dsh-pet-standalone-webm-chat")
+    monkeypatch.setattr(config_mod, "APP_DIR_NAME", "petwisp-webm-chat")
     cfg = config_mod.Config(tmp_path)
-    assert cfg.dir == tmp_path / "dsh-pet-standalone-webm-chat"
+    assert cfg.dir == tmp_path / "petwisp-webm-chat"
     assert cfg.path.is_file()
     assert cfg.get("scale") == 0.85
     assert (cfg.dir / "sessions").is_dir()
@@ -2263,10 +2263,10 @@ def test_config_variant_dir_and_legacy_migration(tmp_path, monkeypatch):
 
 def test_config_shared_dir_when_no_variant_marker(tmp_path):
     """源码运行（无 build_variant 标识）时仍使用共享目录。"""
-    from pet import config as config_mod
+    from petwisp import config as config_mod
 
     cfg = config_mod.Config(tmp_path)
-    assert cfg.dir == tmp_path / "dsh-pet-standalone"
+    assert cfg.dir == tmp_path / "petwisp"
 
 
 def test_provider_config_verify_ssl_roundtrip():
@@ -2294,7 +2294,7 @@ def test_cert_error_detection():
 def test_connection_test_happy_path(tmp_path):
     import http.server
 
-    from pet.chat.providers import OpenAICompatibleProvider, test_connection
+    from petwisp.chat.providers import OpenAICompatibleProvider, test_connection
 
     class Handler(http.server.BaseHTTPRequestHandler):
         def do_POST(self):
@@ -2332,7 +2332,7 @@ def test_connection_test_happy_path(tmp_path):
 
 
 def test_stream_surfaces_certificate_hint(monkeypatch):
-    from pet.chat.providers import OpenAICompatibleProvider
+    from petwisp.chat.providers import OpenAICompatibleProvider
 
     def fake_urlopen(*args, **kwargs):
         raise urllib.error.URLError(
@@ -2348,7 +2348,7 @@ def test_stream_surfaces_certificate_hint(monkeypatch):
 
 
 def test_connection_test_reports_certificate_hint(monkeypatch):
-    from pet.chat.providers import test_connection
+    from petwisp.chat.providers import test_connection
 
     def fake_urlopen(*args, **kwargs):
         raise urllib.error.URLError(
@@ -2365,10 +2365,10 @@ def test_connection_test_reentrant_clicks_do_not_duplicate_requests(tmp_path, mo
     """多次点击测试连接：进行中重复调用被忽略，完成后可再次发起；不产生线程崩溃。"""
     import time
 
-    import pet.chat.settings_dialog as sd
+    import petwisp.chat.settings_dialog as sd
     from PySide6.QtWidgets import QApplication
-    from pet.chat.settings_dialog import ChatSettingsDialog
-    from pet.config import Config
+    from petwisp.chat.settings_dialog import ChatSettingsDialog
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     dialog = ChatSettingsDialog(Config(tmp_path))
@@ -2420,8 +2420,8 @@ def test_chat_settings_dialog_warns_when_keyring_unavailable(tmp_path, monkeypat
     """AI 设置对话框在 keyring 不可用时须提示，且 key 仅保留内存（不落盘明文）。"""
     from PySide6.QtWidgets import QApplication
 
-    import pet.chat.settings_dialog as sd
-    from pet.config import Config
+    import petwisp.chat.settings_dialog as sd
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     warnings = []
@@ -2448,8 +2448,8 @@ def test_chat_window_system_notification_when_not_active(tmp_path):
     """聊天窗口非活动时发送系统通知；点击回调可聚焦窗口。"""
     from PySide6.QtWidgets import QApplication
 
-    from pet.chat.widgets import ChatWindow
-    from pet.config import Config
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.config import Config
 
     _app = QApplication.instance() or QApplication([])
     calls = []
@@ -2474,8 +2474,8 @@ def test_chat_window_authorization_error_opens_settings(tmp_path):
     """认证失败类系统通知的点击回调应打开 AI 设置。"""
     from PySide6.QtWidgets import QApplication
 
-    from pet.chat.widgets import ChatWindow
-    from pet.config import Config
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.config import Config
 
     _app = QApplication.instance() or QApplication([])
     settings_opened = []
@@ -2503,8 +2503,8 @@ def test_system_notification_respects_disabled_setting(tmp_path):
     """关闭“系统通知”设置后，即使窗口非活动也不再弹系统通知。"""
     from PySide6.QtWidgets import QApplication
 
-    from pet.chat.widgets import ChatWindow
-    from pet.config import Config
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.config import Config
 
     _app = QApplication.instance() or QApplication([])
     cfg = Config(tmp_path)
@@ -2528,8 +2528,8 @@ def test_chat_settings_dialog_persists_system_notification_toggle(tmp_path):
     """AI 设置中的“系统通知”开关应能保存并重新读取。"""
     from PySide6.QtWidgets import QApplication
 
-    from pet.chat.settings_dialog import ChatSettingsDialog
-    from pet.config import Config
+    from petwisp.chat.settings_dialog import ChatSettingsDialog
+    from petwisp.config import Config
 
     _app = QApplication.instance() or QApplication([])
     cfg = Config(tmp_path)
@@ -2545,11 +2545,11 @@ def test_chat_settings_dialog_persists_system_notification_toggle(tmp_path):
 
 
 def test_chat_settings_dialog_crop_entry_labels_classic_style(tmp_path):
-    """老聊天设置即存对话框只服务经典风格：裁切入口带风格名「肥鱼牌小手机」。"""
+    """老聊天设置即存对话框只服务经典风格：裁切入口带风格名「桌宠牌小手机」。"""
     from PySide6.QtWidgets import QApplication
 
-    from pet.chat.settings_dialog import ChatSettingsDialog
-    from pet.config import Config
+    from petwisp.chat.settings_dialog import ChatSettingsDialog
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     cfg = Config(tmp_path)
@@ -2557,7 +2557,7 @@ def test_chat_settings_dialog_crop_entry_labels_classic_style(tmp_path):
     cfg.save()
     dlg = ChatSettingsDialog(Config(tmp_path))
     try:
-        assert "肥鱼牌小手机" in dlg.crop_btn.text()
+        assert "桌宠牌小手机" in dlg.crop_btn.text()
         assert dlg.crop_btn.isHidden() is False
     finally:
         dlg.close()
@@ -2568,8 +2568,8 @@ def test_chat_settings_dialog_crop_entry_hidden_when_fill_not_cover(tmp_path):
     """经典风格 fill=contain/stretch 时取景框被忽略，裁切入口隐藏；cover 时可见。"""
     from PySide6.QtWidgets import QApplication
 
-    from pet.chat.settings_dialog import ChatSettingsDialog
-    from pet.config import Config
+    from petwisp.chat.settings_dialog import ChatSettingsDialog
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     for fill, hidden in (("contain", True), ("stretch", True), ("cover", False)):
@@ -2589,8 +2589,8 @@ def test_delete_current_session_during_streaming_resets_typewriter(tmp_path: Pat
     """审查 DS-M6 回归（modern）：删除当前会话时停打字机并丢弃未排空输出，
     防幻影消息写入新加载的会话。"""
     from PySide6.QtWidgets import QApplication, QDialog
-    from pet.chat import widgets as chat_widgets
-    from pet.config import Config
+    from petwisp.chat import widgets as chat_widgets
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     window = chat_widgets.ChatWindow(Config(tmp_path), "demo")
@@ -2617,8 +2617,8 @@ def test_delete_current_session_during_streaming_resets_typewriter(tmp_path: Pat
 def test_legacy_delete_current_session_calls_reset(tmp_path: Path, monkeypatch):
     """审查 DS-M6 回归（legacy）：删除当前会话同样走 _reset 收口。"""
     from PySide6.QtWidgets import QApplication
-    from pet.chat.legacy_widgets import ChatWindow as LegacyChatWindow
-    from pet.config import Config
+    from petwisp.chat.legacy_widgets import ChatWindow as LegacyChatWindow
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     window = LegacyChatWindow(Config(tmp_path), "demo")
@@ -2634,8 +2634,8 @@ def test_append_message_atomic_across_store_instances(tmp_path: Path):
     """审查 R3 P1 回归：append_message 原子「读-追加-提交」——两个
     SessionStore 实例（模拟 modern/legacy/QuickChat 各持一份）交错发送
     互不覆盖；吸收外部消息时 absorbed=True；会话已删返回 (None, False)。"""
-    from pet.chat.models import ChatMessage
-    from pet.chat.session_store import SessionStore
+    from petwisp.chat.models import ChatMessage
+    from petwisp.chat.session_store import SessionStore
 
     store_a = SessionStore(tmp_path, instance_id="shared")
     store_b = SessionStore(tmp_path, instance_id="shared")  # 同实例目录，另一前端
@@ -2665,8 +2665,8 @@ def test_append_message_concurrent_no_lost_messages(tmp_path: Path):
     """并发压力：两个前端各发 20 条，最终 40 条全在。"""
     import threading
 
-    from pet.chat.models import ChatMessage
-    from pet.chat.session_store import SessionStore
+    from petwisp.chat.models import ChatMessage
+    from petwisp.chat.session_store import SessionStore
 
     store_a = SessionStore(tmp_path, instance_id="shared")
     store_b = SessionStore(tmp_path, instance_id="shared")
@@ -2694,9 +2694,9 @@ def test_send_message_resyncs_stale_session_from_disk(tmp_path: Path, monkeypatc
     """审查 DS-M7 回归：另一前端写过同一会话后，本窗发送先对齐磁盘，
     两条消息都保留（陈旧快照不再整体覆盖）。"""
     from PySide6.QtWidgets import QApplication
-    from pet.chat import widgets as chat_widgets
-    from pet.chat.models import ChatMessage
-    from pet.config import Config
+    from petwisp.chat import widgets as chat_widgets
+    from petwisp.chat.models import ChatMessage
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     window = chat_widgets.ChatWindow(Config(tmp_path), "demo")
@@ -2720,8 +2720,8 @@ def test_send_message_resyncs_stale_session_from_disk(tmp_path: Path, monkeypatc
 
 def _make_ai_page(tmp_path, monkeypatch, *, modern_bg="builtin:whale"):
     from PySide6.QtWidgets import QApplication
-    from pet.chat.ai_settings_page import _AiSettingsPage
-    from pet.config import Config
+    from petwisp.chat.ai_settings_page import _AiSettingsPage
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     cfg = Config(tmp_path)
@@ -2734,7 +2734,7 @@ def _make_ai_page(tmp_path, monkeypatch, *, modern_bg="builtin:whale"):
 def test_crop_entry_edits_buffer_and_persists_on_save(tmp_path, monkeypatch):
     """主设置窗的裁切取景：编辑器结果记编辑集，save() 时按背景值合并写 config。"""
     app, cfg, page = _make_ai_page(tmp_path, monkeypatch)
-    import pet.chat.crop_dialog as crop_mod
+    import petwisp.chat.crop_dialog as crop_mod
 
     class FakeDlg:
         def __init__(self, pix, initial, parent, style_name='', view_aspect=None):
@@ -2754,7 +2754,7 @@ def test_crop_entry_edits_buffer_and_persists_on_save(tmp_path, monkeypatch):
     page._crop_background()
     assert page._bg_crop_edits["builtin:whale"] == [0.1, 0.2, 0.5, 0.6]
     # 未保存前不落盘
-    from pet.config import Config
+    from petwisp.config import Config
     assert Config(tmp_path).get("chat_bg_crops", {}) == {}
     page.save()
     assert cfg.get("chat_bg_crops", {})["builtin:whale"] == [0.1, 0.2, 0.5, 0.6]
@@ -2764,11 +2764,11 @@ def test_crop_entry_edits_buffer_and_persists_on_save(tmp_path, monkeypatch):
 
 def test_crop_entry_reset_removes_custom_crop(tmp_path, monkeypatch):
     app, cfg, page = _make_ai_page(tmp_path, monkeypatch)
-    from pet.config import Config
+    from petwisp.config import Config
     other = Config(tmp_path)
     other.set("chat_bg_crops", {"builtin:whale": [0.1, 0.2, 0.5, 0.6], "builtin:furina": [0.9, 0.0, 0.1, 1.0]})
     other.save()  # 磁盘上的已有自定义裁切（编辑器打开时 reload 读磁盘最新）
-    import pet.chat.crop_dialog as crop_mod
+    import petwisp.chat.crop_dialog as crop_mod
 
     class FakeDlg:
         def __init__(self, pix, initial, parent, style_name='', view_aspect=None):
@@ -2799,8 +2799,8 @@ def test_crop_entry_reset_removes_custom_crop(tmp_path, monkeypatch):
 def test_crop_entry_initial_box_falls_back_to_theme_focus(tmp_path, monkeypatch):
     """无自定义裁切时，编辑器初始框 = 主题默认 focus。"""
     app, cfg, page = _make_ai_page(tmp_path, monkeypatch)
-    import pet.chat.crop_dialog as crop_mod
-    from pet.chat.themes import get_theme
+    import petwisp.chat.crop_dialog as crop_mod
+    from petwisp.chat.themes import get_theme
 
     seen = {}
 
@@ -2824,7 +2824,7 @@ def test_crop_entry_initial_box_falls_back_to_theme_focus(tmp_path, monkeypatch)
 def test_crop_entry_needs_a_background(tmp_path, monkeypatch):
     """纯色（无背景）时不得打开编辑器。"""
     app, cfg, page = _make_ai_page(tmp_path, monkeypatch, modern_bg="")
-    import pet.chat.crop_dialog as crop_mod
+    import petwisp.chat.crop_dialog as crop_mod
     opened = []
     monkeypatch.setattr(crop_mod, "CropDialog", lambda *a: opened.append(1))
     page._crop_background()
@@ -2851,17 +2851,17 @@ def test_crop_row_label_refreshes_with_style(tmp_path, monkeypatch):
     app, cfg, page = _make_ai_page(tmp_path, monkeypatch)
     rows = page.appearance_rows()  # 宿主（外观页）挂行时才构建行引用；持有防 GC 带走控件
     row = page._background_crop_row
-    assert row.label.text() == "裁切取景（肥鱼版 DeepSeek）"
-    assert "肥鱼版 DeepSeek" in row.control.accessibleName()
+    assert row.label.text() == "裁切取景（桌宠版 DeepSeek）"
+    assert "桌宠版 DeepSeek" in row.control.accessibleName()
     assert row.control.accessibleName() == row.label.text(), "屏幕阅读器读到的风格必须与标签一致"
     assert "仅「填充裁剪」支持自定义取景" in page._background_detail_rows[1].hint_label.text()
     page.chat_ui_style.setCurrentData("classic")  # 风格切换即刷新，不用重开窗口
-    assert row.label.text() == "裁切取景（肥鱼牌小手机）"
-    assert "肥鱼牌小手机" in row.control.accessibleName()
+    assert row.label.text() == "裁切取景（桌宠牌小手机）"
+    assert "桌宠牌小手机" in row.control.accessibleName()
     assert row.control.accessibleName() == row.label.text()
     page.chat_ui_style.setCurrentData("modern")
-    assert row.label.text() == "裁切取景（肥鱼版 DeepSeek）"
-    assert "肥鱼版 DeepSeek" in row.control.accessibleName()
+    assert row.label.text() == "裁切取景（桌宠版 DeepSeek）"
+    assert "桌宠版 DeepSeek" in row.control.accessibleName()
     assert row.control.accessibleName() == row.label.text()
     assert row is rows[-2]  # 裁切取景是细节行组最后一行
     page.close()
@@ -2890,8 +2890,8 @@ def test_crop_row_visibility_reevaluated_on_style_switch(tmp_path):
     """切换对话窗口风格后按新风格的 fill 重估裁切行：另一风格 contain 时隐藏，切回 cover 复现。"""
     from PySide6.QtWidgets import QApplication
 
-    from pet.chat.ai_settings_page import _AiSettingsPage
-    from pet.config import Config
+    from petwisp.chat.ai_settings_page import _AiSettingsPage
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     cfg = Config(tmp_path)
@@ -2921,8 +2921,8 @@ def test_crop_row_visibility_reevaluated_on_style_switch(tmp_path):
 def test_crop_editor_receives_current_style_name(tmp_path, monkeypatch):
     """打开编辑器时把当前风格名传给 CropDialog（窗口标题据此区分风格）。"""
     from PySide6.QtWidgets import QApplication
-    from pet.chat.ai_settings_page import _AiSettingsPage
-    from pet.config import Config
+    from petwisp.chat.ai_settings_page import _AiSettingsPage
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     cfg = Config(tmp_path)
@@ -2930,7 +2930,7 @@ def test_crop_editor_receives_current_style_name(tmp_path, monkeypatch):
     cfg.set("modern_chat_background", "builtin:whale")
     cfg.save()
     page = _AiSettingsPage(cfg)
-    import pet.chat.crop_dialog as crop_mod
+    import petwisp.chat.crop_dialog as crop_mod
 
     seen = {}
 
@@ -2946,10 +2946,10 @@ def test_crop_editor_receives_current_style_name(tmp_path, monkeypatch):
 
     monkeypatch.setattr(crop_mod, "CropDialog", FakeDlg)
     page._crop_background()
-    assert seen["style"] == "肥鱼版 DeepSeek"
+    assert seen["style"] == "桌宠版 DeepSeek"
     page.chat_ui_style.setCurrentData("classic")
     page._crop_background()
-    assert seen["style"] == "肥鱼牌小手机"
+    assert seen["style"] == "桌宠牌小手机"
     page.close()
     app.processEvents()
 
@@ -2958,12 +2958,12 @@ def test_crop_dialog_title_carries_style_name():
     """编辑器窗口标题带调用方传入的风格名。"""
     from PySide6.QtGui import QPixmap
     from PySide6.QtWidgets import QApplication
-    from pet.chat.crop_dialog import CropDialog
+    from petwisp.chat.crop_dialog import CropDialog
 
     app = QApplication.instance() or QApplication([])
-    dlg = CropDialog(QPixmap(40, 60), None, None, "肥鱼牌小手机")
+    dlg = CropDialog(QPixmap(40, 60), None, None, "桌宠牌小手机")
     try:
-        assert "肥鱼牌小手机" in dlg.windowTitle()
+        assert "桌宠牌小手机" in dlg.windowTitle()
     finally:
         dlg.deleteLater()
         app.processEvents()
@@ -2971,7 +2971,7 @@ def test_crop_dialog_title_carries_style_name():
 
 def test_chat_ui_view_aspect_table_matches_window_defaults():
     """比例表锚点：数值必须等于各风格窗口默认尺寸比，表值被改必红。"""
-    from pet.chat.themes import CHAT_UI_VIEW_ASPECT
+    from petwisp.chat.themes import CHAT_UI_VIEW_ASPECT
 
     assert CHAT_UI_VIEW_ASPECT["modern"] == 960.0 / 700.0
     assert CHAT_UI_VIEW_ASPECT["classic"] == 430.0 / 780.0
@@ -2979,8 +2979,8 @@ def test_chat_ui_view_aspect_table_matches_window_defaults():
 
 def test_clamp_box_uses_passed_aspect():
     """clamp_box 的保比由传入 aspect 决定；缺省退回经典窗比例（430/780）。"""
-    from pet.chat.crop_dialog import clamp_box
-    from pet.chat.themes import CHAT_UI_VIEW_ASPECT
+    from petwisp.chat.crop_dialog import clamp_box
+    from petwisp.chat.themes import CHAT_UI_VIEW_ASPECT
 
     # 1:1 底图：选区像素 w/h 直接等于传入的 aspect
     _x, _y, w, h = clamp_box(0.0, 0.0, 0.5, 1.0, CHAT_UI_VIEW_ASPECT["modern"])
@@ -2997,7 +2997,7 @@ def test_clamp_box_uses_passed_aspect():
 
 def test_clamp_box_falls_back_to_view_aspect_when_aspect_not_positive():
     """aspect 非正数（0/负）时回退缺省比例，不得除零或产出负尺寸。"""
-    from pet.chat.crop_dialog import VIEW_ASPECT, clamp_box
+    from petwisp.chat.crop_dialog import VIEW_ASPECT, clamp_box
 
     expected = clamp_box(0.1, 0.2, 0.5, 1.0, VIEW_ASPECT)
     assert clamp_box(0.1, 0.2, 0.5, 1.0, 0.0) == expected
@@ -3009,13 +3009,13 @@ def test_crop_dialog_normalizes_existing_box_to_view_aspect():
     from PySide6.QtGui import QPixmap
     from PySide6.QtWidgets import QApplication
 
-    from pet.chat.crop_dialog import CropDialog
-    from pet.chat.themes import CHAT_UI_VIEW_ASPECT
+    from petwisp.chat.crop_dialog import CropDialog
+    from petwisp.chat.themes import CHAT_UI_VIEW_ASPECT
 
     app = QApplication.instance() or QApplication([])
     pix = QPixmap(400, 400)
     stale = (0.05, 0.3, 0.9, 0.6562)  # modern 横版默认框，像素比例 ≈ 1.371
-    dlg = CropDialog(pix, stale, None, "肥鱼牌小手机", CHAT_UI_VIEW_ASPECT["classic"])
+    dlg = CropDialog(pix, stale, None, "桌宠牌小手机", CHAT_UI_VIEW_ASPECT["classic"])
     try:
         x, y, w, h = dlg.canvas.box()
         assert (w * pix.width()) / (h * pix.height()) == pytest.approx(
@@ -3041,12 +3041,12 @@ def test_crop_dialog_default_box_is_vertically_centered():
     from PySide6.QtGui import QPixmap
     from PySide6.QtWidgets import QApplication
 
-    from pet.chat.crop_dialog import CropDialog
-    from pet.chat.themes import CHAT_UI_VIEW_ASPECT
+    from petwisp.chat.crop_dialog import CropDialog
+    from petwisp.chat.themes import CHAT_UI_VIEW_ASPECT
 
     app = QApplication.instance() or QApplication([])
     pix = QPixmap(400, 400)  # 1:1 底图 + modern：默认框不满高，居中可观测
-    dlg = CropDialog(pix, None, None, "肥鱼版 DeepSeek", CHAT_UI_VIEW_ASPECT["modern"])
+    dlg = CropDialog(pix, None, None, "桌宠版 DeepSeek", CHAT_UI_VIEW_ASPECT["modern"])
     try:
         x, y, w, h = dlg.canvas.box()
         assert h < 1.0
@@ -3060,7 +3060,7 @@ def test_crop_dialog_default_box_is_vertically_centered():
 
 @pytest.mark.parametrize(
     ("style_id", "style_name", "landscape"),
-    [("modern", "肥鱼版 DeepSeek", True), ("classic", "肥鱼牌小手机", False)],
+    [("modern", "桌宠版 DeepSeek", True), ("classic", "桌宠牌小手机", False)],
 )
 def test_crop_dialog_box_keeps_style_view_aspect(style_id, style_name, landscape):
     """编辑器默认选区与滚轮缩放后的像素纵横比 = 当前风格窗口比例，方向也正确。"""
@@ -3068,8 +3068,8 @@ def test_crop_dialog_box_keeps_style_view_aspect(style_id, style_name, landscape
     from PySide6.QtGui import QPixmap, QWheelEvent
     from PySide6.QtWidgets import QApplication
 
-    from pet.chat.crop_dialog import CropDialog
-    from pet.chat.themes import CHAT_UI_VIEW_ASPECT
+    from petwisp.chat.crop_dialog import CropDialog
+    from petwisp.chat.themes import CHAT_UI_VIEW_ASPECT
 
     app = QApplication.instance() or QApplication([])
     pix = QPixmap(400, 400)  # 1:1 底图：选区像素比例由 view_aspect 唯一决定
@@ -3097,9 +3097,9 @@ def test_crop_editor_receives_style_view_aspect(tmp_path, monkeypatch):
     """两个调用方之一：主设置窗按当前编辑风格把窗口纵横比传给编辑器。"""
     from PySide6.QtWidgets import QApplication
 
-    from pet.chat.ai_settings_page import _AiSettingsPage
-    from pet.chat.themes import CHAT_UI_VIEW_ASPECT
-    from pet.config import Config
+    from petwisp.chat.ai_settings_page import _AiSettingsPage
+    from petwisp.chat.themes import CHAT_UI_VIEW_ASPECT
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     cfg = Config(tmp_path)
@@ -3107,7 +3107,7 @@ def test_crop_editor_receives_style_view_aspect(tmp_path, monkeypatch):
     cfg.set("modern_chat_background", "builtin:whale")
     cfg.save()
     page = _AiSettingsPage(cfg)
-    import pet.chat.crop_dialog as crop_mod
+    import petwisp.chat.crop_dialog as crop_mod
 
     seen = []
 
@@ -3134,15 +3134,15 @@ def test_chat_settings_dialog_crop_uses_classic_aspect(tmp_path, monkeypatch):
     """两个调用方之二：老聊天设置对话框固定服务经典窗，传经典纵横比。"""
     from PySide6.QtWidgets import QApplication
 
-    from pet.chat.settings_dialog import ChatSettingsDialog
-    from pet.chat.themes import CHAT_UI_VIEW_ASPECT
-    from pet.config import Config
+    from petwisp.chat.settings_dialog import ChatSettingsDialog
+    from petwisp.chat.themes import CHAT_UI_VIEW_ASPECT
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     cfg = Config(tmp_path)
     cfg.set("chat_background", "builtin:whale")
     cfg.save()
-    import pet.chat.crop_dialog as crop_mod
+    import petwisp.chat.crop_dialog as crop_mod
 
     seen = []
 
@@ -3164,7 +3164,7 @@ def test_chat_settings_dialog_crop_uses_classic_aspect(tmp_path, monkeypatch):
         dlg.close()
         app.processEvents()
     assert len(seen) == 1
-    assert seen[0][0] == "肥鱼牌小手机"
+    assert seen[0][0] == "桌宠牌小手机"
     assert seen[0][1] == pytest.approx(CHAT_UI_VIEW_ASPECT["classic"])
 
 
@@ -3175,7 +3175,7 @@ def test_crop_entry_preserves_external_edits_when_untouched(tmp_path, monkeypatc
     主设置窗保存时若无条件回写构造期快照，外部改动被静默回滚。
     """
     app, cfg, page = _make_ai_page(tmp_path, monkeypatch)
-    from pet.config import Config
+    from petwisp.config import Config
     other = Config(tmp_path)
     other.set("chat_bg_crops", {"builtin:whale": [0.9, 0.0, 0.1, 1.0]})
     other.save()  # 外部即存改动（磁盘；对本窗口内存不可见）
@@ -3190,7 +3190,7 @@ def test_crop_entry_preserves_external_edits_when_untouched(tmp_path, monkeypatc
 def test_crop_dialog_released_after_use(tmp_path, monkeypatch):
     """裁切编辑器用完必须释放（deleteLater），不随使用次数累积泄漏。"""
     app, cfg, page = _make_ai_page(tmp_path, monkeypatch)
-    import pet.chat.crop_dialog as crop_mod
+    import petwisp.chat.crop_dialog as crop_mod
 
     released = []
 
@@ -3214,7 +3214,7 @@ def test_crop_dialog_released_after_use(tmp_path, monkeypatch):
 def test_crop_persists_through_disk_roundtrip(tmp_path, monkeypatch):
     """保存链路落到磁盘：page.save() → config.save() → 新 Config 可读回。"""
     app, cfg, page = _make_ai_page(tmp_path, monkeypatch)
-    import pet.chat.crop_dialog as crop_mod
+    import petwisp.chat.crop_dialog as crop_mod
 
     class FakeDlg:
         def __init__(self, pix, initial, parent, style_name='', view_aspect=None):
@@ -3233,7 +3233,7 @@ def test_crop_persists_through_disk_roundtrip(tmp_path, monkeypatch):
     page._crop_background()
     page.save()
     cfg.save()
-    from pet.config import Config
+    from petwisp.config import Config
     assert Config(tmp_path).get("chat_bg_crops", {})["builtin:whale"] == [0.3, 0.3, 0.4, 0.4]
     page.close()
     app.processEvents()
@@ -3255,7 +3255,7 @@ def test_crop_save_merges_only_edited_keys(tmp_path, monkeypatch):
     快照，打开期间外部对**其他背景**的即存裁切改动会被静默回滚。
     """
     app, cfg, page = _make_ai_page(tmp_path, monkeypatch)
-    import pet.chat.crop_dialog as crop_mod
+    import petwisp.chat.crop_dialog as crop_mod
 
     class FakeDlg:
         def __init__(self, pix, initial, parent, style_name='', view_aspect=None):
@@ -3273,7 +3273,7 @@ def test_crop_save_merges_only_edited_keys(tmp_path, monkeypatch):
     monkeypatch.setattr(crop_mod, "CropDialog", FakeDlg)
     page._crop_background()  # 编辑了 builtin:whale
     # 外部（老聊天设置，即存）在主设置窗打开期间改了另一个背景的裁切
-    from pet.config import Config
+    from petwisp.config import Config
     other = Config(tmp_path)
     other.set("chat_bg_crops", {"builtin:furina": [0.9, 0.0, 0.1, 1.0]})
     other.save()
@@ -3289,8 +3289,8 @@ def test_crop_save_merges_only_edited_keys(tmp_path, monkeypatch):
 def test_crop_editor_reads_fresh_crops_at_open(tmp_path, monkeypatch):
     """编辑器初始框读打开时的磁盘最新配置，不是构造期/内存快照。"""
     app, cfg, page = _make_ai_page(tmp_path, monkeypatch)
-    import pet.chat.crop_dialog as crop_mod
-    from pet.config import Config
+    import petwisp.chat.crop_dialog as crop_mod
+    from petwisp.config import Config
     other = Config(tmp_path)
     other.set("chat_bg_crops", {"builtin:whale": [0.7, 0.0, 0.3, 1.0]})
     other.save()  # 构造后外部写入磁盘——只有 reload 才看得见
@@ -3319,9 +3319,9 @@ def test_crop_merge_uses_disk_latest_via_host_reload(tmp_path, monkeypatch):
     对话框打开期间外部即存的其他背景裁切必须保留。宿主若丢掉 reload 时序，
     合并读不到磁盘最新，本用例即红。"""
     from PySide6.QtWidgets import QApplication
-    import pet.modern_settings_dialog as settings_mod
-    import pet.chat.crop_dialog as crop_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    import petwisp.chat.crop_dialog as crop_mod
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     cfg = Config(tmp_path)
@@ -3367,8 +3367,8 @@ def test_background_keys_merge_by_edited_style(tmp_path, monkeypatch):
     主设置窗保存时若整体回写快照，外部改动被静默回滚。
     """
     from PySide6.QtWidgets import QApplication
-    from pet.chat.ai_settings_page import _AiSettingsPage
-    from pet.config import Config
+    from petwisp.chat.ai_settings_page import _AiSettingsPage
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     cfg = Config(tmp_path)
@@ -3419,7 +3419,7 @@ def test_system_notify_keeps_external_edit_when_untouched(tmp_path, monkeypatch)
     构造期快照（True），外部改动被静默回滚。
     """
     app, cfg, page = _make_ai_page(tmp_path, monkeypatch)
-    from pet.config import Config
+    from petwisp.config import Config
     assert page.system_notify_check.isChecked() is True  # 构造期快照值
     other = Config(tmp_path)
     other.set("system_notifications_enabled", False)
@@ -3435,7 +3435,7 @@ def test_system_notify_keeps_external_edit_when_untouched(tmp_path, monkeypatch)
 def test_system_notify_toggle_persists_on_save(tmp_path, monkeypatch):
     """用户拨动系统通知开关（toggled 置脏）后，save() 新值必须落盘。"""
     app, cfg, page = _make_ai_page(tmp_path, monkeypatch)
-    from pet.config import Config
+    from petwisp.config import Config
     page.system_notify_check.setChecked(False)  # 用户拨动 → toggled → 置脏
     cfg.reload()  # 宿主 reload 发生在拨动之后：磁盘旧值不得压过用户新值
     page.save()
@@ -3484,8 +3484,8 @@ def _gated_chat_window(module, tmp_path, monkeypatch):
     provider 的真实 service——信号连接仍由窗口自己完成（走真实链路）。"""
     from PySide6.QtWidgets import QApplication
 
-    from pet.chat.service import ChatService
-    from pet.config import Config
+    from petwisp.chat.service import ChatService
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     provider = _GatedChatProvider()
@@ -3542,7 +3542,7 @@ def test_modern_send_switches_composer_to_busy_stop_state(tmp_path, monkeypatch)
     """F6 回归（modern）：`started` 在 `send()` 内同步发出，窗口必须先把本轮
     request id 落到 `_active_request_id`——否则 `_started` 的首行 id 过滤恒命中，
     发送后既不进忙态、按钮不变停止，桌宠也不切思考态。"""
-    from pet.chat import widgets as chat_widgets
+    from petwisp.chat import widgets as chat_widgets
 
     app, window, provider, pet = _gated_chat_window(chat_widgets, tmp_path, monkeypatch)
     try:
@@ -3565,7 +3565,7 @@ def test_modern_send_switches_composer_to_busy_stop_state(tmp_path, monkeypatch)
 
 def test_legacy_send_switches_composer_to_busy_stop_state(tmp_path, monkeypatch):
     """F6 回归（legacy）：与 modern 同构——忙态/停止按钮/桌宠思考态必须生效。"""
-    from pet.chat import legacy_widgets as legacy_chat
+    from petwisp.chat import legacy_widgets as legacy_chat
 
     app, window, provider, pet = _gated_chat_window(legacy_chat, tmp_path, monkeypatch)
     try:
@@ -3586,7 +3586,7 @@ def test_legacy_send_switches_composer_to_busy_stop_state(tmp_path, monkeypatch)
 
 def test_close_while_streaming_still_cancels_the_request(tmp_path, monkeypatch):
     """X3 修复只补「已完成未排空」的收尾，关窗取消在途生成这条行为不得变。"""
-    from pet.chat import widgets as chat_widgets
+    from petwisp.chat import widgets as chat_widgets
 
     app, window, provider, pet = _gated_chat_window(chat_widgets, tmp_path, monkeypatch)
     try:
@@ -3617,9 +3617,9 @@ def test_quick_chat_send_shows_generating_hint(tmp_path, monkeypatch):
     气泡提示停在 `_send` 里写下的「思考中…」，永远切不到「生成中…」。"""
     from PySide6.QtWidgets import QApplication
 
-    from pet.chat.service import ChatService
-    from pet.config import Config
-    from pet import quick_chat as quick_chat_mod
+    from petwisp.chat.service import ChatService
+    from petwisp.config import Config
+    from petwisp import quick_chat as quick_chat_mod
 
     app = QApplication.instance() or QApplication([])
     provider = _GatedChatProvider()
@@ -3646,8 +3646,8 @@ def test_close_during_typewriter_drain_saves_reply_and_resets(tmp_path):
     完成路径落库再复位；否则回复永远丢失，重开还是「生成中」+ 停止按钮。"""
     from PySide6.QtWidgets import QApplication
 
-    from pet.chat.widgets import ChatWindow
-    from pet.config import Config
+    from petwisp.chat.widgets import ChatWindow
+    from petwisp.config import Config
 
     app = QApplication.instance() or QApplication([])
     window = ChatWindow(Config(tmp_path), "demo")
@@ -3714,7 +3714,7 @@ def test_secret_store_counts_a_missing_backend_as_unavailable(caplog):
     """
     import logging as _logging
 
-    from pet.chat import models as chat_models
+    from petwisp.chat import models as chat_models
 
     store = chat_models.SecretStore()
 
@@ -3738,7 +3738,7 @@ def test_secret_store_counts_a_missing_backend_as_unavailable(caplog):
 
 
 def test_secret_store_reports_a_working_backend_as_available():
-    from pet.chat import models as chat_models
+    from petwisp.chat import models as chat_models
 
     store = chat_models.SecretStore()
     written = {}
@@ -3770,7 +3770,7 @@ def test_secret_store_keeps_a_third_party_backend_whose_name_mentions_fail():
     `company.failover.Keyring` 的**可写**后端会被判成不可用——能存凭据的环境被
     判死，API Key 从此每次重启都要重填。判据只该认 keyring 自己的两个占位类。
     """
-    from pet.chat import models as chat_models
+    from petwisp.chat import models as chat_models
 
     store = chat_models.SecretStore()
     written = {}
@@ -3800,7 +3800,7 @@ def test_secret_store_rejects_the_null_backend():
 
     它不抛异常、也不叫 `fail`——只按"能不能存"来判断会漏掉这一档。
     """
-    from pet.chat import models as chat_models
+    from petwisp.chat import models as chat_models
 
     store = chat_models.SecretStore()
 
@@ -3826,7 +3826,7 @@ def test_secret_store_accepts_every_real_platform_backend(module, name):
 
     注意这只证明**名称判据**不误杀，不证明各平台钥匙串实际可用——那要真机真后端。
     """
-    from pet.chat import models as chat_models
+    from petwisp.chat import models as chat_models
 
     store = chat_models.SecretStore()
 
@@ -3849,7 +3849,7 @@ def test_secret_store_rejects_a_subclass_of_the_fail_backend():
     """
     from keyring.backends import fail as fail_backend
 
-    from pet.chat import models as chat_models
+    from petwisp.chat import models as chat_models
 
     subclass = type("FallbackKeyring", (fail_backend.Keyring,), {"__module__": "myplugin.backends"})
     store = chat_models.SecretStore()
@@ -3872,7 +3872,7 @@ def test_secret_store_keeps_working_when_placeholder_modules_cannot_be_imported(
     """
     import importlib
 
-    from pet.chat import models as chat_models
+    from petwisp.chat import models as chat_models
 
     real_import = importlib.import_module
 

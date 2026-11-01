@@ -8,7 +8,7 @@ def test_priority_names_use_loaded_manifest(tmp_path):
     library._priority_names 此前显式传 None）：外部角色包用 manifest 声明分类时，
     预热不得按无 manifest 分叉——否则点击动画不进 pinned 高优，首次点击同步
     ffmpeg 解码卡顿（pinned 机制要消灭的正是这条路径）。"""
-    from pet.library import MovieLibrary
+    from petwisp.library import MovieLibrary
 
     lib = MovieLibrary.__new__(MovieLibrary)
     lib._asset_dir = tmp_path

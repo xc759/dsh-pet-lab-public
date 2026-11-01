@@ -18,7 +18,7 @@ envelope 手写在 index.js 内，与 dsh createUserMessage 形状对齐）。�
      都会让构建失败，而不是在用户机器上炸掉 dsh。
 
 用法（在构建脚本的 PyInstaller 之后调用）：
-    python scripts/fix_bridge_bundle.py --app-dir dist-onedir/dsh-pet-standalone-webm-chat
+    python scripts/fix_bridge_bundle.py --app-dir dist-onedir/petwisp-webm-chat
 """
 import argparse
 import json
@@ -39,17 +39,17 @@ def find_dist_bridge(app_dir: str) -> "str | None":
     导致 macOS 构建在「dist bridge missing」处失败。
     """
     candidates = (
-        os.path.join(app_dir, "_internal", "integrations", "dsh-pet-bridge"),
-        os.path.join(app_dir, "Contents", "Resources", "integrations", "dsh-pet-bridge"),
-        os.path.join(app_dir, "Contents", "Frameworks", "integrations", "dsh-pet-bridge"),
-        os.path.join(app_dir, "integrations", "dsh-pet-bridge"),
+        os.path.join(app_dir, "_internal", "integrations", "petwisp-bridge"),
+        os.path.join(app_dir, "Contents", "Resources", "integrations", "petwisp-bridge"),
+        os.path.join(app_dir, "Contents", "Frameworks", "integrations", "petwisp-bridge"),
+        os.path.join(app_dir, "integrations", "petwisp-bridge"),
     )
     for path in candidates:
         if os.path.isdir(path):
             return path
     # 兜底：按目录名搜索，兼容未来 PyInstaller 的布局变化
     for root, _dirs, _files in os.walk(app_dir):
-        if (os.path.basename(root) == "dsh-pet-bridge"
+        if (os.path.basename(root) == "petwisp-bridge"
                 and os.path.basename(os.path.dirname(root)) == "integrations"):
             return root
     return None
@@ -58,7 +58,7 @@ def find_dist_bridge(app_dir: str) -> "str | None":
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--app-dir", required=True,
-                    help="onedir/.app 输出目录（内含 integrations/dsh-pet-bridge）")
+                    help="onedir/.app 输出目录（内含 integrations/petwisp-bridge）")
     args = ap.parse_args()
 
     # 归一为绝对路径：CI 以 `--dist dist`（相对）调用构建脚本并透传到此，
@@ -68,7 +68,7 @@ def main() -> int:
     args.app_dir = os.path.abspath(args.app_dir)
 
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    src_bridge = os.path.join(root, "integrations", "dsh-pet-bridge")
+    src_bridge = os.path.join(root, "integrations", "petwisp-bridge")
 
     dst_bridge = find_dist_bridge(args.app_dir)
     if dst_bridge is None:

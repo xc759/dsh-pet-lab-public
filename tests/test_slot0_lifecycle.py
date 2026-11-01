@@ -5,8 +5,8 @@ os.environ.setdefault('QT_QPA_PLATFORM', 'offscreen')
 
 import pytest
 from PySide6.QtWidgets import QApplication
-from pet.config import APP_DIR_NAME
-from pet import pet_profiles as profiles
+from petwisp.config import APP_DIR_NAME
+from petwisp import pet_profiles as profiles
 from tests.test_overlay_spawn import _make_persistent_shell
 
 app = QApplication.instance() or QApplication([])
@@ -53,7 +53,7 @@ def test_tray_close_of_the_only_pet_keeps_process_tray_and_services(tmp_path, mo
         assert shell.sprite is not None, '前提：单宠（slot0）在'
         menu = shell.tray.contextMenu()
         sub = next(a.menu() for a in menu.actions()
-                   if a.text() == '主肥鱼 [slot-0]')
+                   if a.text() == '主桌宠 [slot-0]')
         action = next(a for a in sub.actions() if a.text() == '退出这只')
         action.trigger()
 
@@ -86,8 +86,8 @@ def test_v2_empty_builds_no_pet(tmp_path):
     directory.mkdir()
     (directory / profiles.ACTIVE_SET_FILENAME).write_text(json.dumps({'version': 2, 'slots': []}), encoding='utf8')
     from tests.test_overlay_window_capabilities import CapInstance, FakeScreen
-    from pet.config import Config
-    from pet.overlay_shell import OverlayShell
+    from petwisp.config import Config
+    from petwisp.overlay_shell import OverlayShell
     shell = OverlayShell(app, CapInstance(Config(base=tmp_path, instance_id='')),
                          screen=FakeScreen((0, 0, 1920, 1080), (0, 0, 1920, 1040)))
     try:
@@ -112,10 +112,10 @@ def test_spawn_failure_leaves_no_partial_sprite(tmp_path, monkeypatch):
 
 
 def test_capture_empty_zero_restores_only_zero(tmp_path, monkeypatch):
-    from pet.app import AppShell
-    from pet.config import Config
+    from petwisp.app import AppShell
+    from petwisp.config import Config
     from tests.test_single_process_spawn import _FakeWindow
-    from pet import overlay_settings_command
+    from petwisp import overlay_settings_command
 
     cfg = Config(base=tmp_path, instance_id='')
     profiles.write_profile_settings(cfg.dir, 0, {'character': 'demo', 'rx': 0.3})
@@ -151,8 +151,8 @@ def test_slot_focus_does_not_activate_inactive_profile(tmp_path):
 
 
 def test_late_reply_keeps_shared_history_without_retargeting(tmp_path):
-    from pet.overlay_shell import _SpriteChatAnchor
-    from pet.quick_chat import QuickChatBubble
+    from petwisp.overlay_shell import _SpriteChatAnchor
+    from petwisp.quick_chat import QuickChatBubble
     shell, _ = _make_persistent_shell(tmp_path)
     shell.spawn_pet()
     old = shell._spawned[0]
@@ -172,8 +172,8 @@ def test_late_reply_keeps_shared_history_without_retargeting(tmp_path):
 
 def test_late_reply_after_close_touches_nothing_but_presentation(tmp_path):
     """R3/5：关槽后的迟到回复只取消宠物呈现——别宠状态、原配置、会话消息都不变。"""
-    from pet.overlay_shell import _SpriteChatAnchor
-    from pet.quick_chat import QuickChatBubble
+    from petwisp.overlay_shell import _SpriteChatAnchor
+    from petwisp.quick_chat import QuickChatBubble
     shell, _ = _make_persistent_shell(tmp_path)
     shell.overlay.show()
     shell.spawn_pet()
@@ -243,8 +243,8 @@ def test_no_tray_recovery_button_is_visible_and_restores(tmp_path, monkeypatch):
     monkeypatch.setattr(QSystemTrayIcon, 'isSystemTrayAvailable', lambda: False)
     directory = tmp_path / APP_DIR_NAME
     profiles.save_active_set(directory, [])
-    from pet.config import Config
-    from pet.overlay_shell import OverlayShell
+    from petwisp.config import Config
+    from petwisp.overlay_shell import OverlayShell
     from tests.test_overlay_window_capabilities import CapInstance, FakeScreen
     shell = OverlayShell(app, CapInstance(Config(base=tmp_path, instance_id='')),
         screen=FakeScreen((0, 0, 1920, 1080), (0, 0, 1920, 1040)))
@@ -257,10 +257,10 @@ def test_no_tray_recovery_button_is_visible_and_restores(tmp_path, monkeypatch):
 
 
 def test_legacy_profile_reset_keeps_body_anchor_and_reloads_role(tmp_path, monkeypatch):
-    from pet.app import AppShell
-    from pet.config import Config
-    from pet.window import PetWindow
-    from pet import window_placement
+    from petwisp.app import AppShell
+    from petwisp.config import Config
+    from petwisp.window import PetWindow
+    from petwisp import window_placement
     from tests.test_window_pause import FakeLibrary
     monkeypatch.setenv('PET_RENDER_TOPOLOGY', 'legacy')
     cfg = Config(base=tmp_path, instance_id='')
@@ -296,9 +296,9 @@ def test_legacy_window_scale_survives_the_reload_its_own_save_triggers(tmp_path,
     再读 ``scale``。旧实现里那条草稿把档案快照冻住，reload 读回**改之前**的尺寸，
     于是窗口弹回去、盘上也被写回旧值。这里按这条链逐段真跑（不 mock 配置层）。
     """
-    from pet.app import AppShell
-    from pet.config import Config
-    from pet.window import PetWindow
+    from petwisp.app import AppShell
+    from petwisp.config import Config
+    from petwisp.window import PetWindow
     from tests.test_window_pause import FakeLibrary
     monkeypatch.setenv('PET_RENDER_TOPOLOGY', 'legacy')
     cfg = Config(base=tmp_path, instance_id='')
@@ -346,7 +346,7 @@ def test_migration_statuses_separate_slot_only_from_global(tmp_path):
 
 def test_corrupt_slot0_profile_is_reported_as_target_corrupt(tmp_path):
     """真生产者：坏 slot0 档案 → ``target-corrupt``（带路径），不覆盖、不清源。"""
-    from pet.config import Config
+    from petwisp.config import Config
 
     cfg = Config(base=tmp_path, instance_id='')
     cfg.dir.mkdir(parents=True, exist_ok=True)
@@ -370,8 +370,8 @@ def test_corrupt_slot0_profile_does_not_break_the_overlay_shell(tmp_path):
     全不可用，对话框里连文件路径都没有。现在只降级那一个槽：主 sprite 不复活、
     其它 active 子照常、原文件一个字节不动、活跃集合也不被启动期改写。
     """
-    from pet.config import Config
-    from pet.overlay_shell import OverlayShell
+    from petwisp.config import Config
+    from petwisp.overlay_shell import OverlayShell
     from tests.test_overlay_window_capabilities import CapInstance, FakeScreen
 
     directory = tmp_path / APP_DIR_NAME
@@ -401,8 +401,8 @@ def test_corrupt_slot0_profile_does_not_break_the_overlay_shell(tmp_path):
 
 def test_corrupt_slot0_profile_degrades_the_app_shell_with_a_visible_path(tmp_path):
     """ops D2（真 AppShell）：以前这里直接 raise，现在降级并给出**含路径**的诊断。"""
-    from pet.app import AppShell
-    from pet.config import Config
+    from petwisp.app import AppShell
+    from petwisp.config import Config
 
     cfg = Config(base=tmp_path, instance_id='')
     directory = cfg.dir
@@ -433,7 +433,7 @@ def test_corrupt_slot0_profile_degrades_the_app_shell_with_a_visible_path(tmp_pa
 
 def _corrupt_slot0_app(tmp_path):
     """真 AppShell + 坏 slot0 档案（只断言诊断口径时用）。"""
-    from pet.config import Config
+    from petwisp.config import Config
 
     cfg = Config(base=tmp_path, instance_id='')
     directory = cfg.dir
@@ -452,8 +452,8 @@ def test_overlay_diagnosis_points_at_in_place_restore(tmp_path, monkeypatch):
     必须重启（实测发现，见 .scratch/product-close-approved-gui-20261011/REPORT.md
     §4.4）。这条把 overlay 的口径钉住。
     """
-    from pet import overlay_settings_command
-    from pet.app import AppShell
+    from petwisp import overlay_settings_command
+    from petwisp.app import AppShell
 
     monkeypatch.setenv('PET_RENDER_TOPOLOGY', 'overlay')
     overlay_settings_command.reset_topology_snapshot()
@@ -475,8 +475,8 @@ def test_legacy_diagnosis_keeps_the_restart_path(tmp_path, monkeypatch):
 
     与上一条成对：两个拓扑的恢复方式确实不同，谁都不许被"顺手统一"成另一种。
     """
-    from pet import overlay_settings_command
-    from pet.app import AppShell
+    from petwisp import overlay_settings_command
+    from petwisp.app import AppShell
 
     monkeypatch.setenv('PET_RENDER_TOPOLOGY', 'legacy')
     overlay_settings_command.reset_topology_snapshot()
@@ -519,7 +519,7 @@ def test_explicit_spawn_over_a_corrupt_active_set_backs_up_and_writes(tmp_path):
 
 def test_active_set_write_failure_is_visible_and_not_faked(tmp_path, monkeypatch):
     """ops D1：写不进去必须**可见**（气泡点名路径）+ 返回值如实 False，不许假成功。"""
-    from pet import pet_profiles as profiles_mod
+    from petwisp import pet_profiles as profiles_mod
 
     shell, _ = _make_persistent_shell(tmp_path)
     feedback: list = []
@@ -545,8 +545,8 @@ def test_active_set_write_failure_is_visible_and_not_faked(tmp_path, monkeypatch
 # ---------------------------------------------------------------- ops D2-新（2026-10-10 终审复核）
 def _broken_slot0_shell(base, *, active):
     """真 OverlayShell + 坏 ``config-slot-0.json``（原文件保留、其它槽照常）。"""
-    from pet.config import Config
-    from pet.overlay_shell import OverlayShell
+    from petwisp.config import Config
+    from petwisp.overlay_shell import OverlayShell
     from tests.test_overlay_window_capabilities import CapInstance, FakeScreen
 
     directory = base / APP_DIR_NAME
@@ -643,9 +643,9 @@ def test_capture_restore_refuses_a_corrupt_slot0_instead_of_faking_defaults(tmp_
     两个拓扑对同一次事故必须同源处置：overlay 侧本来就会失败（上面两条用例），
     legacy 侧这里改成**同样失败 + 说清路径**，坏文件仍然一个字节不动。
     """
-    from pet import overlay_settings_command
-    from pet.app import AppShell
-    from pet.config import Config
+    from petwisp import overlay_settings_command
+    from petwisp.app import AppShell
+    from petwisp.config import Config
 
     cfg = Config(base=tmp_path, instance_id='')
     directory = cfg.dir

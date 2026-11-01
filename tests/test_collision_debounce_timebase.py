@@ -12,8 +12,8 @@ from __future__ import annotations
 
 import pytest
 
-from pet import sprite_collision as sc
-from pet.sprite_collision import SEPARATION_DEBOUNCE_SECS, SpriteCollisionWorld
+from petwisp import sprite_collision as sc
+from petwisp.sprite_collision import SEPARATION_DEBOUNCE_SECS, SpriteCollisionWorld
 from tests.test_sprite_collision import FakeClock, FakeSprite
 
 

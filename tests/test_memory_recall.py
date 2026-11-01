@@ -18,7 +18,7 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from pet.chat.memory import (
+from petwisp.chat.memory import (
     LAYERS,
     ChatMemory,
     injection_text,
@@ -27,7 +27,7 @@ from pet.chat.memory import (
     memory_payload,
     parse_remember_command,
 )
-from pet.chat.memory_recall import (
+from petwisp.chat.memory_recall import (
     HALF_LIFE_DAYS,
     MAX_KEYWORDS,
     RECALL_TOP_K,
@@ -44,8 +44,8 @@ from pet.chat.memory_recall import (
     recall,
     render_user_snapshot,
 )
-from pet.chat.models import ChatMessage, ChatSettings
-from pet.chat.prompt import PromptBuilder
+from petwisp.chat.models import ChatMessage, ChatSettings
+from petwisp.chat.prompt import PromptBuilder
 
 NOW = datetime(2026, 10, 21, 12, 0, tzinfo=timezone.utc)
 
@@ -763,7 +763,7 @@ def test_payloads_do_not_cross_sessions(tmp_path):
 
 def test_payload_exception_does_not_pollute_next_build(tmp_path, monkeypatch):
     """B：一次构建中途抛异常，不应留下任何可供下一次取走的暂存状态。"""
-    import pet.chat.prompt as prompt_mod
+    import petwisp.chat.prompt as prompt_mod
 
     builder = PromptBuilder()
     now = datetime(2026, 10, 21, 12, 0).astimezone()

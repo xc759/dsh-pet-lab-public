@@ -35,10 +35,10 @@ import pytest  # noqa: E402
 from PySide6.QtGui import QGuiApplication  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
-import pet.window as window_mod  # noqa: E402
-from pet import click_sound  # noqa: E402
-from pet.speech_bubble import PetSpeechBubble  # noqa: E402
-from pet.sprite_bubble import sprite_anchor_rect_global  # noqa: E402
+import petwisp.window as window_mod  # noqa: E402
+from petwisp import click_sound  # noqa: E402
+from petwisp.speech_bubble import PetSpeechBubble  # noqa: E402
+from petwisp.sprite_bubble import sprite_anchor_rect_global  # noqa: E402
 from tests.test_overlay_collision_toggle import _make_slot_shell  # noqa: E402
 
 app = QApplication.instance() or QApplication([])
@@ -380,7 +380,7 @@ def test_timed_alert_rehangs_with_remaining_ttl_and_expires(tmp_path, probes, mo
 # ---------------------------------------------------------------- 6. 有界队列
 def test_pending_queue_is_bounded_prefers_high_priority_and_is_diagnosable(tmp_path, probes, caplog):
     """待处理队列上限 64（另加 current）：同 ID 更新不增量，满时保高优先级，可诊断。"""
-    from pet import window_alerts
+    from petwisp import window_alerts
 
     assert window_alerts.ALERT_QUEUE_LIMIT == QUEUE_LIMIT_BASELINE, "队列基准不得漂移"
     shell, _cfg = _make_slot_shell(tmp_path)
@@ -652,7 +652,7 @@ def test_bounded_command_retry_exhausts_by_event_sync_not_wall_clock(tmp_path, m
     ``MAX_COMMAND_ATTEMPTS = 3`` + 首次领取 = 总共 4 次尝试机会；同步直调消费入口
     （不跑 3 秒轮询定时器）就能把这条链条走完，耗时必须是毫秒级。
     """
-    from pet import overlay_settings_command as cmd
+    from petwisp import overlay_settings_command as cmd
 
     shell, cfg = _make_slot_shell(tmp_path)
     try:

@@ -14,9 +14,9 @@ from pathlib import Path
 
 from PySide6.QtCore import QPoint, QRect, QSize
 
-from pet.chat.geometry import best_position_near_pet, candidate_points_near_pet, clamp_point
-from pet.chat.models import ChatMessage, ChatSession
-from pet.chat.utils import _short_title
+from petwisp.chat.geometry import best_position_near_pet, candidate_points_near_pet, clamp_point
+from petwisp.chat.models import ChatMessage, ChatSession
+from petwisp.chat.utils import _short_title
 
 AVAILABLE = QRect(0, 0, 1280, 800)
 
@@ -176,7 +176,7 @@ def test_clamp_fallback_tiny_available_stays_at_corner():
 
 
 def _chat_src(module_name: str) -> str:
-    return (Path(__file__).resolve().parents[1] / "pet" / "chat" / f"{module_name}.py").read_text(encoding="utf-8")
+    return (Path(__file__).resolve().parents[1] / "petwisp" / "chat" / f"{module_name}.py").read_text(encoding="utf-8")
 
 
 def test_legacy_call_sites_use_default_localize_time_true():

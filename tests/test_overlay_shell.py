@@ -20,12 +20,12 @@ from PySide6.QtCore import QObject, QPointF, QRect, QRectF, Signal
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtWidgets import QApplication
 
-import pet.app as app_mod
-import pet.overlay_shell as overlay_shell_mod
-from pet import click_sound
-from pet.app import AppShell
-from pet.config import Config
-from pet.overlay_shell import OverlayShell, is_overlay_topology
+import petwisp.app as app_mod
+import petwisp.overlay_shell as overlay_shell_mod
+from petwisp import click_sound
+from petwisp.app import AppShell
+from petwisp.config import Config
+from petwisp.overlay_shell import OverlayShell, is_overlay_topology
 
 app = QApplication.instance() or QApplication([])
 
@@ -188,11 +188,11 @@ def test_topology_config_input_is_isolated_to_tmp(tmp_path, monkeypatch):
 
     拓扑自 T4 起还读主配置 ``stream_capture_mode``。若测试进程真去读，上面那条
     「清 env ⇒ 默认 overlay」在**开发机勾过捕获模式**时会假红（判定读到真实
-    ``<APPDATA>/dsh-pet-standalone/config.json``），CI 上却永远绿——断言失去意义。
+    ``<APPDATA>/petwisp/config.json``），CI 上却永远绿——断言失去意义。
     conftest 的 ``_isolate_topology_config`` 夹具把目录解析钉到 ``tmp_path``；
     本用例锁死这件事（并在同一份路径上写 true 证明读的确实是它）。
     """
-    from pet import overlay_settings_command as cmd_mod
+    from petwisp import overlay_settings_command as cmd_mod
 
     monkeypatch.delenv(cmd_mod.ENV_TOPOLOGY, raising=False)
     path = cmd_mod.topology_config_path()
@@ -323,7 +323,7 @@ class _BodySprite(FakeSprite):
 def _warm_spy(monkeypatch, calls, shell=None):
     """替换音效预热入口（模块级 OS 音频边界），记录参数与调用时的可见性。
 
-    替换的是 ``pet.click_sound.warm_click_sound_effects``（产品侧以模块属性
+    替换的是 ``petwisp.click_sound.warm_click_sound_effects``（产品侧以模块属性
     调用），与 ``tests/test_requested_regressions.py`` 替换设置页同名入口同风格——
     不碰 winmm/DLL/声卡。
     """
@@ -522,7 +522,7 @@ def test_about_to_quit_cancels_frameseq_provision():
 
 
 def test_about_to_quit_cancels_provision_for_spawned_libraries(monkeypatch):
-    """子肥鱼各持独立库（M8）：逐库取消，不只主库。"""
+    """子宠各持独立库（M8）：逐库取消，不只主库。"""
     instance = FakeInstance(FakeConfig({"click_sound_enabled": False}))
     shell = OverlayShell(
         app, instance,
@@ -854,7 +854,7 @@ def test_closing_slot0_keeps_its_profile_and_can_be_restored(tmp_path):
     shell, instance, child = _make_slot0_close_shell(tmp_path, "demo", "demo")
     bubble = _FakeQuickChatBubble()
     shell._quick_chat = bubble
-    from pet import pet_profiles
+    from petwisp import pet_profiles
 
     config_dir = shell._spawn_config_dir()
     profile_before = pet_profiles.read_slot_profile(config_dir, 0).data

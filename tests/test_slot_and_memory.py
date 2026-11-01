@@ -24,12 +24,12 @@ from pathlib import Path
 
 import pytest
 
-from pet.config import Config, APP_DIR_NAME
-from pet import slot_manager as sm
-from pet import catalog
-from pet.chat.session_store import SessionStore
-from pet.chat.models import ChatMessage, ChatSession
-from pet.settings_slot_config import route_settings_config
+from petwisp.config import Config, APP_DIR_NAME
+from petwisp import slot_manager as sm
+from petwisp import catalog
+from petwisp.chat.session_store import SessionStore
+from petwisp.chat.models import ChatMessage, ChatSession
+from petwisp.settings_slot_config import route_settings_config
 
 
 def test_field_default_factory_and_individual_memory(tmp_path):
@@ -96,8 +96,8 @@ def test_field_default_factory_and_individual_memory(tmp_path):
 
 
 def test_spawn_reuse_keeps_existing_slot_config(tmp_path, monkeypatch):
-    """「生小肥鱼」复用已有存档的 slot 时不再顶掉原槽设置（回归：旧版
-    DSH_PET_SPAWN_FRESH 强制重播种会把 slot-N 个体配置覆盖成主配置）。
+    """「生小宠」复用已有存档的 slot 时不再顶掉原槽设置（回归：旧版
+    PETWISP_SPAWN_FRESH 强制重播种会把 slot-N 个体配置覆盖成主配置）。
 
     G1 口径：重用槽的每宠键真值在它自己的档案里，构造侧或环境都没法再"重播种"。
     """
@@ -108,7 +108,7 @@ def test_spawn_reuse_keeps_existing_slot_config(tmp_path, monkeypatch):
     assert old_slot.save() is True
 
     # 旧版孵化进程环境可能仍带着 SPAWN_FRESH 标记，须被完全忽略
-    monkeypatch.setenv("DSH_PET_SPAWN_FRESH", "1")
+    monkeypatch.setenv("PETWISP_SPAWN_FRESH", "1")
     reused_slot = route_settings_config(Config(base=tmp_path, instance_id="slot-1"))
     assert reused_slot.get("character") == "dundun"
     assert reused_slot.get("playback_speed") == 0.5
@@ -130,13 +130,13 @@ def test_normal_reopen_keeps_existing_slot_config(tmp_path, monkeypatch):
 
 
 def test_spawn_seed_respects_inherit_size_switch(tmp_path):
-    """生小肥鱼落种遵循 ``spawn_inherit_size`` / ``spawn_scale``（G1 口径）。
+    """生小宠落种遵循 ``spawn_inherit_size`` / ``spawn_scale``（G1 口径）。
 
     落种源是 **slot0 的档案**（不是"主配置整表"）：开启继承 → 新槽拿到的 scale 跟
-    slot0 一样；关闭继承 → 用主配置里给"小肥鱼"单独选的 ``spawn_scale``。
+    slot0 一样；关闭继承 → 用主配置里给"小宠"单独选的 ``spawn_scale``。
     """
     import tests.test_overlay_spawn as osp
-    from pet import pet_profiles
+    from petwisp import pet_profiles
 
     def _spawned_scale(base, values):
         shell, _made = osp._make_persistent_shell(base, values)
@@ -497,14 +497,14 @@ def test_read_live_instances_reclaims_confirmed_dead_pid(tmp_path):
 
 def test_app_main_validates_slot_arg():
     """测试 app.main 校验 --slot 参数范围（身份空间 0~128）及非法值。"""
-    from pet import app as app_mod
+    from petwisp import app as app_mod
 
     # 负数
-    assert app_mod.main(["dsh-pet", "--slot", "-1"]) == 1
+    assert app_mod.main(["petwisp", "--slot", "-1"]) == 1
     # 超大值：上界已按规范 §一 扩到含 128（129 个身份），129 才是非法值
-    assert app_mod.main(["dsh-pet", "--slot", "129"]) == 1
+    assert app_mod.main(["petwisp", "--slot", "129"]) == 1
     # 非法字符串
-    assert app_mod.main(["dsh-pet", "--slot", "abc"]) == 1
+    assert app_mod.main(["petwisp", "--slot", "abc"]) == 1
     # 缺少值
-    assert app_mod.main(["dsh-pet", "--slot"]) == 1
+    assert app_mod.main(["petwisp", "--slot"]) == 1
 

@@ -5,7 +5,7 @@
 > （2026-10-15 下沉，正文逐字保留，只补了首尾的入口与互链）。
 > **互链**：[`../README.md`](../README.md)「动画素材与自定义角色」（用户侧：换角色、热加载）、
 > [`ONEDIR_PACKAGING.md`](ONEDIR_PACKAGING.md)（GIF 变体怎么进包）、[`INDEX.md`](INDEX.md)（全文档入口）。
-> **素材版权**：动画素材源自参考项目 [PC2005-cloud/dsh-pet](https://github.com/PC2005-cloud/dsh-pet)，
+> **素材版权**：动画素材源自参考项目 [PC2005-cloud/petwisp](https://github.com/PC2005-cloud/petwisp)，
 > 授权与署名见 [`../THIRD_PARTY_NOTICES.md`](../THIRD_PARTY_NOTICES.md) 与 [`../LICENSE`](../LICENSE)；
 > 新增/替换素材时请同步维护这两处声明。
 
@@ -32,14 +32,14 @@ assets/
 - 没有稳定静态头像时，不强制从 WebM/GIF 截取首帧，以避免启动变慢和打包兼容性问题。
 - `assets/characters/<id>/videos/` 加它的 manifest 视为**一个角色包**：相对路径与大小写都要保持
   （打包平台之间有差异）；manifest 可选声明 `body_box`（源像素 `[x1, y1, x2, y2]`，镜像对称化），
-  它是摆放/贴边钳制用的身体框（`pet/catalog.py character_body_box`），测量时按 alpha≥128 对齐
+  它是摆放/贴边钳制用的身体框（`petwisp/catalog.py character_body_box`），测量时按 alpha≥128 对齐
   mask 边缘，省略则退回整画布行为。这些约定与 `AGENTS.md` 的 "Context pointers" 一致，改素材前请两份都读。
 
 ---
 
 ## 二、素材生成教学（从零制作动画素材）
 
-本项目的动画素材沿用参考项目 [PC2005-cloud/dsh-pet](https://github.com/PC2005-cloud/dsh-pet) 的**三件套流程**：`① 提示词（配方）→ ② 素材生成链（引擎）→ ③ 插件（成品）`。任何人 clone 参考仓库都可以从零生成自己的桌宠素材，本教学按该流程说明。
+本项目的动画素材沿用参考项目 [PC2005-cloud/petwisp](https://github.com/PC2005-cloud/petwisp) 的**三件套流程**：`① 提示词（配方）→ ② 素材生成链（引擎）→ ③ 插件（成品）`。任何人 clone 参考仓库都可以从零生成自己的桌宠素材，本教学按该流程说明。
 
 ### ① 提示词 → 源视频（绿幕规范）
 
@@ -97,7 +97,7 @@ python encode_thumbs.py
 
 > 不想重新打包？把做好的透明 WebM 按「切换角色」的外部角色目录结构直接放入 `characters/<角色ID>/videos/`，右键菜单即可热加载新角色（用户侧步骤见 [`../README.md`](../README.md) 的「热加载新角色：文件怎么放」）。
 >
-> 快速验证：`python -m pytest -q` 会检查 WebM/GIF 相对路径一一对应；源码运行 `python -m pet` 或重新打包后检查对应分类是否正常播放。
+> 快速验证：`python -m pytest -q` 会检查 WebM/GIF 相对路径一一对应；源码运行 `python -m petwisp` 或重新打包后检查对应分类是否正常播放。
 
 ---
 

@@ -31,10 +31,10 @@ from PySide6.QtCore import QEvent, QPoint, QPointF, Qt
 from PySide6.QtGui import QMouseEvent
 from PySide6.QtWidgets import QApplication, QMenu
 
-from pet import catalog
-import pet.library as library_mod
-from pet.config import Config
-from pet.window import PetWindow
+from petwisp import catalog
+import petwisp.library as library_mod
+from petwisp.config import Config
+from petwisp.window import PetWindow
 from tests.test_window_pause import FakeLibrary
 
 
@@ -672,7 +672,7 @@ def test_lock_position_press_holds_gate(app, tmp_path):
 
 
 def test_context_menu_open_holds_gate_until_closed(app, tmp_path, monkeypatch):
-    import pet.window as window_mod
+    import petwisp.window as window_mod
 
     lib = RecordingLibrary()
     win = PetWindow(lib, Config(base=tmp_path))

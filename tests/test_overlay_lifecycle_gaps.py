@@ -246,7 +246,7 @@ def test_about_to_quit_shuts_down_main_library(tmp_path):
 
 def test_about_to_quit_shuts_down_real_main_library_and_closes_clips(tmp_path):
     """真库口径：退出后主库 ``_shutdown`` 为真、已建 clip 已 close。"""
-    from pet.library import MovieLibrary
+    from petwisp.library import MovieLibrary
 
     shell, _lib = _make_persistent_shell(tmp_path)
     lib = MovieLibrary(prewarm_enabled=False)     # 真库：走真实 shutdown 收口

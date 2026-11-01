@@ -16,10 +16,10 @@ from PySide6.QtCore import QObject, QPoint, QRect, Signal
 from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QApplication, QMenu
 
-import pet.window as window_mod
-from pet import catalog
-from pet.config import Config
-from pet.window import PetWindow
+import petwisp.window as window_mod
+from petwisp import catalog
+from petwisp.config import Config
+from petwisp.window import PetWindow
 
 
 class FakeClip(QObject):

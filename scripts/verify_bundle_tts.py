@@ -27,7 +27,7 @@ not a package``）就继续构建，产物静默缺 TTS；用户拿到包后点�
   实际踩到的假红见 `_has_packable_source` 与 `import_closure` 的说明。
 
 用法：
-    python scripts/verify_bundle_tts.py --app-dir dist-onedir/dsh-pet-standalone-webm-chat
+    python scripts/verify_bundle_tts.py --app-dir dist-onedir/petwisp-webm-chat
     python scripts/verify_bundle_tts.py --exe <path to exe>
     python scripts/verify_bundle_tts.py --environment
 
@@ -51,7 +51,7 @@ from packaging.version import InvalidVersion, Version
 # 这些模块也必须在包里。`tabulate` 在列——它是 PYZ-only 的那类依赖。
 #
 # `keyring` 在列（2026-10-17）：语音报时的收费后端（MiMo / 豆包）把 API Key 存系统
-# 钥匙串，而 **no-chat 变体原先把它和 `pet.chat` 一起排除**——用户填了 Key、界面报
+# 钥匙串，而 **no-chat 变体原先把它和 `petwisp.chat` 一起排除**——用户填了 Key、界面报
 # 「已保存」，主宠进程读到的却是空串，收费后端永远自报「没配 Key」。静默、且看不见，
 # 所以放进这份清单：任何变体少带它，构建期就判红（退出码 4）。
 MINIMUM_MODULES = (

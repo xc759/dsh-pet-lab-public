@@ -20,9 +20,9 @@ from __future__ import annotations
 import pytest
 from PySide6.QtCore import QPoint, QRect
 
-import pet.catalog as catalog
-from pet import window_placement
-from pet.window import PetWindow
+import petwisp.catalog as catalog
+from petwisp import window_placement
+from petwisp.window import PetWindow
 
 # demo manifest 声明的身体框（源像素，640×360 画布，已镜像对称化）
 BOX = (212, 60, 428, 330)

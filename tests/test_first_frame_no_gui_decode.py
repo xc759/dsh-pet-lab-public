@@ -21,7 +21,7 @@ import pytest
 from PySide6.QtGui import QImage
 from PySide6.QtWidgets import QApplication
 
-from pet.webm_clip import WebMClip
+from petwisp.webm_clip import WebMClip
 
 
 @pytest.fixture

@@ -24,10 +24,10 @@ pytest.importorskip("PySide6")
 
 from PySide6.QtWidgets import QApplication, QMenu  # noqa: E402
 
-from pet import menu_layout  # noqa: E402
-from pet.context_menu import populate_context_menu  # noqa: E402
-from pet.context_menus import registry as registry_mod  # noqa: E402
-from pet.screen_capture import actions as actions_mod  # noqa: E402
+from petwisp import menu_layout  # noqa: E402
+from petwisp.context_menu import populate_context_menu  # noqa: E402
+from petwisp.context_menus import registry as registry_mod  # noqa: E402
+from petwisp.screen_capture import actions as actions_mod  # noqa: E402
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -39,8 +39,8 @@ def qapp():
 def _isolate_os_touching_menus(monkeypatch):
     """默认菜单里另有开机自启/角色清单两处系统面：按 test_menu_layout 的既有口径
     打桩，免得测截图入口时先在别的入口上炸。"""
-    from pet import catalog
-    from pet.context_menus import shared as menu_shared
+    from petwisp import catalog
+    from petwisp.context_menus import shared as menu_shared
 
     monkeypatch.setattr(menu_shared.autostart_mod, "is_enabled", lambda: False)
     monkeypatch.setattr(catalog, "list_available_characters", lambda: ["demo"])
@@ -179,7 +179,7 @@ def test_the_leaf_does_not_gate_on_the_engines(monkeypatch):
     assert leaf.isEnabled() is True
     # 可用态不再挂"为什么用不了"的说明：两条旧的置灰原因都不许出现在这里
     # （「翻译」现在真的接了；真值在 reasons.py，动作条上才用它）。
-    from pet.screen_capture import reasons as reasons_mod
+    from petwisp.screen_capture import reasons as reasons_mod
 
     assert "尚未接入" not in leaf.toolTip()
     assert reasons_mod.TRANSLATION_UNAVAILABLE_REASON not in leaf.toolTip()
@@ -219,9 +219,9 @@ def test_real_hosts_expose_the_single_entry():
     / ``_ask``）只要还留一个，宿主→动作的连接就还停在旧契约上（菜单照旧能用，
     静默地少调一层）。
     """
-    from pet.overlay_shell import OverlayShell
-    from pet.sprite_menu_facade import SpriteMenuFacade
-    from pet.window import PetWindow
+    from petwisp.overlay_shell import OverlayShell
+    from petwisp.sprite_menu_facade import SpriteMenuFacade
+    from petwisp.window import PetWindow
 
     retired = ("on_screen_capture_ocr", "on_screen_capture_translate", "on_screen_capture_ask")
     for host in (PetWindow, OverlayShell, SpriteMenuFacade):

@@ -30,13 +30,13 @@ import pytest
 from PySide6.QtCore import QRect
 from PySide6.QtWidgets import QApplication
 
-import pet.island.dynamic_island as island_mod
-from pet import gpu_monitor as gm
-from pet.island import segments as isl
-from pet import sys_monitor as sm
-from pet.config import Config
-from pet.island.dynamic_island import DynamicIsland
-from pet.island.segments import CPU, GPU, MEM
+import petwisp.island.dynamic_island as island_mod
+from petwisp import gpu_monitor as gm
+from petwisp.island import segments as isl
+from petwisp import sys_monitor as sm
+from petwisp.config import Config
+from petwisp.island.dynamic_island import DynamicIsland
+from petwisp.island.segments import CPU, GPU, MEM
 from tests.test_island_segment_render import _config as _island_config
 from tests.test_island_segment_render import _island
 

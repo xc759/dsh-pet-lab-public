@@ -46,7 +46,7 @@ def _fake_dir(tmp_path: Path, files: dict[str, str]) -> Path:
 
 def test_expected_values_come_from_the_engine_module(verifier):
     """判据必须来自产品那一份（单一真相源），不是脚本里抄的字面量。"""
-    from pet.screen_capture import ocr
+    from petwisp.screen_capture import ocr
 
     directory, files, shas = verifier.load_expectations()
 
@@ -164,15 +164,15 @@ def test_app_dir_mode_judges_three_things_not_just_the_models(verifier, tmp_path
     _, files, shas = verifier.load_expectations()
 
     report = verifier.inspect_app_dir(tmp_path / "app", files, shas,
-                                      required_modules=("pet.screen_capture.ocr",))
+                                      required_modules=("petwisp.screen_capture.ocr",))
 
-    assert report["missing_bundle_modules"] == ["pet.screen_capture.ocr"]
-    assert any("pet.screen_capture.ocr" in problem for problem in report["problems"])
+    assert report["missing_bundle_modules"] == ["petwisp.screen_capture.ocr"]
+    assert any("petwisp.screen_capture.ocr" in problem for problem in report["problems"])
     assert report["missing_rapidocr_config"] == []
 
     (internal / "rapidocr" / "config.yaml").unlink()
     report = verifier.inspect_app_dir(tmp_path / "app", files, shas,
-                                      required_modules=("pet.screen_capture.ocr",))
+                                      required_modules=("petwisp.screen_capture.ocr",))
 
     assert report["missing_rapidocr_config"] == ["config.yaml"]
     assert any("config.yaml" in problem for problem in report["problems"])
@@ -180,19 +180,19 @@ def test_app_dir_mode_judges_three_things_not_just_the_models(verifier, tmp_path
 
 def test_required_bundle_modules_come_from_the_product(verifier):
     """判据必须来自产品那一份声明（``ocr.BUNDLE_MODULES``），不抄第二份字面量。"""
-    from pet.screen_capture import ocr
+    from petwisp.screen_capture import ocr
 
     assert verifier.required_bundle_modules() == ocr.BUNDLE_MODULES
     assert verifier.required_bundle_modules() == (
-        "pet.screen_capture.ocr", "pet.screen_capture.ocr_worker")
+        "petwisp.screen_capture.ocr", "petwisp.screen_capture.ocr_worker")
 
 
 def test_missing_bundle_modules_is_a_pure_set_difference(verifier):
-    required = ("pet.screen_capture.ocr", "pet.screen_capture.translate")
+    required = ("petwisp.screen_capture.ocr", "petwisp.screen_capture.translate")
 
     assert verifier.missing_bundle_modules(set(required), required) == []
     assert verifier.missing_bundle_modules(
-        {"pet.screen_capture.ocr"}, required) == ["pet.screen_capture.translate"]
+        {"petwisp.screen_capture.ocr"}, required) == ["petwisp.screen_capture.translate"]
 
 
 def test_payload_paths_are_found_by_existence_not_by_platform_guess(verifier, tmp_path):
@@ -268,7 +268,7 @@ def test_packaging_doc_and_notices_register_the_models():
 
     notices = NOTICES.read_text(encoding="utf-8")
     assert MODELS_ADD_DATA in notices
-    from pet.screen_capture import ocr
+    from petwisp.screen_capture import ocr
 
     for section, digest in ocr.MODEL_SHA256.items():
         assert digest in notices, f"THIRD_PARTY_NOTICES.md 没登记 {section} 的 sha256"

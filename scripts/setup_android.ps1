@@ -1,5 +1,5 @@
 param(
-    [string]$ToolsRoot = "$env:LOCALAPPDATA/dsh-pet-android",
+    [string]$ToolsRoot = "$env:LOCALAPPDATA/petwisp-android",
     [switch]$WithEmulator
 )
 $ErrorActionPreference = 'Stop'

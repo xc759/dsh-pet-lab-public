@@ -29,9 +29,9 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 import pytest
 from PySide6.QtWidgets import QApplication
 
-import pet.app as app_mod
-from pet import harness_launcher as hl
-from pet.config import Config
+import petwisp.app as app_mod
+from petwisp import harness_launcher as hl
+from petwisp.config import Config
 
 # 本机实测的命令形态：``which("dsh")`` 解析到 npm 的 .cmd shim，``_wrap_cmd`` 把它
 # 包成 ``cmd.exe /c <...>\dsh.CMD web``——直接子进程的镜像是 cmd.exe，真正持有
@@ -219,8 +219,8 @@ def test_autostart_still_gated_by_master_toggles(tmp_path, spawn_probe):
     （harness 与 AI 对话无关，模块显隐归功能投影）。冻结快照判负后必须复位，
     否则线程级拉起会漏进后续用例的 probe（实测）。
     """
-    from pet import feature_activation as fa
-    from pet.features import MIGRATION_BASELINE
+    from petwisp import feature_activation as fa
+    from petwisp.features import MIGRATION_BASELINE
 
     try:
         fa.freeze_snapshot_for_tests(

@@ -20,8 +20,8 @@ import pytest
 
 pytest.importorskip("PySide6")
 
-from pet import feature_activation as fa
-from pet.features import FEATURES, MIGRATION_BASELINE
+from petwisp import feature_activation as fa
+from petwisp.features import FEATURES, MIGRATION_BASELINE
 
 
 @pytest.fixture(autouse=True)
@@ -58,7 +58,7 @@ class _FakePet:
 
 
 def test_projection_hides_inactive_module_actions():
-    from pet.context_menus.registry import MENU_ACTIONS
+    from petwisp.context_menus.registry import MENU_ACTIONS
 
     _freeze_all_but("weather")
     ids = MENU_ACTIONS.available_ids(_FakePet())
@@ -69,7 +69,7 @@ def test_projection_hides_inactive_module_actions():
 
 
 def test_projection_hides_feature_when_hard_dependency_missing():
-    from pet.context_menus.registry import MENU_ACTIONS
+    from petwisp.context_menus.registry import MENU_ACTIONS
 
     # 只开 file_interpret 不开 chat：file_interpret 被依赖求解 blocked
     fa.freeze_snapshot_for_tests(["file_interpret"])
@@ -81,7 +81,7 @@ def test_projection_hides_feature_when_hard_dependency_missing():
 
 
 def test_unfrozen_snapshot_shows_everything():
-    from pet.context_menus.registry import MENU_ACTIONS
+    from petwisp.context_menus.registry import MENU_ACTIONS
 
     ids = MENU_ACTIONS.available_ids(_FakePet())
     assert {"weather", "weather_cities", "divination_draw", "chat"} <= ids
@@ -89,8 +89,8 @@ def test_unfrozen_snapshot_shows_everything():
 
 def test_menu_build_drops_empty_submenu_and_never_writes_layout_back(tmp_path):
     """布局解析（纯函数半）：不可用动作剔除后空子菜单丢弃、分隔线规整、输入不动。"""
-    from pet.context_menus.registry import MENU_ACTIONS
-    from pet.menu_layout import resolve_menu_layout
+    from petwisp.context_menus.registry import MENU_ACTIONS
+    from petwisp.menu_layout import resolve_menu_layout
 
     layout = {
         "schema_version": 1,
@@ -130,8 +130,8 @@ def test_menu_build_drops_empty_submenu_and_never_writes_layout_back(tmp_path):
 # ---------------------------------------------------------------- 设置层
 @pytest.fixture
 def dialog(tmp_path, monkeypatch):
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = _qapp()
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -142,7 +142,7 @@ def dialog(tmp_path, monkeypatch):
 
 
 def _interaction_tab_labels(dialog):
-    from pet.settings_widgets import SettingsTabContainer
+    from petwisp.settings_widgets import SettingsTabContainer
 
     page = next(
         dialog.pages.widget(i)
@@ -155,7 +155,7 @@ def _interaction_tab_labels(dialog):
 
 def test_weather_and_divination_tabs_absent_when_inactive(dialog):
     _freeze_all_but("weather", "divination")
-    import pet.settings_interaction as si
+    import petwisp.settings_interaction as si
 
     tabs = si.build_interaction_domain(dialog)
     labels = tabs.labels()
@@ -165,7 +165,7 @@ def test_weather_and_divination_tabs_absent_when_inactive(dialog):
 
 
 def test_weather_and_divination_tabs_present_by_default(dialog):
-    import pet.settings_interaction as si
+    import petwisp.settings_interaction as si
 
     tabs = si.build_interaction_domain(dialog)
     labels = tabs.labels()
@@ -174,8 +174,8 @@ def test_weather_and_divination_tabs_present_by_default(dialog):
 
 def test_inactive_module_settings_are_not_written_back(tmp_path, monkeypatch):
     """未激活模块：_write_config 不执行其 save（控件未构造，写了就是回默认值）。"""
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = _qapp()
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -201,7 +201,7 @@ def test_inactive_module_settings_are_not_written_back(tmp_path, monkeypatch):
 # ---------------------------------------------------------------- 执行层
 def test_show_weather_inactive_creates_no_service(monkeypatch):
     """绕过菜单直达回调：未激活时不建 WeatherService、不起网络线程。"""
-    import pet.app as app_mod
+    import petwisp.app as app_mod
 
     _freeze_all_but("weather")
     shell = object.__new__(app_mod.AppShell)
@@ -212,7 +212,7 @@ def test_show_weather_inactive_creates_no_service(monkeypatch):
 
 
 def test_show_weather_active_lazy_creates_service(monkeypatch):
-    import pet.app as app_mod
+    import petwisp.app as app_mod
 
     fa.freeze_snapshot_for_tests(["weather"])
     created = []
@@ -224,7 +224,7 @@ def test_show_weather_active_lazy_creates_service(monkeypatch):
         def show_weather(self, _parent):
             pass
 
-    import pet.weather.service as ws
+    import petwisp.weather.service as ws
 
     monkeypatch.setattr(ws, "WeatherService", _Svc)
     shell = object.__new__(app_mod.AppShell)
@@ -235,7 +235,7 @@ def test_show_weather_active_lazy_creates_service(monkeypatch):
 
 # ------------------------------------- 执行层：divination / todo / festival（第二批）
 class _Cfg:
-    """只读配置替身：门控判据只经 ``get`` 读扁平键（与 pet.config.Config 同口径）。"""
+    """只读配置替身：门控判据只经 ``get`` 读扁平键（与 petwisp.config.Config 同口径）。"""
 
     def __init__(self, **values):
         self._values = values
@@ -246,7 +246,7 @@ class _Cfg:
 
 def _shell(**attrs):
     """不构造真壳：只放被测方法要读的字段（``test_show_weather_*`` 同手法）。"""
-    import pet.app as app_mod
+    import petwisp.app as app_mod
 
     shell = object.__new__(app_mod.AppShell)
     for key, value in attrs.items():
@@ -256,7 +256,7 @@ def _shell(**attrs):
 
 def test_divination_sync_inactive_creates_no_service(monkeypatch):
     """未激活：即使 ``divination_enabled`` 开着也不建服务（不装跨天定时器、不预合成）。"""
-    import pet.divination.service as ds_mod
+    import petwisp.divination.service as ds_mod
 
     created = []
 
@@ -293,7 +293,7 @@ def test_divination_sync_inactive_stops_service_with_generation_guard():
 
 def test_divination_draw_inactive_returns_before_lazy_create(monkeypatch):
     """菜单落点兜底：本方法会懒创建服务 + apply_config，闸必须在其之前。"""
-    import pet.divination.service as ds_mod
+    import petwisp.divination.service as ds_mod
 
     created = []
     bubbles = []
@@ -318,7 +318,7 @@ def test_divination_draw_inactive_returns_before_lazy_create(monkeypatch):
 
 
 def test_divination_draw_active_lazy_creates_service(monkeypatch):
-    import pet.divination.service as ds_mod
+    import petwisp.divination.service as ds_mod
 
     calls = []
 
@@ -343,7 +343,7 @@ def test_divination_draw_active_lazy_creates_service(monkeypatch):
 
 
 def test_todo_sync_inactive_creates_no_service(monkeypatch):
-    import pet.app as app_mod
+    import petwisp.app as app_mod
 
     created = []
 
@@ -377,7 +377,7 @@ def test_todo_sync_inactive_stops_service_and_frees_it():
 
 def test_open_todo_panel_inactive_refuses_before_lazy_create(monkeypatch):
     """面板打开即懒创建服务（「总开关关着也要服务对象」）：模块闸必须在它之前。"""
-    import pet.app as app_mod
+    import petwisp.app as app_mod
 
     created = []
 
@@ -395,7 +395,7 @@ def test_open_todo_panel_inactive_refuses_before_lazy_create(monkeypatch):
 
 
 def test_todo_sync_active_lazy_creates_and_starts_service(monkeypatch):
-    import pet.app as app_mod
+    import petwisp.app as app_mod
 
     events = []
 
@@ -422,7 +422,7 @@ def test_todo_sync_active_lazy_creates_and_starts_service(monkeypatch):
 
 def _install_festival_fake(monkeypatch, events, *, running=False):
     """把 ``FestivalReminderService`` 换成记录器（模块内惰性 import，故打模块属性）。"""
-    import pet.festival.service as fs_mod
+    import petwisp.festival.service as fs_mod
 
     class _Svc:
         def __init__(self, _app):
@@ -518,8 +518,8 @@ def test_inactive_modules_do_not_keep_the_shared_chime_channel_alive():
 
 # ---------------------------------------------------------------- 期 2b：todo/festival 设置层 + 设置进程
 def _build_dialog(tmp_path, monkeypatch):
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = _qapp()
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -531,7 +531,7 @@ def test_todo_group_unmounted_when_inactive(tmp_path, monkeypatch):
     _freeze_all_but("todo")
     app, dlg = _build_dialog(tmp_path, monkeypatch)
     try:
-        from pet.modern_settings_dialog import SettingRow
+        from petwisp.modern_settings_dialog import SettingRow
 
         row = dlg.findChild(SettingRow, "settingRow_todo_reminder_enabled")
         assert row is not None  # 控件保留（重新激活原样回来）
@@ -556,7 +556,7 @@ def test_todo_group_unmounted_when_inactive(tmp_path, monkeypatch):
 def test_todo_group_mounted_by_default(tmp_path, monkeypatch):
     app, dlg = _build_dialog(tmp_path, monkeypatch)
     try:
-        from pet.modern_settings_dialog import SettingRow
+        from petwisp.modern_settings_dialog import SettingRow
 
         row = dlg.findChild(SettingRow, "settingRow_todo_reminder_enabled")
         pages = [dlg.pages.widget(i) for i in range(dlg.pages.count())]
@@ -590,7 +590,7 @@ def test_freeze_for_settings_process_reads_global_config(tmp_path):
     """设置进程：按主 config.json 的待生效集合冻结（slot 实例配置也读主文件）。"""
     import json
 
-    from pet.config import Config
+    from petwisp.config import Config
 
     main_cfg = Config(tmp_path)
     assert fa.write_enabled(main_cfg, ["weather", "chat"])
@@ -618,7 +618,7 @@ def test_freeze_for_settings_process_reads_global_config(tmp_path):
 # ---------------------------------------------------------------- 期 3a：voice 模块
 def _voice_shell(config):
     """裸 AppShell（不构造）：方法解析走类，属性只有 config。"""
-    import pet.app as app_mod
+    import petwisp.app as app_mod
 
     shell = object.__new__(app_mod.AppShell)
     shell.config = config
@@ -626,8 +626,8 @@ def _voice_shell(config):
 
 
 def test_chime_wanted_off_when_voice_inactive(tmp_path):
-    import pet.app as app_mod
-    from pet.config import Config
+    import petwisp.app as app_mod
+    from petwisp.config import Config
 
     cfg = Config(tmp_path)
     cfg.set("voice_chime_enabled", True)
@@ -639,8 +639,8 @@ def test_chime_wanted_off_when_voice_inactive(tmp_path):
 
 
 def test_ensure_audio_channel_returns_none_when_voice_inactive(tmp_path):
-    import pet.app as app_mod
-    from pet.config import Config
+    import petwisp.app as app_mod
+    from petwisp.config import Config
 
     _freeze_all_but("voice")
     shell = _voice_shell(Config(tmp_path))
@@ -648,8 +648,8 @@ def test_ensure_audio_channel_returns_none_when_voice_inactive(tmp_path):
 
 
 def test_self_talk_speak_wanted_off_when_voice_inactive(tmp_path, monkeypatch):
-    import pet.app as app_mod
-    from pet.config import Config
+    import petwisp.app as app_mod
+    from petwisp.config import Config
 
     class _Cfg:
         def get(self, key, default=None):
@@ -665,9 +665,9 @@ def test_self_talk_speak_wanted_off_when_voice_inactive(tmp_path, monkeypatch):
 
 
 def test_precache_not_started_when_voice_inactive(tmp_path, monkeypatch):
-    import pet.app as app_mod
-    from pet.config import Config
-    from pet.voice import self_talk
+    import petwisp.app as app_mod
+    from petwisp.config import Config
+    from petwisp.voice import self_talk
 
     monkeypatch.setattr(self_talk, "enabled", lambda _cfg: True)
     started = []
@@ -689,7 +689,7 @@ def test_voice_settings_pages_absent_when_inactive(tmp_path, monkeypatch):
         labels = [dlg.sidebar.item(i).text() for i in range(dlg.sidebar.count())]
         assert "语音" not in labels
         # 朗读两行不出现，核心行在
-        from pet.modern_settings_dialog import SettingRow
+        from petwisp.modern_settings_dialog import SettingRow
 
         assert dlg.findChild(SettingRow, "settingRow_click_self_talk") is not None
         pages = [dlg.pages.widget(i) for i in range(dlg.pages.count())]
@@ -770,7 +770,7 @@ def _default_template():
     from pathlib import Path
 
     return json.loads(
-        (Path(__file__).resolve().parent.parent / "pet/menu_templates/modern-default-v1.json")
+        (Path(__file__).resolve().parent.parent / "petwisp/menu_templates/modern-default-v1.json")
         .read_text(encoding="utf-8")
     )
 
@@ -781,8 +781,8 @@ def test_music_menu_action_ids_match_registry_and_template():
     菜单投影按 ``feature_for_action`` 反查模块，三者一旦漂移就会出现「模块停了
     但某条动作还在菜单里」——这条用例就是那份数据的对账（本次核对结果：对得上）。
     """
-    from pet.context_menus.registry import MENU_ACTIONS
-    from pet.features import feature_for_action
+    from petwisp.context_menus.registry import MENU_ACTIONS
+    from petwisp.features import feature_for_action
 
     assert set(FEATURES["music"].menu_action_ids) == set(_MUSIC_ACTIONS)
     for action_id in _MUSIC_ACTIONS:
@@ -795,7 +795,7 @@ def test_music_menu_action_ids_match_registry_and_template():
 
 
 def test_projection_hides_music_menu_when_inactive():
-    from pet.context_menus.registry import MENU_ACTIONS
+    from petwisp.context_menus.registry import MENU_ACTIONS
 
     pet = _MusicPet()
     assert set(_MUSIC_ACTIONS) <= MENU_ACTIONS.available_ids(pet)  # 未冻结：全在
@@ -807,8 +807,8 @@ def test_projection_hides_music_menu_when_inactive():
 
 def test_default_layout_drops_music_submenu_when_inactive():
     """布局解析：九条动作被投影剔除后「音乐」子菜单整体消失（不写回布局）。"""
-    from pet.context_menus.registry import MENU_ACTIONS
-    from pet.menu_layout import resolve_menu_layout
+    from petwisp.context_menus.registry import MENU_ACTIONS
+    from petwisp.menu_layout import resolve_menu_layout
 
     template = _default_template()
     _freeze_all_but("music")
@@ -836,7 +836,7 @@ def test_music_sing_polling_not_started_when_inactive():
     from PySide6.QtCore import QTimer
     from PySide6.QtWidgets import QWidget
 
-    from pet import window_alerts
+    from petwisp import window_alerts
 
     _qapp()
 
@@ -873,8 +873,8 @@ def test_music_sing_polling_not_started_when_inactive():
 
 def test_check_music_sing_skips_audio_probe_when_inactive(monkeypatch):
     """停用后不再每秒调 pycaw COM（也不拉 SMTC 探针线程）。"""
-    from pet import window_alerts
-    from pet.music import detect as music_detect
+    from petwisp import window_alerts
+    from petwisp.music import detect as music_detect
 
     _qapp()
     calls = []
@@ -907,7 +907,7 @@ def test_overlay_music_sing_timer_not_started_when_inactive():
     """overlay 拓扑：构造期不直接起表（它绕过了 start_music_sing_polling）。"""
     from PySide6.QtWidgets import QWidget
 
-    from pet.overlay_shell import OverlayShell
+    from petwisp.overlay_shell import OverlayShell
 
     _qapp()
 
@@ -940,9 +940,9 @@ def test_lyric_controller_not_installed_when_inactive(monkeypatch):
     """两条链（legacy mixin / overlay 壳）都不构造歌词控制器。"""
     from PySide6.QtWidgets import QWidget
 
-    from pet.music import lyric_controller as mlc_mod
-    from pet.overlay_shell import OverlayShell
-    from pet.window_optional_services import WindowFeatureGateMixin
+    from petwisp.music import lyric_controller as mlc_mod
+    from petwisp.overlay_shell import OverlayShell
+    from petwisp.window_optional_services import WindowFeatureGateMixin
 
     _qapp()
     created = []
@@ -974,8 +974,8 @@ def test_lyric_controller_shutdown_and_dropped_when_inactive():
     """模块停用时已建的控制器走既有 shutdown 收口并置 None。"""
     from PySide6.QtWidgets import QWidget
 
-    from pet.overlay_shell import OverlayShell
-    from pet.window_optional_services import WindowFeatureGateMixin
+    from petwisp.overlay_shell import OverlayShell
+    from petwisp.window_optional_services import WindowFeatureGateMixin
 
     _qapp()
 
@@ -1016,7 +1016,7 @@ def test_lyric_controller_shutdown_and_dropped_when_inactive():
 
 def test_music_player_warm_not_scheduled_when_inactive(monkeypatch):
     """启动期的播放器路径浅扫（app.py 的延迟预热）不登记。"""
-    import pet.app as app_mod
+    import petwisp.app as app_mod
 
     scheduled = []
 
@@ -1038,8 +1038,8 @@ def test_music_menu_callbacks_early_return_when_inactive(monkeypatch):
     """绕过菜单直达回调：不装控制器、不起线程、不读路径缓存。"""
     from PySide6.QtWidgets import QMenu
 
-    from pet.music import players as music_players
-    from pet.context_menus import shared as shared_mod
+    from petwisp.music import players as music_players
+    from petwisp.context_menus import shared as shared_mod
 
     _qapp()
     threads = []
@@ -1112,7 +1112,7 @@ def test_music_menu_callbacks_early_return_when_inactive(monkeypatch):
 
 def test_music_player_detect_no_scan_when_inactive():
     """设置页「自动检测」：停用后不清缓存、不起扫描、不起轮询表。"""
-    from pet.music import settings as settings_music
+    from petwisp.music import settings as settings_music
 
     calls = []
 
@@ -1129,7 +1129,7 @@ def test_music_player_detect_no_scan_when_inactive():
 
 
 def _row_mounted(dlg, key: str) -> bool:
-    from pet.modern_settings_dialog import SettingRow
+    from petwisp.modern_settings_dialog import SettingRow
 
     row = dlg.findChild(SettingRow, f"settingRow_{key}")
     if row is None:
@@ -1205,8 +1205,8 @@ def test_music_settings_not_written_back_when_inactive(tmp_path, monkeypatch):
 # ---------------------------------------------------------------- 期 4a：chat 单源复合 + harness 解耦
 def test_chat_module_off_disables_enable_chat(tmp_path):
     """AppShell 构造：enable_chat = 构建能力 ∧ chat 模块激活（单源复合）。"""
-    import pet.app as app_mod
-    from pet.config import Config
+    import petwisp.app as app_mod
+    from petwisp.config import Config
 
     app = _qapp()
     _freeze_all_but("chat")
@@ -1222,7 +1222,7 @@ def test_chat_module_off_disables_enable_chat(tmp_path):
 
 def test_harness_action_available_without_chat_callback():
     """harness 解耦：chat 运行回调缺席（模块关）时仍可用；构建变体缺失才隐藏。"""
-    from pet.context_menus.registry import MENU_ACTIONS
+    from petwisp.context_menus.registry import MENU_ACTIONS
 
     class _NoChatPet(_FakePet):
         on_open_chat = None
@@ -1238,8 +1238,8 @@ def test_harness_action_available_without_chat_callback():
 
 
 def test_harness_autostart_follows_system_tools_not_chat(tmp_path, monkeypatch):
-    import pet.app as app_mod
-    from pet.config import Config
+    import petwisp.app as app_mod
+    from petwisp.config import Config
 
     cfg = Config(tmp_path)
     cfg.set("harness_autostart", True)
@@ -1289,8 +1289,8 @@ def test_file_interpret_domain_present_by_default(tmp_path, monkeypatch):
 
 def test_file_interpret_config_survives_inactive_save(tmp_path, monkeypatch):
     """未挂出不代表写回默认值：域整域消失时原配置一个字节都不改。"""
-    import pet.modern_settings_dialog as settings_mod
-    from pet.config import Config
+    import petwisp.modern_settings_dialog as settings_mod
+    from petwisp.config import Config
 
     app = _qapp()
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
@@ -1311,7 +1311,7 @@ def test_file_interpret_config_survives_inactive_save(tmp_path, monkeypatch):
 
 def _install_file_interpret_fake(monkeypatch):
     """把 ``FileInterpretController`` 换成记录器（模块内惰性 import，打模块属性）。"""
-    import pet.file_interpret as fi_mod
+    import petwisp.file_interpret as fi_mod
 
     created = []
 
@@ -1330,7 +1330,7 @@ def _file_interpret_host():
     """只借 ``WindowFeatureGateMixin`` 的真装配方法（legacy 窗侧接入面）。"""
     from PySide6.QtWidgets import QWidget
 
-    from pet.window_optional_services import WindowFeatureGateMixin
+    from petwisp.window_optional_services import WindowFeatureGateMixin
 
     class _Host(QWidget, WindowFeatureGateMixin):
         cfg = _cfg_obj()
@@ -1340,7 +1340,7 @@ def _file_interpret_host():
 
 def test_file_interpret_wiring_skipped_when_inactive(monkeypatch):
     """拖拽链入口闸：控制器不构造、投喂接缝保持 None（吃动画与统计照旧）。"""
-    from pet.window_optional_services import WindowFeatureGateMixin
+    from petwisp.window_optional_services import WindowFeatureGateMixin
 
     _qapp()
     created = _install_file_interpret_fake(monkeypatch)
@@ -1358,7 +1358,7 @@ def test_file_interpret_wiring_skipped_when_inactive(monkeypatch):
 
 def test_file_interpret_wiring_skipped_when_chat_missing(monkeypatch):
     """硬依赖 chat 未满足（只勾 file_interpret）：同「未激活」口径，不接线。"""
-    from pet.window_optional_services import WindowFeatureGateMixin
+    from petwisp.window_optional_services import WindowFeatureGateMixin
 
     _qapp()
     created = _install_file_interpret_fake(monkeypatch)
@@ -1374,7 +1374,7 @@ def test_file_interpret_wiring_skipped_when_chat_missing(monkeypatch):
 
 
 def test_file_interpret_wiring_installed_by_default(monkeypatch):
-    from pet.window_optional_services import WindowFeatureGateMixin
+    from petwisp.window_optional_services import WindowFeatureGateMixin
 
     _qapp()
     created = _install_file_interpret_fake(monkeypatch)
@@ -1424,7 +1424,7 @@ class _FakeHotkeyService:
 
 
 def _hotkey_shell(config, service):
-    import pet.app as app_mod
+    import petwisp.app as app_mod
 
     shell = object.__new__(app_mod.AppShell)
     shell.config = config
@@ -1434,7 +1434,7 @@ def _hotkey_shell(config, service):
 
 def test_vision_hotkeys_not_registered_when_inactive():
     """注册侧：两个截图热键既不进绑定表也不进回调表（全量重设顺带注销旧绑定）。"""
-    import pet.app as app_mod
+    import petwisp.app as app_mod
 
     service = _FakeHotkeyService()
     shell = _hotkey_shell(_cfg_obj(
@@ -1459,7 +1459,7 @@ def test_vision_hotkeys_not_registered_when_inactive():
 
 def test_vision_hotkey_callbacks_do_nothing_when_inactive():
     """回调落点侧：残留绑定/直连回调绕不过模块闸。"""
-    import pet.app as app_mod
+    import petwisp.app as app_mod
 
     class _Overlay:
         def __init__(self):
@@ -1488,8 +1488,8 @@ def test_vision_hotkey_callbacks_do_nothing_when_inactive():
 
 def test_look_screen_hosts_return_before_any_work_when_inactive():
     """两个宿主的「看看屏幕」：模块停用后不冒泡、不起线程、不查 sprite。"""
-    from pet.overlay_shell import OverlayShell
-    from pet.window import PetWindow
+    from petwisp.overlay_shell import OverlayShell
+    from petwisp.window import PetWindow
 
     bubbles = []
 
@@ -1519,8 +1519,8 @@ def test_look_screen_hosts_return_before_any_work_when_inactive():
 
 def test_screen_capture_entry_is_noop_when_inactive():
     """``on_screen_capture`` 两侧都是 property：闸必须在落点（可调性判据不变）。"""
-    from pet.overlay_shell import OverlayShell
-    from pet.window import PetWindow
+    from petwisp.overlay_shell import OverlayShell
+    from petwisp.window import PetWindow
 
     calls = []
 
@@ -1559,7 +1559,7 @@ def test_vision_group_unmounted_when_inactive(tmp_path, monkeypatch):
     _freeze_all_but("vision")  # chat 仍激活：AI 域在，只有视觉组收起
     app, dlg = _build_dialog(tmp_path, monkeypatch)
     try:
-        from pet.modern_settings_dialog import SettingRow
+        from petwisp.modern_settings_dialog import SettingRow
 
         for key in ("vision_same", "vision_model", "vision_url", "vision_key"):
             assert dlg.findChild(SettingRow, f"settingRow_{key}") is not None, key
@@ -1589,7 +1589,7 @@ def _install_shared_fakes(monkeypatch, events):
     """共享子系统的三个真组件换成记录器（只钉「构造与否」，不碰真探测）。"""
     from PySide6.QtCore import QObject
 
-    import pet.multi_window_shared as mws
+    import petwisp.multi_window_shared as mws
 
     class _Proactive:
         def __init__(self, _proxy, _config, identity_provider=None):
@@ -1656,7 +1656,7 @@ def _shared_shell_stub():
 def test_shared_subsystems_skips_proactive_construction_when_inactive(monkeypatch):
     """构造前挡：停用时不建共享 watcher（它构造即 apply_config → 8s 心跳）。"""
     _qapp()
-    import pet.multi_window_shared as mws
+    import petwisp.multi_window_shared as mws
 
     events = []
     _install_shared_fakes(monkeypatch, events)
@@ -1697,7 +1697,7 @@ def test_sync_shared_optional_services_skips_missing_proactive():
 
 def test_proactive_wanted_false_and_no_lazy_watcher_when_inactive():
     """窗侧懒建口同源闸：行为开关开着也不建 watcher、不上报「想要」。"""
-    from pet.window_optional_services import WindowFeatureGateMixin
+    from petwisp.window_optional_services import WindowFeatureGateMixin
 
     class _Host:
         cfg = _cfg_obj(proactive_screen={"enabled": True})
@@ -1753,10 +1753,10 @@ def test_vision_config_survives_inactive_save(tmp_path, monkeypatch):
     未挂出的四行控件仍按构造时的配置值持有，保存的往返写回是**同值覆盖**——
     这条用例把「没有单独跳过写回」的口径钉成可验证事实，而不是靠注释承诺。
     """
-    from pet.config import Config
+    from petwisp.config import Config
 
     app = _qapp()
-    import pet.modern_settings_dialog as settings_mod
+    import petwisp.modern_settings_dialog as settings_mod
 
     monkeypatch.setattr(settings_mod.autostart_mod, "is_enabled", lambda: False)
     cfg = Config(tmp_path)
@@ -1843,7 +1843,7 @@ def _write_keys(dlg, monkeypatch) -> list[str]:
 
 
 def _domain_tab_labels(dlg, domain_label: str) -> list[str]:
-    from pet.settings_widgets import SettingsTabContainer
+    from petwisp.settings_widgets import SettingsTabContainer
 
     page = next(
         dlg.pages.widget(i)
@@ -1881,10 +1881,10 @@ def test_island_module_off_never_creates_the_island(tmp_path, monkeypatch):
     「建好再 hide()」那条路径保留岛对象、四路采样槽与 FPS 订阅（``FpsHub``
     attach 只发生在 ``DynamicIsland`` 内部），所以停用必须落在构造之前。
     """
-    import pet.app as app_mod
-    import pet.island.dynamic_island as island_mod
-    from pet.chat.service import ChatService
-    from pet.config import Config
+    import petwisp.app as app_mod
+    import petwisp.island.dynamic_island as island_mod
+    from petwisp.chat.service import ChatService
+    from petwisp.config import Config
 
     monkeypatch.setattr(island_mod, "DynamicIsland", _IslandStub)
     monkeypatch.setattr(app_mod.AppShell, "_sync_island_collision", lambda _s, _cfg: None)
@@ -1912,8 +1912,8 @@ def test_island_interactive_follows_the_module_gate(tmp_path):
     """``_island_interactive`` 是岛可用的单一口径：模块未激活恒 False。"""
     from PySide6.QtWidgets import QWidget
 
-    import pet.app as app_mod
-    from pet.config import Config
+    import petwisp.app as app_mod
+    from petwisp.config import Config
 
     app = _qapp()
     cfg = Config(tmp_path)
@@ -1937,8 +1937,8 @@ def test_island_interactive_follows_the_module_gate(tmp_path):
 def test_balance_refresh_timer_off_when_island_inactive(tmp_path):
     from PySide6.QtCore import QTimer
 
-    import pet.app as app_mod
-    from pet.config import Config
+    import petwisp.app as app_mod
+    from petwisp.config import Config
 
     cfg = Config(tmp_path)
     cfg.set("balance_refresh_minutes", 5)
@@ -1963,8 +1963,8 @@ def test_island_balance_entry_points_blocked_when_inactive(tmp_path):
     会先读 ``chat_settings()`` 再走到 ``island.set_balance_info`` 与
     ``pet-balance-quiet`` 线程。
     """
-    import pet.app as app_mod
-    from pet.config import Config
+    import petwisp.app as app_mod
+    from petwisp.config import Config
 
     cfg = Config(tmp_path)
     shell = object.__new__(app_mod.AppShell)
@@ -1980,8 +1980,8 @@ def test_island_balance_entry_points_blocked_when_inactive(tmp_path):
 
 def test_agent_link_module_off_stops_dsh_tracker_and_harness_autostart(tmp_path):
     """``_dsh_tracker_wanted`` 是 DSH 的单一口径：模块停用后连带 harness 不自启。"""
-    import pet.app as app_mod
-    from pet.config import Config
+    import petwisp.app as app_mod
+    from petwisp.config import Config
 
     cfg = Config(tmp_path)
     cfg.set("agent_link", {"dsh": True})
@@ -2006,8 +2006,8 @@ def test_shared_subsystems_skips_agent_link_construction_when_inactive(tmp_path)
     线程 / DshMonitor），所以闸必须在构造处；None 是既有语义（单窗路径历史上
     就有"没有管理器"这一态），全部消费点按 None 降级。
     """
-    import pet.app as app_mod
-    from pet.config import Config
+    import petwisp.app as app_mod
+    from petwisp.config import Config
 
     app = _qapp()
     _freeze_all_but("agent_link")
@@ -2123,8 +2123,8 @@ def test_memory_trim_blocked_when_system_tools_inactive(monkeypatch):
     """执行层：菜单投影之外的两条直达路（builder 直调 / 回调直调）都不起回收线程。"""
     from PySide6.QtWidgets import QMenu
 
-    import pet.memory_trim as memory_trim_mod
-    from pet.context_menus import shared as menu_shared
+    import petwisp.memory_trim as memory_trim_mod
+    from petwisp.context_menus import shared as menu_shared
 
     app = _qapp()
     started: list = []
@@ -2156,7 +2156,7 @@ def test_memory_trim_blocked_when_system_tools_inactive(monkeypatch):
 # ---------------------------------------------------------------- 期 4 合并收尾：余额行与隐藏对话行
 def test_balance_rows_follow_island_module(tmp_path, monkeypatch):
     """余额是灵动岛子能力：岛关时 AI 域余额组与互动域点击余额行都不挂出。"""
-    from pet.modern_settings_dialog import SettingRow
+    from petwisp.modern_settings_dialog import SettingRow
 
     _freeze_all_but("dynamic_island")
     app, dlg = _build_dialog(tmp_path, monkeypatch)
@@ -2181,7 +2181,7 @@ def test_balance_rows_follow_island_module(tmp_path, monkeypatch):
 
 def test_hidden_chat_row_follows_chat_module(tmp_path, monkeypatch):
     """岛的「隐藏时对话气泡」行：岛开 chat 关时不出现（chat 恢复即回来）。"""
-    from pet.modern_settings_dialog import SettingRow
+    from petwisp.modern_settings_dialog import SettingRow
 
     _freeze_all_but("chat")  # 岛开、chat 关
     app, dlg = _build_dialog(tmp_path, monkeypatch)
@@ -2198,8 +2198,8 @@ def test_stream_capture_row_absent_and_topology_off_when_inactive(tmp_path, monk
     """直播捕获模块关：设置行不出现、不写回；拓扑判定按未开启（配置开着也回落 overlay）。"""
     import json
 
-    from pet.modern_settings_dialog import SettingRow
-    from pet.overlay_settings_command import _read_stream_capture_mode
+    from petwisp.modern_settings_dialog import SettingRow
+    from petwisp.overlay_settings_command import _read_stream_capture_mode
 
     _freeze_all_but("stream_capture")
     app, dlg = _build_dialog(tmp_path, monkeypatch)
@@ -2228,7 +2228,7 @@ def test_stream_capture_row_present_by_default(tmp_path, monkeypatch):
     if sys.platform != "win32":
         # 控件只在 Windows 创建（settings_pet_controls.py:499 的既有平台分支）
         return
-    from pet.modern_settings_dialog import SettingRow
+    from petwisp.modern_settings_dialog import SettingRow
 
     app, dlg = _build_dialog(tmp_path, monkeypatch)
     try:
@@ -2239,7 +2239,7 @@ def test_stream_capture_row_present_by_default(tmp_path, monkeypatch):
 
 
 def test_cross_screen_row_absent_and_save_skipped_when_inactive(tmp_path, monkeypatch):
-    from pet.modern_settings_dialog import SettingRow
+    from petwisp.modern_settings_dialog import SettingRow
 
     _freeze_all_but("cross_screen")
     app, dlg = _build_dialog(tmp_path, monkeypatch)
@@ -2258,8 +2258,8 @@ def test_cross_screen_row_absent_and_save_skipped_when_inactive(tmp_path, monkey
 
 def test_cross_screen_allowed_follows_module(tmp_path):
     """overlay 活动区：配置开跨屏 + 模块停用 = 不许跨屏（与配置关闭同义）。"""
-    import pet.overlay_shell as ovs
-    from pet.config import Config
+    import petwisp.overlay_shell as ovs
+    from petwisp.config import Config
 
     cfg = Config(tmp_path)
     cfg.set("allow_cross_screen", True)
@@ -2268,7 +2268,7 @@ def test_cross_screen_allowed_follows_module(tmp_path):
         shell = ovs.OverlayShell.__new__(ovs.OverlayShell)
         shell._config = cfg
         # 只跑 __init__ 里跨屏快照那两行（真 __init__ 太重，语义一致地复刻判据）
-        from pet import feature_activation as _fa2
+        from petwisp import feature_activation as _fa2
 
         shell._cross_screen_allowed = (
             bool(shell._config.get("allow_cross_screen", False))
@@ -2285,8 +2285,8 @@ def test_cross_screen_allowed_follows_module(tmp_path):
 # ---------------------------------------------------------------- 归属守卫（可维护性合同）
 def test_every_action_and_key_has_single_owner():
     """菜单动作与配置键的归属必须唯一——同一入口归两个模块是门控漂移的开始。"""
-    from pet.context_menus.registry import MENU_ACTIONS
-    from pet.features import FEATURES
+    from petwisp.context_menus.registry import MENU_ACTIONS
+    from petwisp.features import FEATURES
 
     action_owners: dict[str, str] = {}
     for spec in FEATURES.values():
@@ -2319,8 +2319,8 @@ CORE_MENU_ACTION_IDS = frozenset({
 def test_every_menu_action_is_owned_or_pinned_core():
     """每个菜单动作要么归某个功能模块、要么在核心白名单——新功能动作漏登记
     features.py 时会静默变成永不被门控（这条守卫堵的就是这个洞）。"""
-    from pet.context_menus.registry import MENU_ACTIONS
-    from pet.features import FEATURES
+    from petwisp.context_menus.registry import MENU_ACTIONS
+    from petwisp.features import FEATURES
 
     owned = {a for spec in FEATURES.values() for a in spec.menu_action_ids}
     stray = [a for a in MENU_ACTIONS.ids if a not in owned and a not in CORE_MENU_ACTION_IDS]

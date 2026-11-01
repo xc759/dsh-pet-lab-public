@@ -11,8 +11,8 @@ from PySide6.QtCore import QPoint, QRect, Qt
 from PySide6.QtGui import QBitmap, QColor, QImage, QMoveEvent, QPainter, QPixmap, QRegion
 from PySide6.QtWidgets import QApplication, QWidget
 
-from pet import window as window_mod
-from pet import catalog
+from petwisp import window as window_mod
+from petwisp import catalog
 
 
 def _qapp() -> QApplication:
@@ -103,8 +103,8 @@ def test_input_controller_survives_init():
         pytest.skip("逐像素命中测试仅 Windows")
 
     import tempfile
-    from pet.config import Config
-    from pet.library import MovieLibrary
+    from petwisp.config import Config
+    from petwisp.library import MovieLibrary
     lib = MovieLibrary(character_id='demo')
     win = window_mod.PetWindow(lib, Config(base=Path(tempfile.mkdtemp())))
     assert win._input_controller is not None

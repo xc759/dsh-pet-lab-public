@@ -21,7 +21,7 @@ import threading
 import pytest
 from PySide6.QtWidgets import QApplication
 
-import pet.webm_clip as webm_clip_mod
+import petwisp.webm_clip as webm_clip_mod
 
 
 @pytest.fixture

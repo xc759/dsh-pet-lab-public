@@ -19,11 +19,11 @@ import tempfile
 from PySide6.QtCore import QRect
 from PySide6.QtWidgets import QApplication
 
-import pet.island.dynamic_island as island_mod
-from pet import net_monitor
-from pet.config import Config
-from pet.island.dynamic_island import DynamicIsland
-from pet.island.segments import NETWORK
+import petwisp.island.dynamic_island as island_mod
+from petwisp import net_monitor
+from petwisp.config import Config
+from petwisp.island.dynamic_island import DynamicIsland
+from petwisp.island.segments import NETWORK
 
 app = QApplication.instance() or QApplication([])
 

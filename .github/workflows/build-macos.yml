@@ -152,14 +152,14 @@ jobs:
       - name: Verify pet module collected
         run: |
           for VARIANT in webm-chat webm; do
-            APP="dsh-pet-standalone-$VARIANT"
+            APP="petwisp-$VARIANT"
             WARN="$(find build -name "warn-$APP.txt" | head -1)"
             if [ -n "$WARN" ] && grep -q "missing module named pet" "$WARN"; then
               echo "::error::$APP pet 模块未被 PyInstaller 收集"; cat "$WARN"; exit 1
             fi
             echo "$APP pet 模块已收集"
-            if ! find dist -path "*integrations/dsh-pet-bridge/package.json" | grep -q .; then
-              echo "::error::$APP 未打包 integrations/dsh-pet-bridge，DSH 桥接一键安装必然失败"; exit 1
+            if ! find dist -path "*integrations/petwisp-bridge/package.json" | grep -q .; then
+              echo "::error::$APP 未打包 integrations/petwisp-bridge，DSH 桥接一键安装必然失败"; exit 1
             fi
             echo "$APP 桥接插件资源已打包"
           done
@@ -168,13 +168,13 @@ jobs:
         run: |
           cd dist
           for VARIANT in webm-chat webm; do
-            ditto -c -k --keepParent "dsh-pet-standalone-$VARIANT.app" \
-              "dsh-pet-standalone-$VARIANT-macos-arm64.zip"
+            ditto -c -k --keepParent "petwisp-$VARIANT.app" \
+              "petwisp-$VARIANT-macos-arm64.zip"
           done
 
       - name: Verify zip preserves executable permission
         run: |
-          for ZIP in dist/dsh-pet-standalone-*-macos-arm64.zip; do
+          for ZIP in dist/petwisp-*-macos-arm64.zip; do
             rm -rf /tmp/verify && mkdir -p /tmp/verify
             cd /tmp/verify
             unzip -q "$GITHUB_WORKSPACE/$ZIP"
@@ -197,7 +197,7 @@ jobs:
         if: (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) || github.event.inputs.upload_artifacts == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: dsh-pet-standalone-macos-arm64
+          name: petwisp-macos-arm64
           path: dist/*.zip
           retention-days: 30
 

@@ -27,8 +27,8 @@ from PySide6.QtGui import (
 )
 from PySide6.QtWidgets import QApplication
 
-from pet.overlay_window import ALPHA_HIT_THRESHOLD, OverlayWindow
-from pet.pet_sprite import INTERACTION_DRAG, INTERACTION_NORMAL, PetSprite
+from petwisp.overlay_window import ALPHA_HIT_THRESHOLD, OverlayWindow
+from petwisp.pet_sprite import INTERACTION_DRAG, INTERACTION_NORMAL, PetSprite
 
 app = QApplication.instance() or QApplication([])
 
@@ -294,7 +294,7 @@ def test_press_is_candidate_and_threshold_drag_binds_drag_clip():
     基类 release 只做 grab 收尾（点击/拖拽判别在壳层），松手后控制器靠
     接管态自愈回待机——这条路径覆盖「看门狗收尾 / 壳层分支没走到」。
     """
-    from pet.sprite_behavior import STATE_DRAG, STATE_IDLE, BehaviorController
+    from petwisp.sprite_behavior import STATE_DRAG, STATE_IDLE, BehaviorController
 
     overlay = OverlayWindow()
     lib = PoolLibrary(idles=["idle"], drag="hang")
@@ -329,7 +329,7 @@ def test_press_is_candidate_and_threshold_drag_binds_drag_clip():
 
 def test_click_below_threshold_never_binds_drag_clip():
     """全程不超阈值 = 单击：sprite 不挪窝、不置拖拽态、不绑 drag clip。"""
-    from pet.sprite_behavior import STATE_DRAG, BehaviorController
+    from petwisp.sprite_behavior import STATE_DRAG, BehaviorController
 
     overlay = OverlayWindow()
     lib = PoolLibrary(idles=["idle"], drag="hang")
@@ -507,7 +507,7 @@ def test_windows_per_pixel_controller_integration():
         import pytest
 
         pytest.skip("WindowsPerPixelInputController 仅 Windows")
-    from pet.platform_win import WindowsPerPixelInputController
+    from petwisp.platform_win import WindowsPerPixelInputController
 
     overlay = OverlayWindow()
     sprite = FakeSprite((100, 100), (100, 100))
@@ -590,7 +590,7 @@ def test_overlay_render_of_frameseq_sprite_builds_no_per_frame_pixmap(
     浪费，预热线程里更是在非 GUI 线程构建 QPixmap。托盘/灵动岛图标那类消费者
     仍必须拿到非空同帧 pixmap（本用例第二段）。
     """
-    from pet import frameseq_clip
+    from petwisp import frameseq_clip
 
     built: list[str] = []
 
@@ -740,7 +740,7 @@ def test_overlay_tool_window_stays_visible_when_application_deactivates(monkeypa
     断言走**真实构造的窗口**（不是源码文本）：漏调用时
     ``testAttribute`` 为 False，红。
     """
-    import pet.platform_mac as platform_mac
+    import petwisp.platform_mac as platform_mac
 
     monkeypatch.setattr(platform_mac.sys, "platform", "darwin")
     overlay = OverlayWindow()
@@ -779,7 +779,7 @@ def test_overlay_show_event_pushes_native_hides_on_deactivate(monkeypatch):
     在非 cocoa 平台本身就是安全 no-op，所以调用点无条件调用，本用例在 offscreen
     下同样成立。
     """
-    import pet.overlay_window as overlay_mod
+    import petwisp.overlay_window as overlay_mod
 
     seen: list[int] = []
     monkeypatch.setattr(overlay_mod, "_mac_set_hides_on_deactivate",
@@ -801,6 +801,6 @@ def test_mac_set_hides_on_deactivate_is_safe_off_cocoa():
     （try/except 捕不到）。故新 helper 必须与它同口径地先判平台——本用例就是那道
     防线：一旦有人把平台判定删掉，这里会以进程崩溃而不是断言失败的形式暴露。
     """
-    from pet.platform_mac import _mac_set_hides_on_deactivate
+    from petwisp.platform_mac import _mac_set_hides_on_deactivate
 
     assert _mac_set_hides_on_deactivate(0) is False
