@@ -9,6 +9,7 @@
 | [../README.md](../README.md) | 项目定位、快速开始、转交外部助手、打包、已知限制 |
 | [BRANDING.md](BRANDING.md) | 命名与品牌：英文名/中文名方案、写法约定、改名兼容策略 |
 | [CHARACTER-PACK.md](CHARACTER-PACK.md) | 形象包规范：目录结构、manifest 字段、视频规格、一键切换、许可 |
+| [PACK_IMPORT.md](PACK_IMPORT.md) | 形象包导入器：Petdex / 通用精灵表 / 视频素材树的转换与校验 |
 | [ACCEPTANCE_TESTS.md](ACCEPTANCE_TESTS.md) | 验收测试清单与跑法 |
 
 ## 构建与发布

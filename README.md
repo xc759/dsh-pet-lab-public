@@ -66,6 +66,18 @@ assets/characters/<角色名>/
 的同人角色视频提交到这个仓库（`.gitignore` 已硬性忽略 `assets/characters/` 下除
 `placeholder/` 以外的一切内容，作为第二道防线）。自己做的、或已取得授权的形象再考虑公开。
 
+### 手上已有别人的形象？
+
+不用手改目录结构，有个导入器能把常见格式直接转成上面的形象包：
+
+```bash
+python -m petwisp.pack_import info  ./某个形象目录   # 先看看认出了什么
+python -m petwisp.pack_import build ./某个形象目录 --out ./out
+```
+
+支持 Petdex 精灵图集、任意网格的通用精灵表、以及散装 webm/gif 素材树。
+用法、格式细节与排错见 [docs/PACK_IMPORT.md](docs/PACK_IMPORT.md)。
+
 ---
 
 ## 转交外部助手（可选）
